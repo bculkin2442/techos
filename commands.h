@@ -1,3 +1,14 @@
+enum commands {
+	COM_UNKNOWN,
+	COM_EXIT   ,
+};
+
+struct command {
+	const char *name;
+
+	int (*comfun)(int, char **);
+};
+
 /*
  * Handle an attempt to exit.
  *

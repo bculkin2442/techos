@@ -11,4 +11,4 @@ void comhan();
  *
  * Determines which command should be executed.
  */
-int parsecom(char *);
+enum commands parsecom(char *);

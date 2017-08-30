@@ -28,7 +28,7 @@ void comhan() {
 	printf("TechOS>");
 
 	while((lread = getdelim(&line, &lsize, '\n', stdin)) > 0) {
-		int com;
+		enum commands com;
 
 		size_t llen = 0;
 
@@ -43,10 +43,11 @@ void comhan() {
 		com = parsecom(line);
 
 		switch(com) {
-		case 1:
+		case COM_EXIT:
 			if(handle_exit() == 1) goto cleanup;
 
 			break;
+		case COM_UNKNOWN:
 		default:
 			printf("Unknown command.\n");
 		}
@@ -59,7 +60,7 @@ cleanup: if(line != NULL)
 		free(line);
 }
 
-int parsecom(char *line) {
+enum commands parsecom(char *line) {
 	char *newline;
 
 	char *name;
@@ -72,10 +73,8 @@ int parsecom(char *line) {
 	name = strtok_r(newline, " \t", &saveptr);
 
 	if(name != NULL) {
-		if(strcmp("exit", name) == 0)
-			com = 1;
-		else
-			com = -1;
+		if(strcmp("exit", name) == 0) com = COM_EXIT;
+		else                          com = COM_UNKNOWN;
 	}
 
 	free(newline);
