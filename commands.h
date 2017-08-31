@@ -4,6 +4,16 @@ struct command {
 	int (*comfun)(int, char **, char *);
 };
 
+/*
+ * Initialize data for commands.
+ */
+void initcoms();
+
+/*
+ * Cleanup after commands.
+ */
+void disposecoms();
+
 #define DECLCOM(name) int handle_##name(int, char **, char *)
 /*
  * Handle an attempt to exit.
@@ -11,22 +21,22 @@ struct command {
  * Prompts to make sure the user wants to exit.
  */
 DECLCOM(exit);
-
 DECLCOM(version);
-
 DECLCOM(date);
+DECLCOM(datefmt);
 
 static struct command commands[] = {
 	{"exit",    &handle_exit},
 	{"version", &handle_version},
 	{"date",    &handle_date},
+	{"datefmt", &handle_datefmt},
 	{"invalid", NULL},
 };
 
 /*
  * The number of valid commands.
  */
-static const int NUM_COMMANDS = 3;
+static const int NUM_COMMANDS = 4;
 
 /*
  * The max no. of arguments a command can take.

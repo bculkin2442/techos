@@ -19,14 +19,17 @@ $(DEPDIR)/%.d: ;
 # --------------
 SRCS := techos.c commands.c
 
-CFLAGS := -std=c11 -O0 -g -Wall -Wextra -Wpedantic
+CFLAGS := -std=c11 -O0 -g -Wall -Wextra -Wpedantic -Wno-unused-variable -Wno-unused-parameter -Wno-implicit-function-declaration -Wno-unused-but-set-variable
 
 .PHONY: all clean run
 
-all: $(patsubst %.c,%.o,$(SRCS))
+all: techos
+
+
+techos: $(patsubst %.c,%.o,$(SRCS))
 	gcc -O0 -g -o techos $(patsubst %.c,%.o,$(SRCS))
 	
-run: all
+run: techos
 	./techos
 
 clean: 

@@ -5,6 +5,11 @@ static const int major_ver = 1;
 static const int minor_ver = 0;
 
 /*
+ * The stream we read input from.
+ */
+FILE *strem;
+
+/*
  * Main command handler.
  *
  * Loops reading commands and handling them until EOF or an exit command is

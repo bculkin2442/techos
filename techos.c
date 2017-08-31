@@ -16,12 +16,16 @@ FILE *strem;
  * After that's done, say goodbye.
  */
 int main() {
+	initcoms();
+
 	printf("Welcome to TechOS v%d.%d\n", major_ver, minor_ver);
 
 	strem = stdin;
 	comhan();
 
 	printf("Goodbye\n");
+
+	disposecoms();
 }
 
 /*
