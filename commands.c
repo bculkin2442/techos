@@ -148,6 +148,11 @@ HANDLECOM(datefmt) {
 	fmt = 0;
 
 	/*
+	 * Reinit getopt.
+	 */
+	optind = 1;
+
+	/*
 	 * Parse CLI args.
 	 *
 	 * -s turns on mode setting.
