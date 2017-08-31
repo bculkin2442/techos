@@ -7,12 +7,6 @@
 #include "techos.h"
 
 /*
- * The major/minor version of TechOS.
- */
-const int major_ver = 1;
-const int minor_ver = 0;
-
-/*
  * The stream we read input from.
  */
 FILE *strem;
@@ -104,6 +98,10 @@ void comhan() {
 			 * Execute the command if we have one.
 			 */
 			if(com.comfun != NULL) {
+				char *newline;
+
+				newline = strdup(line);
+
 				/*
 				 * Execute the command.
 				 *
@@ -112,8 +110,9 @@ void comhan() {
 				 * - positive for non-fatal errors
 				 * - negative for fatal errors.
 				 */
-				comres = execcom(com, saveptr);
+				comres = execcom(com, saveptr, newline);
 
+				free(newline);
 				/*
 				 * Exit the loop if something failed.
 				 */
@@ -167,7 +166,7 @@ struct command parsecom(char *name) {
 /*
  * Execute a command, plus any arguments it has.
  */
-int execcom(struct command com, char *argmarker) {
+int execcom(struct command com, char *argmarker, char *argline) {
 	/*
 	 * Arg. array for commands.
 	 */
@@ -187,6 +186,9 @@ int execcom(struct command com, char *argmarker) {
 	argv[0] = com.name;
 	argc    = 1;
 
+	/*
+	 * Gather space-seperated args into an array.
+	 */
 	for(i = 1; i < MAX_ARG_COUNT; i++) {
 		char *tok;
 
@@ -198,7 +200,10 @@ int execcom(struct command com, char *argmarker) {
 		argc   += 1;
 	}
 
-	comret = com.comfun(argc, argv);
+	/*
+	 * Execute the command.
+	 */
+	comret = com.comfun(argc, argv, argline);
 
 	return comret;
 }
