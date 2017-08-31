@@ -2,3 +2,4 @@
 techos
 *.o
 ccglue.*
+*.swp
