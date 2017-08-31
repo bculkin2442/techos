@@ -7,11 +7,6 @@
 #include "techos.h"
 
 /*
- * The stream we read input from.
- */
-FILE *strem;
-
-/*
  * Main function. Print out a greeting, then enter the command loop.
  * After that's done, say goodbye.
  */
@@ -125,7 +120,7 @@ void comhan() {
 				/*
 				 * No such command exists.
 				 */
-				printf("! NSC '%s'\n", name);
+				printf("ERROR: No such command named '%s'\n", name);
 			}
 		}
 

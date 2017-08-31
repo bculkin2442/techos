@@ -64,7 +64,7 @@ HANDLECOM(exit) {
 			ret = 0;
 			break;
 		default:
-			printf("? UNA '%c'\n", ch);
+			printf("Unknown answer '%c'\n", ch);
 		}
 	}
 
@@ -108,11 +108,11 @@ HANDLECOM(date) {
 	 */
 	size_t timesize;
 
+	/*
+	 * Get the time and stringize it in the proper format.
+	 */
 	clocktime = time(NULL);
-
 	datetime = localtime(&clocktime);
-
-	/* "%a, %d %b %Y %T %z" */
 	timesize  = strftime(outtime, 255, out_datefmt, datetime);
 
 	printf("%s\n", outtime);
@@ -173,6 +173,9 @@ HANDLECOM(datefmt) {
 	}
 
 	if(set == 0) {
+		/*
+		 * Display the format.
+		 */
 		if(fmt == 0) {
 			printf("%s\n", in_datefmt);
 		} else {
@@ -236,6 +239,14 @@ HANDLECOM(setdate) {
 	struct tm *datetime;
 	char      *leftovers;
 
+	/*
+	 * The official time.
+	 */
+	time_t *clocktime;
+
+	/*
+	 * Get the current time.
+	 */
 	datetime = localtime(time(NULL));
 
 	/*
@@ -245,7 +256,7 @@ HANDLECOM(setdate) {
 	lread = getline(&line, &lsize, strem);
 
 	if(lread > 1) {
-		printf("! IOE\n");
+		printf("ERROR: No input provided.\n");
 		return 1;
 	}
 
@@ -262,6 +273,10 @@ HANDLECOM(setdate) {
 		printf("\tERROR: Input doesn't match format '%s'", in_datefmt);
 		return 1;
 	}
+
+	clocktime = mktime(datetime);
+
+	stime(clocktime);
 
 	free(line);
 
