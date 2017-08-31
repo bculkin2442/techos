@@ -267,17 +267,24 @@ HANDLECOM(setdate) {
 	if(line[llen-1] == '\n')
 		line[llen-1] = '\0';
 
+	/*
+	 * Parse the input according to the format.
+	 */
 	leftovers = strptime(line, in_datefmt, datetime);
-
 	if(leftovers == NULL) {
 		printf("\tERROR: Input doesn't match format '%s'", in_datefmt);
 		return 1;
 	}
 
+	/*
+	 * Sanitize/set the time.
+	 */
 	clocktime = mktime(datetime);
-
 	stime(clocktime);
 
+	/*
+	 * Cleanup.
+	 */
 	free(line);
 
 	return 0;
