@@ -9,6 +9,13 @@ void comhan();
 /*
  * Command parser.
  *
- * Determines which command should be executed.
+ * Determines which command should be executed based off of a name.
  */
-enum commands parsecom(char *);
+struct command parsecom(char *);
+
+/*
+ * Command executor.
+ *
+ * Gathers the CLI args for a command, and then executes it.
+ */
+int execcom(struct command, char *);

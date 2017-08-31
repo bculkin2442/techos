@@ -1,8 +1,3 @@
-enum commands {
-	COM_UNKNOWN,
-	COM_EXIT   ,
-};
-
 struct command {
 	const char *name;
 
@@ -16,4 +11,21 @@ struct command {
  *
  * Returns 1 for a confirmed exit, 0 to continue running commands.
  */
-int handle_exit();
+int handle_exit(int, char **);
+
+static struct command commands[] = {
+	{"exit", &handle_exit},
+	{"invalid", NULL},
+};
+
+/*
+ * The number of valid commands.
+ */
+static const int NUM_COMMANDS = 1;
+
+/*
+ * The max no. of arguments a command can take.
+ *
+ * Remember the first arg. of a command is its name.
+ */
+static const int MAX_ARG_COUNT = 256;

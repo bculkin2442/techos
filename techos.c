@@ -6,78 +6,199 @@
 #include "commands.h"
 #include "techos.h"
 
+/*
+ * The major/minor version of TechOS.
+ */
 const int major_ver = 1;
 const int minor_ver = 0;
 
+/*
+ * The stream we read input from.
+ */
+FILE *strem;
+
+/*
+ * Main function. Print out a greeting, then enter the command loop.
+ * After that's done, say goodbye.
+ */
 int main() {
 	printf("Welcome to TechOS v%d.%d\n", major_ver, minor_ver);
 
+	strem = stdin;
 	comhan();
 
 	printf("Goodbye\n");
 }
 
+/*
+ * Command loop. Read & execute commands from the user.
+ */
 void comhan() {
+	/* 
+	 * The number of commands executed so far. 
+	 */
 	int lno = 0;
 
+	/*
+	 * Variables for line input.
+	 */
 	size_t lread = 0;
 	size_t lsize = 0;
-	
 	char *line = NULL;
 
-	printf("TechOS>");
+	/*
+	 * Initial prompt.
+	 */
+	printf("TechOS(%d)>", lno);
 
-	while((lread = getdelim(&line, &lsize, '\n', stdin)) > 0) {
-		enum commands com;
+	/*
+	 * Loop until we don't read anything.
+	 */
+	while((lread = getline(&line, &lsize, strem)) > 0) {
+		/*
+		 * Actual length of read string.
+		 */
+		size_t llen;
 
-		size_t llen = 0;
+		/*
+		 * Variables for parsing the command name/arguments.
+		 */
+		char *name;
+		char *saveptr;
 
-		if(feof(stdin) != 0) goto cleanup;
+		/*
+		 * The return status of the command.
+		 */
+		int comres;
+
+		/*
+		 * Exit the command loop if we've read EOF.
+		 */
+		if(feof(strem) != 0) goto cleanup;
 
 		lno += 1;
 
+		/*
+		 * Remove the trailing newline from the command.
+		 */
 		llen = strlen(line);
 		if(line[llen-1] == '\n')
 			line[llen-1] = '\0';
 
-		com = parsecom(line);
+		/*
+		 * Get the name from the command.
+		 */
+		name = strtok_r(line, " \t", &saveptr);
+		if(name != NULL) {
+			/*
+			 * The command to execute.
+			 */
+			struct command com;
 
-		switch(com) {
-		case COM_EXIT:
-			if(handle_exit() == 1) goto cleanup;
+			/*
+			 * Determine the command to execute from the name.
+			 */
+			com = parsecom(name);
 
-			break;
-		case COM_UNKNOWN:
-		default:
-			printf("Unknown command.\n");
+			/*
+			 * Execute the command if we have one.
+			 */
+			if(com.comfun != NULL) {
+				/*
+				 * Execute the command.
+				 *
+				 * The status should be 
+				 * - zero for executing succesfully
+				 * - positive for non-fatal errors
+				 * - negative for fatal errors.
+				 */
+				comres = execcom(com, saveptr);
+
+				/*
+				 * Exit the loop if something failed.
+				 */
+				if(comres < 0) goto cleanup;
+			} else {
+				/*
+				 * No such command exists.
+				 */
+				printf("! NSC '%s'\n", name);
+			}
 		}
 
-		printf("Read line '%s'\n", line);
-		printf("TechOS>");
+		/*
+		 * Reprompt.
+		 */
+		printf("TechOS(%d)>", lno);
 	}
 
+	/*
+	 * Cleanup after ourselves.
+	 */
 cleanup: if(line != NULL)
 		free(line);
 }
 
-enum commands parsecom(char *line) {
-	char *newline;
+/*
+ * Get a command from its name.
+ */
+struct command parsecom(char *name) {
+	int i;
 
-	char *name;
-	char *saveptr;
+	/*
+	 * Go through all the commands.
+	 *
+	 * If one matches, return it.
+	 */
+	for(i = 0; i < NUM_COMMANDS; i++) {
+		struct command com = commands[i];
 
-	int com;
-
-	newline = strdup(line);
-
-	name = strtok_r(newline, " \t", &saveptr);
-
-	if(name != NULL) {
-		if(strcmp("exit", name) == 0) com = COM_EXIT;
-		else                          com = COM_UNKNOWN;
+		if(strcmp(com.name, name) == 0) {
+			return com;
+		}
 	}
 
-	free(newline);
+	/*
+	 * INVALID_COMMAND is the last command.
+	 */
+	return commands[NUM_COMMANDS+2];
+}
 
-	return com;
+/*
+ * Execute a command, plus any arguments it has.
+ */
+int execcom(struct command com, char *argmarker) {
+	/*
+	 * Arg. array for commands.
+	 */
+	char *argv[MAX_ARG_COUNT];
+	int   argc;
+
+	/*
+	 * Return status of commands.
+	 */
+	int comret;
+
+	int i;
+
+	/*
+	 * argv[0] is always the command name.
+	 */
+	argv[0] = com.name;
+	argc    = 1;
+
+	for(i = 1; i < MAX_ARG_COUNT; i++) {
+		char *tok;
+
+		tok = strtok_r(NULL, " \t", &argmarker);
+
+		if(tok == NULL) break;
+
+		argv[i] = tok;
+		argc   += 1;
+	}
+
+	comret = com.comfun(argc, argv);
+
+	return comret;
 }
