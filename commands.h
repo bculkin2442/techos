@@ -1,6 +1,20 @@
+/*
+ * Represents a command.
+ */
 struct command {
+	/*
+	 * The name of the command.
+	 */
 	const char *name;
 
+	/*
+	 * A brief description of the command.
+	 */
+	const char *brief;
+
+	/*
+	 * The function that implements the command.
+	 */
 	int (*comfun)(int, char **, char *);
 };
 
@@ -24,19 +38,23 @@ DECLCOM(exit);
 DECLCOM(version);
 DECLCOM(date);
 DECLCOM(datefmt);
+DECLCOM(setdate);
+DECLCOM(help);
 
 static struct command commands[] = {
-	{"exit",    &handle_exit},
-	{"version", &handle_version},
-	{"date",    &handle_date},
-	{"datefmt", &handle_datefmt},
-	{"invalid", NULL},
+	{"exit",    "Exit TechOS",                                    &handle_exit},
+	{"version", "Display version/author information",             &handle_version},
+	{"date",    "Display the current date/time",                  &handle_date},
+	{"datefmt", "Set the format the date is displayed/read in",   &handle_datefmt},
+	{"setdate", "Set the current date/time",                      &handle_setdate},
+	{"help",    "Get help for commands, or list available ones.", &handle_help},
+	{"invalid", "",                                                NULL},
 };
 
 /*
  * The number of valid commands.
  */
-static const int NUM_COMMANDS = 4;
+static const int NUM_COMMANDS = 6;
 
 /*
  * The max no. of arguments a command can take.

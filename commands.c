@@ -289,3 +289,22 @@ HANDLECOM(setdate) {
 
 	return 0;
 }
+
+HANDLECOM(help) {
+	if(argc == 1) {
+		int i;
+
+		printf("Available commands\n");
+		for(i = 0; i < NUM_COMMANDS; i++) {
+			struct command com;
+
+			com = commands[i];
+
+			printf("\t%s\t%s\n", com.name, com.brief);
+		}
+	} else {
+
+	}
+
+	return 0;
+}
