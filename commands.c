@@ -6,6 +6,9 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include "commands.h"
 #include "techos.h"
 
@@ -143,6 +146,11 @@ HANDLECOM(datefmt) {
 
 	set = 0;
 	fmt = 0;
+
+	/*
+	 * Reinit getopt.
+	 */
+	optind = 1;
 
 	/*
 	 * Parse CLI args.
@@ -302,8 +310,32 @@ HANDLECOM(help) {
 
 			printf("\t%s\t%s\n", com.name, com.brief);
 		}
-	} else {
+	} else if(argc == 2){
+		char *manpath;
 
+		struct stat scratch;
+
+		asprintf(&manpath, "help/%s.1", argv[1]);
+
+		stat(manpath, &scratch);
+		if(S_ISREG(scratch.st_mode)) {
+			char *compath;
+
+			asprintf(&compath, "man %s", manpath);
+
+			system(compath);
+
+			free(compath);	
+		} else {
+			printf("ERROR: No help available for command '%s'\n", argv[1]);
+
+			free(manpath);
+			return 1;
+		}
+
+		free(manpath);
+	} else {
+		printf("Usage: help [command-name]\n");
 	}
 
 	return 0;
