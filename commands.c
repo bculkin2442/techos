@@ -50,6 +50,14 @@ HANDLECOM(exit) {
 	 */
 	int ret = 0;
 
+	if(argc > 1) {
+		if(argc > 2 || strcmp("-h", argv[1]) != 0 && strcmp("--help", argv[1]) != 0)
+			printf("ERROR: Invalid command-line arguments.\n");
+		printf("Usage: exit [-h] [--help]\n");
+
+		return 0;
+	}
+
 	printf("Are you sure you want to exit? (y/n) ");
 	lread = getline(&line, &lsize, stdin);
 
@@ -84,6 +92,14 @@ HANDLECOM(exit) {
  * Print out version/author information.
  */
 HANDLECOM(version) {
+	if(argc > 1) {
+		if(argc > 2 || strcmp("-h", argv[1]) != 0 && strcmp("--help", argv[1]) != 0)
+			printf("ERROR: Invalid command-line arguments.\n");
+		printf("Usage: version [-h] [--help]\n");
+
+		return 0;
+	}
+		
 	printf("TechOS v%d.%d\n", major_ver, minor_ver);
 	printf("\tAuthors: Benjamin Culkin, Lucas Darnell, Jared Miller\n");
 	printf("\tCompletion Date: 8/31/17\n");
@@ -111,6 +127,13 @@ HANDLECOM(date) {
 	 */
 	size_t timesize;
 
+	if(argc > 1) {
+		if(argc > 2 || strcmp("-h", argv[1]) != 0 && strcmp("--help", argv[1]) != 0)
+			printf("ERROR: Invalid command-line arguments.\n");
+		printf("Usage: date [-h] [--help]\n");
+
+		return 0;
+	}
 	/*
 	 * Get the time and stringize it in the proper format.
 	 */
@@ -128,9 +151,9 @@ HANDLECOM(date) {
  */
 HANDLECOM(datefmt) {
 	/*
-	 * The current option.
+	 * The current option, and the current long option
 	 */
-	int opt;
+	int opt, optidx;
 	
 	/*
 	 * Whether to set or display the format.
@@ -160,8 +183,32 @@ HANDLECOM(datefmt) {
 	 * -i selects the input format.
 	 * -o selects the output format.
 	 */
-	while((opt = getopt(argc, argv, "sdio")) != -1) {
+	while(1) {
+		char *usage = "Usage: datefmt [-sdioh] [--help]\n";
+
+		static struct option opts[] = {
+			{"help", no_argument, 0, 0},
+			{0,     0,           0, 0}
+		};
+
+		opt = getopt_long(argc, argv, "sdioh", opts, &optidx);
+		if(opt == -1) break;
+
 		switch(opt) {
+		case 0:
+			/*
+			 * We picked a long option.
+			 */
+			switch(optidx) {
+			case 0:
+				printf("%s\n", usage);
+				return 0;
+			default:
+				printf("ERROR: Invalid command-line argument\n");
+				printf("%s\n", usage);
+				return 1;
+			}
+			break;
 		case 's':
 			set = 1;
 			break;
@@ -174,8 +221,12 @@ HANDLECOM(datefmt) {
 		case 'o':
 			fmt = 1;
 			break;
+		case 'h':
+			printf("%s\n", usage);
+			return 0;
 		default:
-			printf("Usage: datefmt [-sdio]\n");
+			printf("ERROR: Invalid command-line argument.\n");
+			printf("%s\n", usage);
 			return 1;
 		}
 	}
@@ -202,8 +253,8 @@ HANDLECOM(datefmt) {
 		printf("Enter the new format: ");
 		lread = getline(&line, &lsize, strem);
 
-		if(lread > 1) {
-			printf("! IOE\n");
+		if(lread < 1) {
+			printf("ERROR: No input available\n");
 			return 1;
 		}
 
@@ -240,7 +291,6 @@ HANDLECOM(setdate) {
 	 */
 	char *line;
 	size_t lsize, lread, llen;
-
 	/*
 	 * The time from the line, and any left-over bits.
 	 */
@@ -252,6 +302,13 @@ HANDLECOM(setdate) {
 	 */
 	time_t *clocktime;
 
+	if(argc > 1) {
+		if(argc > 2 || strcmp("-h", argv[1]) != 0 && strcmp("--help", argv[1]) != 0)
+			printf("ERROR: Invalid command-line arguments.\n");
+		printf("Usage: setdate [-h] [--help]\n");
+
+		return 0;
+	}
 	/*
 	 * Get the current time.
 	 */
@@ -300,6 +357,8 @@ HANDLECOM(setdate) {
 }
 
 HANDLECOM(help) {
+	char *usage = "Usage: help [-h] [--help] [<command-name>]";
+
 	if(argc == 1) {
 		int i;
 
@@ -315,6 +374,14 @@ HANDLECOM(help) {
 		char *manpath;
 
 		struct stat scratch;
+
+		if(argv[1][0] == '-') {
+			if(strcmp("-h", argv[1]) != 0 && strcmp("--help", argv[1]) != 0)
+				printf("ERROR: Invalid command-line arguments.\n");
+		
+			printf("%s\n", usage);
+			return 1;
+		}
 
 		asprintf(&manpath, "help/%s.1", argv[1]);
 
@@ -336,7 +403,8 @@ HANDLECOM(help) {
 
 		free(manpath);
 	} else {
-		printf("Usage: help [command-name]\n");
+		printf("ERROR: Invalid command-line arguments\n");
+		printf("%s\n", usage);
 	}
 
 	return 0;
