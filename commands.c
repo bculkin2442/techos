@@ -255,7 +255,8 @@ HANDLECOM(setdate) {
 	/*
 	 * Get the current time.
 	 */
-	datetime = localtime(time(NULL));
+	clocktime = time(NULL);
+	datetime  = localtime(&clocktime);
 
 	/*
 	 * Prompt/read the new date.
