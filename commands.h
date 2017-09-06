@@ -51,6 +51,7 @@ static struct command commands[] = {
 	{"invalid", "",                                                NULL},
 };
 
+static struct command INVALID_COMMAND = {"invalid", "", NULL};
 /*
  * The number of valid commands.
  */

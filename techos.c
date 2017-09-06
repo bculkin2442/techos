@@ -159,7 +159,7 @@ struct command parsecom(char *name) {
 	/*
 	 * INVALID_COMMAND is the last command.
 	 */
-	return commands[NUM_COMMANDS+2];
+	return INVALID_COMMAND;
 }
 
 /*
