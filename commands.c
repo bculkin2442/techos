@@ -12,6 +12,9 @@
 #include "commands.h"
 #include "techos.h"
 
+/*
+ * Define a command handler.
+ */
 #define HANDLECOM(nam) int handle_##nam(int argc, char **argv, char *argl)
 
 /*
@@ -20,6 +23,9 @@
 static char *in_datefmt;
 static char *out_datefmt;
 
+/*
+ * Initialize commands.
+ */
 void initcoms() {
 	in_datefmt  = malloc(256);
 	out_datefmt = malloc(256);
@@ -28,6 +34,9 @@ void initcoms() {
 	sprintf(out_datefmt, "%s", "%a, %d %b %Y %T %z");
 }
 
+/*
+ * Dispose of commands.
+ */
 void disposecoms() {
 	free(out_datefmt);
 	free(in_datefmt);
@@ -50,6 +59,9 @@ HANDLECOM(exit) {
 	 */
 	int ret = 0;
 
+	/*
+	 * Handle CLI args.
+	 */
 	if(argc > 1) {
 		if(argc > 2 || strcmp("-h", argv[1]) != 0 && strcmp("--help", argv[1]) != 0)
 			printf("ERROR: Invalid command-line arguments.\n");
@@ -92,6 +104,9 @@ HANDLECOM(exit) {
  * Print out version/author information.
  */
 HANDLECOM(version) {
+	/*
+	 * Handle CLI args.
+	 */
 	if(argc > 1) {
 		if(argc > 2 || strcmp("-h", argv[1]) != 0 && strcmp("--help", argv[1]) != 0)
 			printf("ERROR: Invalid command-line arguments.\n");
@@ -127,6 +142,9 @@ HANDLECOM(date) {
 	 */
 	size_t timesize;
 
+	/*
+	 * Handle CLI args.
+	 */
 	if(argc > 1) {
 		if(argc > 2 || strcmp("-h", argv[1]) != 0 && strcmp("--help", argv[1]) != 0)
 			printf("ERROR: Invalid command-line arguments.\n");
@@ -302,6 +320,9 @@ HANDLECOM(setdate) {
 	 */
 	time_t *clocktime;
 
+	/*
+	 * Handle CLI args.
+	 */
 	if(argc > 1) {
 		if(argc > 2 || strcmp("-h", argv[1]) != 0 && strcmp("--help", argv[1]) != 0)
 			printf("ERROR: Invalid command-line arguments.\n");
@@ -359,6 +380,9 @@ HANDLECOM(setdate) {
 HANDLECOM(help) {
 	char *usage = "Usage: help [-h] [--help] [<command-name>]";
 
+	/*
+	 * Handle CLI args.
+	 */
 	if(argc == 1) {
 		int i;
 
@@ -375,6 +399,9 @@ HANDLECOM(help) {
 
 		struct stat scratch;
 
+		/*
+		 * Handle CLI args.
+		 */
 		if(argv[1][0] == '-') {
 			if(strcmp("-h", argv[1]) != 0 && strcmp("--help", argv[1]) != 0)
 				printf("ERROR: Invalid command-line arguments.\n");
@@ -383,14 +410,22 @@ HANDLECOM(help) {
 			return 1;
 		}
 
+		/*
+		 * Get the path we want to use.
+		 */
 		asprintf(&manpath, "help/%s.1", argv[1]);
 
+		/*
+		 * Check if the file exists.
+		 */
 		stat(manpath, &scratch);
 		if(S_ISREG(scratch.st_mode)) {
 			char *compath;
 
+			/*
+			 * Create our command, then run it.
+			 */
 			asprintf(&compath, "man %s", manpath);
-
 			system(compath);
 
 			free(compath);	

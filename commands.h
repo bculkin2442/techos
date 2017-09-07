@@ -28,7 +28,11 @@ void initcoms();
  */
 void disposecoms();
 
+/*
+ * Declare a command.
+ */
 #define DECLCOM(name) int handle_##name(int, char **, char *)
+
 /*
  * Handle an attempt to exit.
  *
@@ -41,6 +45,9 @@ DECLCOM(datefmt);
 DECLCOM(setdate);
 DECLCOM(help);
 
+/*
+ * All the commands in the operating system.
+ */
 static struct command commands[] = {
 	{"exit",    "Exit TechOS",                                    &handle_exit},
 	{"version", "Display version/author information",             &handle_version},
@@ -51,11 +58,16 @@ static struct command commands[] = {
 	{"invalid", "",                                                NULL},
 };
 
-static struct command INVALID_COMMAND = {"invalid", "", NULL};
 /*
- * The number of valid commands.
+ * The number of valid commands. Make sure to update this whenever a new command
+ * is added.
  */
 static const int NUM_COMMANDS = 6;
+
+/*
+ * An invalid command.
+ */
+static struct command INVALID_COMMAND = {"invalid", "", NULL};
 
 /*
  * The max no. of arguments a command can take.
