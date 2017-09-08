@@ -367,7 +367,6 @@ HANDLECOM(setdate) {
 	 * Sanitize/set the time.
 	 */
 	clocktime = mktime(datetime);
-	stime(clocktime);
 
 	/*
 	 * Cleanup.
