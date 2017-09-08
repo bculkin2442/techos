@@ -29,9 +29,11 @@ static char *out_datefmt;
 void initcoms() {
 	in_datefmt  = malloc(256);
 	out_datefmt = malloc(256);
+	out_timefmt = malloc(256);
 
 	sprintf(in_datefmt,  "%s", "%Y-%m-%d");
 	sprintf(out_datefmt, "%s", "%a, %d %b %Y %T %z");
+	sprintf(out_timefmt, "%H %M %S");
 }
 
 /*
@@ -163,6 +165,22 @@ HANDLECOM(date) {
 
 	return 0;
 }
+/*
+ * Display current time.
+ */
+HANDLECOM(time) {
+	
+	if(argc > 1) {
+                if(argc > 2 || strcmp("-h", argv[1]) != 0 && strcmp("--help", argv[1]) != 0)
+                        printf("ERROR: Invalid command-line arguments.\n");
+                printf("Usage: time [-h] [--help]\n");
+
+                return 0;
+        }
+
+}
+
+
 
 /*
  * Configure the date format.
