@@ -30,7 +30,7 @@ void initcoms() {
 	in_datefmt  = malloc(256);
 	out_datefmt = malloc(256);
 
-	sprintf(in_datefmt,  "%s", "%Y-%m-%d %H:%M:%S");
+	sprintf(in_datefmt,  "%s", "%Y-%m-%d");
 	sprintf(out_datefmt, "%s", "%a, %d %b %Y %T %z");
 }
 
