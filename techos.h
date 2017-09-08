@@ -2,7 +2,7 @@
  * The major/minor version of TechOS.
  */
 static const int major_ver = 1;
-static const int minor_ver = 0;
+static const int minor_ver = 1;
 
 /*
  * The stream we read input from.
