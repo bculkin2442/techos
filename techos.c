@@ -244,9 +244,9 @@ struct osstate *makeosstate() {
 	ostate->out_datefmt  = malloc(256);
 	ostate->time_datefmt = malloc(256);
 
-	sprintf(ostate->in_datefmt,   "%s", "%Y-%m-%d");
-	sprintf(ostate->time_datefmt, "%s", "%r (%Z)");
-	sprintf(ostate->out_datefmt,  "%s", "%A, %d %B %Y");
+	sprintf(ostate->in_datefmt,   "%s", defin_datefmt);
+	sprintf(ostate->time_datefmt, "%s", deftime_datefmt);
+	sprintf(ostate->out_datefmt,  "%s", defout_datefmt);
 
 	/*
 	 * Get current date/time.

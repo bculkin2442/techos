@@ -5,6 +5,12 @@ static const int major_ver = 1;
 static const int minor_ver = 1;
 
 /*
+ * Standard date formats.
+ */
+static char *defin_datefmt   = "%Y-%m-%d";
+static char *deftime_datefmt = "%r (%Z)";
+static char *defout_datefmt  = "%A, %d, %B, %Y";
+/*
  * The stream we read input from.
  */
 FILE *strem;
