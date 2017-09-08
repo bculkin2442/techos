@@ -33,8 +33,8 @@ void initcoms() {
 	time_datefmt = malloc(256);
 
 	sprintf(in_datefmt,   "%s", "%Y-%m-%d");
-	sprintf(time_datefmt, "%s", "%H:%M:%S (%Z)");
-	sprintf(out_datefmt,  "%s", "%a, %d %b %Y");
+	sprintf(time_datefmt, "%s", "%r (%Z)");
+	sprintf(out_datefmt,  "%s", "%A, %d %B %Y");
 }
 
 /*
@@ -221,14 +221,14 @@ HANDLECOM(datefmt) {
 	 * -o selects the output format.
 	 */
 	while(1) {
-		char *usage = "Usage: datefmt [-sdioh] [--help]\n";
+		char *usage = "Usage: datefmt [-stdioh] [--help]\n";
 
 		static struct option opts[] = {
 			{"help", no_argument, 0, 0},
 			{0,     0,           0, 0}
 		};
 
-		opt = getopt_long(argc, argv, "sdioh", opts, &optidx);
+		opt = getopt_long(argc, argv, "stdioh", opts, &optidx);
 		if(opt == -1) break;
 
 		switch(opt) {
