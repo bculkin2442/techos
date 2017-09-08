@@ -18,20 +18,23 @@
 #define HANDLECOM(nam) int handle_##nam(int argc, char **argv, char *argl)
 
 /*
- * Input/output date formats.
+ * Input/output/time date formats.
  */
 static char *in_datefmt;
 static char *out_datefmt;
+static char *time_datefmt;
 
 /*
  * Initialize commands.
  */
 void initcoms() {
-	in_datefmt  = malloc(256);
-	out_datefmt = malloc(256);
+	in_datefmt   = malloc(256);
+	out_datefmt  = malloc(256);
+	time_datefmt = malloc(256);
 
-	sprintf(in_datefmt,  "%s", "%Y-%m-%d");
-	sprintf(out_datefmt, "%s", "%a, %d %b %Y %T %z");
+	sprintf(in_datefmt,   "%s", "%Y-%m-%d");
+	sprintf(time_datefmt, "%s", "%H:%M:%S (%Z)");
+	sprintf(out_datefmt,  "%s", "%a, %d %b %Y");
 }
 
 /*
@@ -156,7 +159,7 @@ HANDLECOM(date) {
 	 * Get the time and stringize it in the proper format.
 	 */
 	clocktime = time(NULL);
-	datetime = localtime(&clocktime);
+	datetime  = localtime(&clocktime);
 	timesize  = strftime(outtime, 255, out_datefmt, datetime);
 
 	printf("%s\n", outtime);
@@ -239,6 +242,9 @@ HANDLECOM(datefmt) {
 		case 'o':
 			fmt = 1;
 			break;
+		case 't':
+			fmt = 2;
+			break;
 		case 'h':
 			printf("%s\n", usage);
 			return 0;
@@ -253,10 +259,18 @@ HANDLECOM(datefmt) {
 		/*
 		 * Display the format.
 		 */
-		if(fmt == 0) {
+		switch(fmt) {
+		case 0:
 			printf("%s\n", in_datefmt);
-		} else {
+			break;
+		case 1:
 			printf("%s\n", out_datefmt);
+			break;
+		case 2:
+			printf("%s\n", time_datefmt);
+			break;
+		default:
+			printf("INTERNAL ERROR: Invalid format setting.\n");
 		}
 	} else {
 		/*
@@ -286,10 +300,20 @@ HANDLECOM(datefmt) {
 		/*
 		 * Set the format.
 		 */
-		if(fmt == 0) {
+		switch(fmt) {
+		case 0:
 			sprintf(in_datefmt,  "%s", line);
-		} else {
+			break;
+		case 1:
 			sprintf(out_datefmt, "%s", line);
+			break;
+		case 2:
+			sprintf(time_datefmt, "%s", line);
+			break;
+		default:
+			printf("INTERNAL ERROR: Invalid format setting.\n");
+			free(line);
+			return 1;
 		}
 
 		/*
