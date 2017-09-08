@@ -211,6 +211,32 @@ HANDLECOM(time) {
  */
 HANDLECOM(datefmt) {
 	/*
+	 * Enum declarations for modes.
+	 */
+	enum setmode { SM_SET, SM_DISPLAY,         };
+	enum fmtmode { FM_IN,  FM_OUT,     FM_TIME };
+
+	/*
+	 * Enum declaration for long options.
+	 */
+	enum dfmtopt {
+		DO_HELP = 0,
+
+		/*
+		 * Mode options.
+		 */
+		DO_SET,
+		DO_DISPLAY,
+
+		/*
+		 * Format choice options.
+		 */
+		DO_TIME,
+		DO_IN,
+		DO_OUT,
+	};
+
+	/*
 	 * The current option, and the current long option
 	 */
 	int opt, optidx;
@@ -218,17 +244,17 @@ HANDLECOM(datefmt) {
 	/*
 	 * Whether to set or display the format.
 	 */
-	int set;
+	enum setmode set;
 
 	/*
 	 * The format to display/modify.
 	 *
 	 * 0 is the input format, 1 is the output format.
 	 */
-	int fmt;
+	enum fmtmode fmt;
 
-	set = 0;
-	fmt = 0;
+	set = SM_SET;
+	fmt = FM_IN;
 
 	/*
 	 * Reinit getopt.
@@ -244,11 +270,28 @@ HANDLECOM(datefmt) {
 	 * -o selects the output format.
 	 */
 	while(1) {
-		char *usage = "Usage: datefmt [-stdioh] [--help]\n";
+		char *usage = "Usage: datefmt [-stdioh] [--help] [--set|--display] [--time|--in|--out]\n";
 
 		static struct option opts[] = {
+			/*
+			 * Misc. options.
+			 */
 			{"help", no_argument, 0, 0},
-			{0,	0,	     0, 0}
+
+			/*
+			 * Mode options.
+			 */
+			{"set",     no_argument, 0, 0},
+			{"display", no_argument, 0, 0},
+
+			/*
+			 * Format options.
+			 */
+			{"time", no_argument, 0, 0},
+			{"in",   no_argument, 0, 0},
+			{"out",  no_argument, 0, 0},
+
+			{0, 0, 0, 0}
 		};
 
 		opt = getopt_long(argc, argv, "stdioh", opts, &optidx);
@@ -260,9 +303,24 @@ HANDLECOM(datefmt) {
 			 * We picked a long option.
 			 */
 			switch(optidx) {
-			case 0:
+			case DO_HELP:
 				printf("%s\n", usage);
 				return 0;
+			case DO_SET:
+				set = SM_SET;
+				break;
+			case DO_DISPLAY:
+				set = SM_DISPLAY;
+				break;
+			case DO_TIME:
+				fmt = FM_TIME;
+				break;
+			case DO_IN:
+				fmt = FM_IN;
+				break;
+			case DO_OUT:
+				fmt = FM_OUT;
+				break;
 			default:
 				printf("ERROR: Invalid command-line argument\n");
 				printf("%s\n", usage);
