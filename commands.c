@@ -170,17 +170,43 @@ HANDLECOM(date) {
  * Display current time.
  */
 HANDLECOM(time) {
-	
-	if(argc > 1) {
+        /*
+         * Time values.
+         */
+        time_t     clocktime;
+        struct tm *datetime;
+
+        /*
+         * String buffer for times.
+         */
+        char outtime[255];
+
+        /*
+         * Amount of occupied buffer.
+         */
+        size_t timesize;
+
+        /*
+         * Handle CLI args.
+         */
+        if(argc > 1) {
                 if(argc > 2 || strcmp("-h", argv[1]) != 0 && strcmp("--help", argv[1]) != 0)
                         printf("ERROR: Invalid command-line arguments.\n");
                 printf("Usage: time [-h] [--help]\n");
 
                 return 0;
         }
+        /*
+         * Get the time and stringize it in the proper format.
+         */
+        clocktime = time(NULL);
+        datetime  = localtime(&clocktime);
+        timesize  = strftime(outtime, 255, time_datefmt, datetime);
 
+	printf("%s\n", outtime);
+
+        return 0;
 }
-
 
 
 /*

@@ -55,7 +55,7 @@ static struct command commands[] = {
 	{"date",    "Display the current date/time",                  &handle_date},
 	{"datefmt", "Set the format the date is displayed/read in",   &handle_datefmt},
 	{"setdate", "Set the current date",                           &handle_setdate},
-	{"time", "Display the current time",                          &handle_time}
+	{"time", "Display the current time",                          &handle_time},
 	{"help",    "Get help for commands, or list available ones.", &handle_help},
 	{"invalid", "",                                                NULL},
 };
@@ -64,7 +64,7 @@ static struct command commands[] = {
  * The number of valid commands. Make sure to update this whenever a new command
  * is added.
  */
-static const int NUM_COMMANDS = 6;
+static const int NUM_COMMANDS = 7;
 
 /*
  * An invalid command.
