@@ -44,6 +44,7 @@ DECLCOM(date);
 DECLCOM(datefmt);
 DECLCOM(setdate);
 DECLCOM(help);
+DECLCOM(time);
 
 /*
  * All the commands in the operating system.
@@ -53,7 +54,8 @@ static struct command commands[] = {
 	{"version", "Display version/author information",             &handle_version},
 	{"date",    "Display the current date/time",                  &handle_date},
 	{"datefmt", "Set the format the date is displayed/read in",   &handle_datefmt},
-	{"setdate", "Set the current date/time",                      &handle_setdate},
+	{"setdate", "Set the current date",                           &handle_setdate},
+	{"time", "Display the current time",                          &handle_time}
 	{"help",    "Get help for commands, or list available ones.", &handle_help},
 	{"invalid", "",                                                NULL},
 };
