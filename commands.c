@@ -318,7 +318,7 @@ HANDLECOM(setdate) {
 	/*
 	 * The official time.
 	 */
-	time_t *clocktime;
+	time_t clocktime;
 
 	/*
 	 * Handle CLI args.
@@ -342,7 +342,7 @@ HANDLECOM(setdate) {
 	printf("Enter the new date: ");
 	lread = getline(&line, &lsize, strem);
 
-	if(lread > 1) {
+	if(lread < 1) {
 		printf("ERROR: No input provided.\n");
 		return 1;
 	}
@@ -359,7 +359,7 @@ HANDLECOM(setdate) {
 	 */
 	leftovers = strptime(line, in_datefmt, datetime);
 	if(leftovers == NULL) {
-		printf("\tERROR: Input doesn't match format '%s'", in_datefmt);
+		printf("\tERROR: Input doesn't match format '%s'\n", in_datefmt);
 		return 1;
 	}
 
