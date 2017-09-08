@@ -1,4 +1,9 @@
 /*
+ * Forward-declare OS state.
+ */
+struct osstate;
+
+/*
  * Represents a command.
  */
 struct command {
@@ -15,7 +20,7 @@ struct command {
 	/*
 	 * The function that implements the command.
 	 */
-	int (*comfun)(int, char **, char *);
+	int (*comfun)(int, char **, char *, struct osstate *);
 };
 
 /*
@@ -31,7 +36,7 @@ void disposecoms();
 /*
  * Declare a command.
  */
-#define DECLCOM(name) int handle_##name(int, char **, char *)
+#define DECLCOM(name) int handle_##name(int, char **, char *, struct osstate *)
 
 /*
  * Handle an attempt to exit.
@@ -50,14 +55,14 @@ DECLCOM(time);
  * All the commands in the operating system.
  */
 static struct command commands[] = {
-	{"exit",    "Exit TechOS",                                    &handle_exit},
-	{"version", "Display version/author information",             &handle_version},
-	{"date",    "Display the current date/time",                  &handle_date},
+	{"exit",    "Exit TechOS",				      &handle_exit},
+	{"version", "Display version/author information",	      &handle_version},
+	{"date",    "Display the current date/time",		      &handle_date},
 	{"datefmt", "Set the format the date is displayed/read in",   &handle_datefmt},
-	{"setdate", "Set the current date",                           &handle_setdate},
-	{"time", "Display the current time",                          &handle_time},
+	{"setdate", "Set the current date",			      &handle_setdate},
+	{"time",    "Display the current time",			      &handle_time},
 	{"help",    "Get help for commands, or list available ones.", &handle_help},
-	{"invalid", "",                                                NULL},
+	{"invalid", "",						       NULL},
 };
 
 /*

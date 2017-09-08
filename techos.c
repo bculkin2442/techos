@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <time.h>
+
 #include "commands.h"
 #include "techos.h"
 
@@ -35,9 +37,19 @@ void comhan() {
 	/*
 	 * Variables for line input.
 	 */
-	size_t lread = 0;
-	size_t lsize = 0;
-	char *line = NULL;
+	size_t  lread = 0;
+	size_t  lsize = 0;
+	char   *line = NULL;
+
+	/*
+	 * OS state.
+	 */
+	struct osstate *ostate;
+
+	/*
+	 * Init. OS state.
+	 */
+	ostate = makeosstate();
 
 	/*
 	 * Initial prompt.
@@ -91,7 +103,7 @@ void comhan() {
 			/*
 			 * Determine the command to execute from the name.
 			 */
-			com = parsecom(name);
+			com = parsecom(name, ostate);
 
 			/*
 			 * Execute the command if we have one.
@@ -109,7 +121,7 @@ void comhan() {
 				 * - positive for non-fatal errors
 				 * - negative for fatal errors.
 				 */
-				comres = execcom(com, saveptr, newline);
+				comres = execcom(com, saveptr, newline, ostate);
 
 				free(newline);
 				/*
@@ -135,12 +147,14 @@ void comhan() {
 	 */
 cleanup: if(line != NULL)
 		free(line);
+
+	 killosstate(ostate);
 }
 
 /*
  * Get a command from its name.
  */
-struct command parsecom(char *name) {
+struct command parsecom(char *name, struct osstate *ostate) {
 	int i;
 
 	/*
@@ -165,7 +179,7 @@ struct command parsecom(char *name) {
 /*
  * Execute a command, plus any arguments it has.
  */
-int execcom(struct command com, char *argmarker, char *argline) {
+int execcom(struct command com, char *argmarker, char *argline, struct osstate *ostate) {
 	/*
 	 * Arg. array for commands.
 	 */
@@ -202,7 +216,54 @@ int execcom(struct command com, char *argmarker, char *argline) {
 	/*
 	 * Execute the command.
 	 */
-	comret = com.comfun(argc, argv, argline);
+	comret = com.comfun(argc, argv, argline, ostate);
 
 	return comret;
+}
+
+/*
+ * Allocate/initialize OS state.
+ */
+struct osstate *makeosstate() {
+	/*
+	 * State to return.
+	 */
+	struct osstate *ostate;
+
+	/*
+	 * Current time.
+	 */
+	clock_t clocktime;
+
+	ostate = malloc(sizeof(struct osstate));
+
+	/*
+	 * Set up default formats for date I/O.
+	 */
+	ostate->in_datefmt   = malloc(256);
+	ostate->out_datefmt  = malloc(256);
+	ostate->time_datefmt = malloc(256);
+
+	sprintf(ostate->in_datefmt,   "%s", "%Y-%m-%d");
+	sprintf(ostate->time_datefmt, "%s", "%r (%Z)");
+	sprintf(ostate->out_datefmt,  "%s", "%A, %d %B %Y");
+
+	/*
+	 * Get current date/time.
+	 */
+	clocktime = time(NULL);
+	ostate->datetime = localtime(&clocktime);
+
+	return ostate;
+}
+
+/*
+ * Free/destroy OS state.
+ */
+void killosstate(struct osstate *state) {
+	free(state->in_datefmt);
+	free(state->time_datefmt);
+	free(state->out_datefmt);
+
+	free(state);
 }

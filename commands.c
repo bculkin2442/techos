@@ -15,34 +15,24 @@
 /*
  * Define a command handler.
  */
-#define HANDLECOM(nam) int handle_##nam(int argc, char **argv, char *argl)
-
-/*
- * Input/output/time date formats.
- */
-static char *in_datefmt;
-static char *out_datefmt;
-static char *time_datefmt;
+#define HANDLECOM(nam) int handle_##nam(int argc, char **argv, char *argl, struct osstate *ostate)
 
 /*
  * Initialize commands.
  */
 void initcoms() {
-	in_datefmt   = malloc(256);
-	out_datefmt  = malloc(256);
-	time_datefmt = malloc(256);
-
-	sprintf(in_datefmt,   "%s", "%Y-%m-%d");
-	sprintf(time_datefmt, "%s", "%r (%Z)");
-	sprintf(out_datefmt,  "%s", "%A, %d %B %Y");
+	/*
+	 * Doing nothing at the moment.
+	 */
 }
 
 /*
  * Dispose of commands.
  */
 void disposecoms() {
-	free(out_datefmt);
-	free(in_datefmt);
+	/*
+	 * Doing nothing at the moment.
+	 */
 }
 /*
  * Handle exiting from the prompt.
@@ -132,7 +122,7 @@ HANDLECOM(date) {
 	/*
 	 * Time values.
 	 */
-	time_t     clocktime;
+	time_t	   clocktime;
 	struct tm *datetime;
 
 	/*
@@ -155,12 +145,11 @@ HANDLECOM(date) {
 
 		return 0;
 	}
+
 	/*
 	 * Get the time and stringize it in the proper format.
 	 */
-	clocktime = time(NULL);
-	datetime  = localtime(&clocktime);
-	timesize  = strftime(outtime, 255, out_datefmt, datetime);
+	timesize  = strftime(outtime, 255, ostate->out_datefmt, ostate->datetime);
 
 	printf("%s\n", outtime);
 
@@ -170,42 +159,50 @@ HANDLECOM(date) {
  * Display current time.
  */
 HANDLECOM(time) {
-        /*
-         * Time values.
-         */
-        time_t     clocktime;
-        struct tm *datetime;
+	/*
+	 * Time values.
+	 */
+	time_t	   clocktime;
+	struct tm *datetime;
 
-        /*
-         * String buffer for times.
-         */
-        char outtime[255];
+	/*
+	 * String buffer for times.
+	 */
+	char outtime[255];
 
-        /*
-         * Amount of occupied buffer.
-         */
-        size_t timesize;
+	/*
+	 * Amount of occupied buffer.
+	 */
+	size_t timesize;
 
-        /*
-         * Handle CLI args.
-         */
-        if(argc > 1) {
-                if(argc > 2 || strcmp("-h", argv[1]) != 0 && strcmp("--help", argv[1]) != 0)
-                        printf("ERROR: Invalid command-line arguments.\n");
-                printf("Usage: time [-h] [--help]\n");
+	/*
+	 * Handle CLI args.
+	 */
+	if(argc > 1) {
+		if(argc > 2 || strcmp("-h", argv[1]) != 0 && strcmp("--help", argv[1]) != 0)
+			printf("ERROR: Invalid command-line arguments.\n");
+		printf("Usage: time [-h] [--help]\n");
 
-                return 0;
-        }
-        /*
-         * Get the time and stringize it in the proper format.
-         */
-        clocktime = time(NULL);
-        datetime  = localtime(&clocktime);
-        timesize  = strftime(outtime, 255, time_datefmt, datetime);
+		return 0;
+	}
+
+	/*
+	 * Update the time in our time struct.
+	 */
+	clocktime = time(NULL);
+	datetime  = localtime(&clocktime);
+	ostate->datetime->tm_sec = datetime->tm_sec;
+	ostate->datetime->tm_min = datetime->tm_min;
+	ostate->datetime->tm_hour = datetime->tm_hour;
+
+	/*
+	 * Stringize the time in the proper format.
+	 */
+	timesize  = strftime(outtime, 255, ostate->time_datefmt, ostate->datetime);
 
 	printf("%s\n", outtime);
 
-        return 0;
+	return 0;
 }
 
 
@@ -251,7 +248,7 @@ HANDLECOM(datefmt) {
 
 		static struct option opts[] = {
 			{"help", no_argument, 0, 0},
-			{0,     0,           0, 0}
+			{0,	0,	     0, 0}
 		};
 
 		opt = getopt_long(argc, argv, "stdioh", opts, &optidx);
@@ -303,13 +300,13 @@ HANDLECOM(datefmt) {
 		 */
 		switch(fmt) {
 		case 0:
-			printf("%s\n", in_datefmt);
+			printf("%s\n", ostate->in_datefmt);
 			break;
 		case 1:
-			printf("%s\n", out_datefmt);
+			printf("%s\n", ostate->out_datefmt);
 			break;
 		case 2:
-			printf("%s\n", time_datefmt);
+			printf("%s\n", ostate->time_datefmt);
 			break;
 		default:
 			printf("INTERNAL ERROR: Invalid format setting.\n");
@@ -344,13 +341,13 @@ HANDLECOM(datefmt) {
 		 */
 		switch(fmt) {
 		case 0:
-			sprintf(in_datefmt,  "%s", line);
+			sprintf(ostate->in_datefmt,  "%s", line);
 			break;
 		case 1:
-			sprintf(out_datefmt, "%s", line);
+			sprintf(ostate->out_datefmt, "%s", line);
 			break;
 		case 2:
-			sprintf(time_datefmt, "%s", line);
+			sprintf(ostate->time_datefmt, "%s", line);
 			break;
 		default:
 			printf("INTERNAL ERROR: Invalid format setting.\n");
@@ -375,11 +372,12 @@ HANDLECOM(setdate) {
 	 */
 	char *line;
 	size_t lsize, lread, llen;
+
 	/*
 	 * The time from the line, and any left-over bits.
 	 */
 	struct tm *datetime;
-	char      *leftovers;
+	char	  *leftovers;
 
 	/*
 	 * The official time.
@@ -396,11 +394,11 @@ HANDLECOM(setdate) {
 
 		return 0;
 	}
+
 	/*
 	 * Get the current time.
 	 */
-	clocktime = time(NULL);
-	datetime  = localtime(&clocktime);
+	datetime  = ostate->datetime;
 
 	/*
 	 * Prompt/read the new date.
@@ -423,16 +421,17 @@ HANDLECOM(setdate) {
 	/*
 	 * Parse the input according to the format.
 	 */
-	leftovers = strptime(line, in_datefmt, datetime);
+	leftovers = strptime(line, ostate->in_datefmt, datetime);
 	if(leftovers == NULL) {
-		printf("\tERROR: Input doesn't match format '%s'\n", in_datefmt);
+		printf("\tERROR: Input doesn't match format '%s'\n", ostate->in_datefmt);
 		return 1;
 	}
 
 	/*
 	 * Sanitize/set the time.
 	 */
-	clocktime = mktime(datetime);
+	clocktime        = mktime(datetime);
+	ostate->datetime = localtime(&clocktime);
 
 	/*
 	 * Cleanup.
