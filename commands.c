@@ -328,19 +328,19 @@ HANDLECOM(datefmt) {
 			}
 			break;
 		case 's':
-			set = 1;
+			set = SM_SET;
 			break;
 		case 'd':
-			set = 0;
+			set = SM_DISPLAY;
 			break;
 		case 'i':
-			fmt = 0;
+			fmt = FM_IN;
 			break;
 		case 'o':
-			fmt = 1;
+			fmt = FM_OUT;
 			break;
 		case 't':
-			fmt = 2;
+			fmt = FM_TIME;
 			break;
 		case 'h':
 			printf("%s\n", usage);
@@ -352,18 +352,18 @@ HANDLECOM(datefmt) {
 		}
 	}
 
-	if(set == 0) {
+	if(set == SM_DISPLAY) {
 		/*
 		 * Display the format.
 		 */
 		switch(fmt) {
-		case 0:
+		case FM_IN:
 			printf("%s\n", ostate->in_datefmt);
 			break;
-		case 1:
+		case FM_OUT:
 			printf("%s\n", ostate->out_datefmt);
 			break;
-		case 2:
+		case FM_TIME:
 			printf("%s\n", ostate->time_datefmt);
 			break;
 		default:
@@ -398,13 +398,13 @@ HANDLECOM(datefmt) {
 		 * Set the format.
 		 */
 		switch(fmt) {
-		case 0:
+		case FM_IN:
 			sprintf(ostate->in_datefmt,  "%s", line);
 			break;
-		case 1:
+		case FM_OUT:
 			sprintf(ostate->out_datefmt, "%s", line);
 			break;
-		case 2:
+		case FM_TIME:
 			sprintf(ostate->time_datefmt, "%s", line);
 			break;
 		default:

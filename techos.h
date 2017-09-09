@@ -1,4 +1,8 @@
 /*
+ * Main TechOS header.
+ */
+
+/*
  * The major/minor version of TechOS.
  */
 static const int major_ver = 1;
@@ -31,6 +35,11 @@ struct osstate {
 	 */
 	struct tm *datetime;
 };
+
+/*
+ * Forward declare commands (defined in commands.h)
+ */
+struct command;
 
 /*
  * Create/delete an osstate.

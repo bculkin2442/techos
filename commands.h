@@ -1,5 +1,9 @@
 /*
- * Forward-declare OS state.
+ * Header for commands.
+ */
+
+/*
+ * Forward-declare OS state. (This is defined in techos.h)
  */
 struct osstate;
 
