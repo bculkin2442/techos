@@ -253,7 +253,7 @@ HANDLECOM(datefmt) {
 	 */
 	enum fmtmode fmt;
 
-	set = SM_SET;
+	set = SM_DISPLAY;
 	fmt = FM_IN;
 
 	/*
