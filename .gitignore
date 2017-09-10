@@ -3,3 +3,4 @@ techos
 *.o
 ccglue.*
 *.swp
+help/*.pdf
