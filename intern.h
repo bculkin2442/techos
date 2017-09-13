@@ -1,3 +1,5 @@
+#ifndef TECHOS_INTERNH
+#define TECHOS_INTERNH
 /*
  * Handle interning of string constants for quick equality checking.
  */
@@ -46,3 +48,4 @@ internkey lookupstring(struct interntab *, const char *);
  * Returns the string if the key was found, or NULL if the given key is invalid.
  */
 const char *lookupkey(struct interntab *, internkey);
+#endif

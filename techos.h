@@ -1,51 +1,16 @@
+#ifndef TECHOS_HEADER
+#define TECHOS_HEADER
+
+#include "osstate.h"
+#include "commands.h"
+
 /*
  * Main TechOS header.
  */
 
-/*
- * The major/minor version of TechOS.
- */
+/* The major/minor version of TechOS. */
 static const int major_ver = 1;
-static const int minor_ver = 1;
-
-/*
- * Standard date formats.
- */
-static char *defin_datefmt   = "%Y-%m-%d";
-static char *deftime_datefmt = "%r (%Z)";
-static char *defout_datefmt  = "%A, %d, %B, %Y";
-/*
- * The stream we read input from.
- */
-FILE *strem;
-
-/*
- * General structure for OS-level state.
- */
-struct osstate {
-	/*
-	 * Input/output/time date formats.
-	 */
-	char *in_datefmt;
-	char *out_datefmt;
-	char *time_datefmt;
-
-	/*
-	 * Current time/date.
-	 */
-	struct tm *datetime;
-};
-
-/*
- * Forward declare commands (defined in commands.h)
- */
-struct command;
-
-/*
- * Create/delete an osstate.
- */
-struct osstate *makeosstate();
-void             killosstate(struct osstate *);
+static const int minor_ver = 2;
 
 /*
  * Main command handler.
@@ -53,7 +18,7 @@ void             killosstate(struct osstate *);
  * Loops reading commands and handling them until EOF or an exit command is
  * handled.
  */
-void comhan();
+void comhan(struct osstate *);
 
 /*
  * Command parser.
@@ -68,3 +33,4 @@ struct command parsecom(char *, struct osstate *);
  * Gathers the CLI args for a command, and then executes it.
  */
 int execcom(struct command, char *, char *, struct osstate *);
+#endif

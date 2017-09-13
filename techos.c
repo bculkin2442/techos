@@ -5,104 +5,77 @@
 
 #include <time.h>
 
+#include "osstate.h"
 #include "commands.h"
 #include "techos.h"
 
 /*
- * Main function. Print out a greeting, then enter the command loop.
+ * Main function. 
+ *
+ * Print out a greeting, then enter the command loop.
+ *
  * After that's done, say goodbye.
  */
 int main() {
+	/* OS state. */
+	struct osstate *ostate;
+
+	/* Initialize commands. */
 	initcoms();
-
 	printf("Welcome to TechOS v%d.%d\n", major_ver, minor_ver);
+	/* Init. OS state. */
+	ostate        = makeosstate();
+	ostate->strem = stdin;
 
-	strem = stdin;
-	comhan();
+	comhan(ostate);
 
 	printf("Goodbye\n");
 
 	disposecoms();
 }
 
-/*
- * Command loop. Read & execute commands from the user.
- */
-void comhan() {
-	/* 
-	 * The number of commands executed so far. 
-	 */
+/* Command loop. Read & execute commands from the user. */
+void comhan(struct osstate *ostate) {
+	/* The number of commands executed so far. */
 	int lno = 0;
 
-	/*
-	 * Variables for line input.
-	 */
+	/* Variables for line input. */
 	size_t  lread = 0;
 	size_t  lsize = 0;
-	char   *line = NULL;
+	char   *line  = NULL;
 
-	/*
-	 * OS state.
-	 */
-	struct osstate *ostate;
-
-	/*
-	 * Init. OS state.
-	 */
-	ostate = makeosstate();
-
-	/*
-	 * Initial prompt.
-	 */
+	/* Initial prompt. */
 	printf("TechOS(%d)>", lno);
 
-	/*
-	 * Loop until we don't read anything.
-	 */
-	while((lread = getline(&line, &lsize, strem)) > 0) {
-		/*
-		 * Actual length of read string.
-		 */
+	/* Loop until we don't read anything. */
+	while((lread = getline(&line, &lsize, ostate->strem)) > 0) {
+		/* Actual length of read string. */
 		size_t llen;
 
-		/*
-		 * Variables for parsing the command name/arguments.
-		 */
+		/* Variables for parsing the command name/arguments. */
 		char *name;
 		char *saveptr;
 
-		/*
-		 * The return status of the command.
-		 */
+		/* The return status of the command. */
 		int comres;
 
-		/*
-		 * Exit the command loop if we've read EOF.
-		 */
-		if(feof(strem) != 0) goto cleanup;
+		/* Exit the command loop if we've read EOF. */
+		if(feof(ostate->strem) != 0) goto cleanup;
 
 		lno += 1;
 
-		/*
-		 * Remove the trailing newline from the command.
-		 */
+		/* Remove the trailing newline from the command. */
 		llen = strlen(line);
 		if(line[llen-1] == '\n')
 			line[llen-1] = '\0';
 
-		/*
-		 * Get the name from the command.
-		 */
+		/* Get the name from the command. */
 		name = strtok_r(line, " \t", &saveptr);
 		if(name != NULL) {
-			/*
-			 * The command to execute.
-			 */
+			/* The command to execute. */
 			struct command com;
 
-			/*
-			 * Determine the command to execute from the name.
-			 */
+			/* Determine the command to execute from the name. */
 			com = parsecom(name, ostate);
 
 			/*
@@ -219,51 +192,4 @@ int execcom(struct command com, char *argmarker, char *argline, struct osstate *
 	comret = com.comfun(argc, argv, argline, ostate);
 
 	return comret;
-}
-
-/*
- * Allocate/initialize OS state.
- */
-struct osstate *makeosstate() {
-	/*
-	 * State to return.
-	 */
-	struct osstate *ostate;
-
-	/*
-	 * Current time.
-	 */
-	clock_t clocktime;
-
-	ostate = malloc(sizeof(struct osstate));
-
-	/*
-	 * Set up default formats for date I/O.
-	 */
-	ostate->in_datefmt   = malloc(256);
-	ostate->out_datefmt  = malloc(256);
-	ostate->time_datefmt = malloc(256);
-
-	sprintf(ostate->in_datefmt,   "%s", defin_datefmt);
-	sprintf(ostate->time_datefmt, "%s", deftime_datefmt);
-	sprintf(ostate->out_datefmt,  "%s", defout_datefmt);
-
-	/*
-	 * Get current date/time.
-	 */
-	clocktime = time(NULL);
-	ostate->datetime = localtime(&clocktime);
-
-	return ostate;
-}
-
-/*
- * Free/destroy OS state.
- */
-void killosstate(struct osstate *state) {
-	free(state->in_datefmt);
-	free(state->time_datefmt);
-	free(state->out_datefmt);
-
-	free(state);
 }

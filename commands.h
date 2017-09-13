@@ -1,51 +1,37 @@
+#ifndef TECHOS_COMMANDSH
+#define TECHOS_COMMANDSH
+
+#include "osstate.h"
+
 /*
  * Header for commands.
  */
 
-/*
- * Forward-declare OS state. (This is defined in techos.h)
- */
-struct osstate;
-
-/*
- * Represents a command.
- */
+/* Represents a command. */
 struct command {
-	/*
-	 * The name of the command.
-	 */
+	/* The name of the command. */
 	const char *name;
 
-	/*
-	 * A brief description of the command.
-	 */
+	/* A brief description of the command. */
 	const char *brief;
 
-	/*
-	 * The function that implements the command.
-	 */
+	/* The function that implements the command. */
 	int (*comfun)(int, char **, char *, struct osstate *);
 };
 
-/*
- * Initialize data for commands.
- */
+/* Initialize data for commands. */
 void initcoms();
 
-/*
- * Cleanup after commands.
- */
+/* Cleanup after commands. */
 void disposecoms();
 
-/*
- * Declare a command.
- */
+/* Declare a command. */
 #define DECLCOM(name) int handle_##name(int, char **, char *, struct osstate *)
 
 /*
- * Handle an attempt to exit.
+ * Declare all of the command handlers.
  *
- * Prompts to make sure the user wants to exit.
+ * @TODO organize these
  */
 DECLCOM(exit);
 DECLCOM(version);
@@ -55,9 +41,7 @@ DECLCOM(setdate);
 DECLCOM(help);
 DECLCOM(time);
 
-/*
- * All the commands in the operating system.
- */
+/* All the commands in the operating system. */
 static struct command commands[] = {
 	{"exit",    "Exit TechOS",				      &handle_exit},
 	{"version", "Display version/author information",	      &handle_version},
@@ -70,14 +54,15 @@ static struct command commands[] = {
 };
 
 /*
- * The number of valid commands. Make sure to update this whenever a new command
- * is added.
+ * The number of valid commands. 
+ *
+ * Make sure to update this whenever a new command is added.
+ *
+ * @TODO make this unnecessary
  */
 static const int NUM_COMMANDS = 7;
 
-/*
- * An invalid command.
- */
+/* An invalid command. */
 static struct command INVALID_COMMAND = {"invalid", "", NULL};
 
 /*
@@ -85,4 +70,5 @@ static struct command INVALID_COMMAND = {"invalid", "", NULL};
  *
  * Remember the first arg. of a command is its name.
  */
-static const int MAX_ARG_COUNT = 256;
+#define MAX_ARG_COUNT 256
+#endif

@@ -110,7 +110,7 @@ HANDLECOM(version) {
 		
 	printf("TechOS v%d.%d\n", major_ver, minor_ver);
 	printf("\tAuthors: Benjamin Culkin, Lucas Darnell, Jared Miller\n");
-	printf("\tCompletion Date: 8/31/17\n");
+	printf("\tCompletion Date: 9/13/17\n");
 
 	return 0;
 }
@@ -380,7 +380,7 @@ HANDLECOM(datefmt) {
 		 * Prompt/read the new format.
 		 */
 		printf("Enter the new format: ");
-		lread = getline(&line, &lsize, strem);
+		lread = getline(&line, &lsize, ostate->strem);
 
 		if(lread < 1) {
 			printf("ERROR: No input available\n");
@@ -462,7 +462,7 @@ HANDLECOM(setdate) {
 	 * Prompt/read the new date.
 	 */
 	printf("Enter the new date: ");
-	lread = getline(&line, &lsize, strem);
+	lread = getline(&line, &lsize, ostate->strem);
 
 	if(lread < 1) {
 		printf("ERROR: No input provided.\n");
