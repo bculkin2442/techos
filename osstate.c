@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -18,15 +19,19 @@ struct osstate *makeosstate() {
 	clock_t clocktime;
 
 	ostate = malloc(sizeof(struct osstate));
+	assert(ostate != NULL);
 
 	/* Set up default formats for date I/O. */
-	ostate->in_datefmt   = malloc(256);
-	ostate->out_datefmt  = malloc(256);
-	ostate->time_datefmt = malloc(256);
+	ostate->in_datefmt   = malloc(MAX_FMT_SIZE);
+	assert(ostate->in_datefmt != NULL);
+	ostate->out_datefmt  = malloc(MAX_FMT_SIZE);
+	assert(ostate->out_datefmt != NULL);
+	ostate->time_datefmt = malloc(MAX_FMT_SIZE);
+	assert(ostate->time_datefmt != NULL);
 
-	sprintf(ostate->in_datefmt,   "%s", defin_datefmt);
-	sprintf(ostate->time_datefmt, "%s", deftime_datefmt);
-	sprintf(ostate->out_datefmt,  "%s", defout_datefmt);
+	sprintf(ostate->in_datefmt,   "%.256s", defin_datefmt);
+	sprintf(ostate->time_datefmt, "%.256s", deftime_datefmt);
+	sprintf(ostate->out_datefmt,  "%.256s", defout_datefmt);
 
 	/* Get current date/time. */
 	clocktime = time(NULL);

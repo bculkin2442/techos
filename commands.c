@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <ctype.h>
 #include <getopt.h>
 #include <stdio.h>
@@ -34,41 +35,41 @@ void disposecoms() {
 	 * Doing nothing at the moment.
 	 */
 }
+
+/* Check if a command that only takes the 'help' argument recieved it. */
+int checkhelpargs(int argc, char **argv, char *usage, struct osstate *ostate) {
+	if(argc > 2 || (strcmp("-h", argv[1]) != 0 && strcmp("--help", argv[1]) != 0)) {
+		fprintf(ostate->output, "\tERROR: Invalid command-line arguments.\n");
+	}
+
+	fprintf(ostate->output, "%s", usage);
+
+	return 0;
+}
+
 /*
  * Handle exiting from the prompt.
  *
  * Make sure to confirm before hand.
  */
 HANDLECOM(exit) {
-	/*
-	 * Variables for line input.
-	 */
+	/* Variables for line input. */
 	char *line = NULL;
 	size_t lread;
 	size_t lsize;
 
-	/*
-	 * Command return status.
-	 */
+	/* Command return status. */
 	int ret = 0;
 
-	/*
-	 * Handle CLI args.
-	 */
+	/* Handle CLI args. */
 	if(argc > 1) {
-		if(argc > 2 || strcmp("-h", argv[1]) != 0 && strcmp("--help", argv[1]) != 0)
-			printf("ERROR: Invalid command-line arguments.\n");
-		printf("Usage: exit [-h] [--help]\n");
-
-		return 0;
+		return checkhelpargs(argc, argv, "Usage: exit [-h] [--help]\n", ostate);
 	}
 
-	printf("Are you sure you want to exit? (y/n) ");
+	fprintf(ostate->output, "Are you sure you want to exit? (y/n) ");
 	lread = getline(&line, &lsize, stdin);
 
-	/*
-	 * As long as we read at least one character, decide what to do off it.
-	 */
+	/* As long as we read at least one character, decide what to do off it. */
 	if(lread > 1) {
 		int ch = toupper(line[0]);
 
@@ -80,127 +81,100 @@ HANDLECOM(exit) {
 			ret = 0;
 			break;
 		default:
-			printf("Unknown answer '%c'\n", ch);
+			fprintf(ostate->output, "Unknown answer '%c'\n", ch);
 		}
 	}
 
 	/*
 	 * Cleanup after ourselves.
 	 */
-	if(line != NULL)
-		free(line);
+	if(line != NULL) free(line);
 
 	return ret;
 }
 
-/*
- * Print out version/author information.
- */
+/* Print out version/author information. */
 HANDLECOM(version) {
-	/*
-	 * Handle CLI args.
-	 */
+	/* Handle CLI args. */
 	if(argc > 1) {
-		if(argc > 2 || strcmp("-h", argv[1]) != 0 && strcmp("--help", argv[1]) != 0)
-			printf("ERROR: Invalid command-line arguments.\n");
-		printf("Usage: version [-h] [--help]\n");
-
-		return 0;
+		return checkhelpargs(argc, argv, "Usage: version [-h] [--help]\n", ostate);
 	}
-		
-	printf("TechOS v%d.%d\n", major_ver, minor_ver);
-	printf("\tAuthors: Benjamin Culkin, Lucas Darnell, Jared Miller\n");
-	printf("\tCompletion Date: 9/13/17\n");
+
+	/*
+	 * Print version info.
+	 *
+	 * @TODO add flags for printing only parts of this information.
+	 */
+	fprintf(ostate->output, "TechOS v%d.%d\n", major_ver, minor_ver);
+	fprintf(ostate->output, "\tAuthors: Benjamin Culkin, Lucas Darnell, Jared Miller\n");
+	fprintf(ostate->output, "\tCompletion Date: 9/13/17\n");
 
 	return 0;
 }
 
-/*
- * Print out localtime in the current date format.
- */
+/* Print out localtime in the current date format. */
 HANDLECOM(date) {
-	/*
-	 * Time values.
-	 */
+	/* Time values. */
 	time_t	   clocktime;
 	struct tm *datetime;
 
-	/*
-	 * String buffer for times.
-	 */
+	/* String buffer for times. */
 	char outtime[255];
 
-	/*
-	 * Amount of occupied buffer.
-	 */
+	/* Amount of occupied buffer. */
 	size_t timesize;
 
-	/*
-	 * Handle CLI args.
-	 */
+	/* Handle CLI args. */
 	if(argc > 1) {
-		if(argc > 2 || strcmp("-h", argv[1]) != 0 && strcmp("--help", argv[1]) != 0)
-			printf("ERROR: Invalid command-line arguments.\n");
-		printf("Usage: date [-h] [--help]\n");
-
-		return 0;
+		return checkhelpargs(argc, argv, "Usage: date [-h] [--help]\n", ostate);
 	}
 
-	/*
-	 * Get the time and stringize it in the proper format.
-	 */
+	/* Get the time and stringize it in the proper format. */
 	timesize  = strftime(outtime, 255, ostate->out_datefmt, ostate->datetime);
+	/* Error if the format was too long. */
+	if(timesize == 0) {
+		fprintf(ostate->output, "Output for format '%s' is too long. It must be shorter than 255 characters when filled out\n", ostate->out_datefmt);
+		return 1;
+	}
 
-	printf("%s\n", outtime);
+	fprintf(ostate->output, "%s\n", outtime);
 
 	return 0;
 }
-/*
- * Display current time.
- */
+
+/* Display current time. */
 HANDLECOM(time) {
-	/*
-	 * Time values.
-	 */
+	/* Time values. */
 	time_t	   clocktime;
 	struct tm *datetime;
 
-	/*
-	 * String buffer for times.
-	 */
+	/* String buffer for times. */
 	char outtime[255];
 
-	/*
-	 * Amount of occupied buffer.
-	 */
+	/* Amount of occupied buffer. */
 	size_t timesize;
 
-	/*
-	 * Handle CLI args.
-	 */
+	/* Handle CLI args. */
 	if(argc > 1) {
-		if(argc > 2 || strcmp("-h", argv[1]) != 0 && strcmp("--help", argv[1]) != 0)
-			printf("ERROR: Invalid command-line arguments.\n");
-		printf("Usage: time [-h] [--help]\n");
-
-		return 0;
+		return checkhelpargs(argc, argv, "Usage: time [-h] [--help]\n", ostate);
 	}
 
-	/*
-	 * Update the time in our time struct.
-	 */
+	/* Update the time in our time struct. */
 	clocktime = time(NULL);
 	datetime  = localtime(&clocktime);
 	ostate->datetime->tm_sec = datetime->tm_sec;
 	ostate->datetime->tm_min = datetime->tm_min;
 	ostate->datetime->tm_hour = datetime->tm_hour;
 
-	/*
-	 * Stringize the time in the proper format.
-	 */
+	/* Stringize the time in the proper format. */
 	timesize  = strftime(outtime, 255, ostate->time_datefmt, ostate->datetime);
+	/* Error if the format was too long. */
+	if(timesize == 0) {
+		fprintf(ostate->output, "Output for format '%s' is too long. It must be shorter than 255 characters when filled out\n", ostate->out_datefmt);
+		return 1;
+	}
 
-	printf("%s\n", outtime);
+	fprintf(ostate->output, "%s\n", outtime);
 
 	return 0;
 }
@@ -210,93 +184,70 @@ HANDLECOM(time) {
  * Configure the date format.
  */
 HANDLECOM(datefmt) {
-	/*
-	 * Enum declarations for modes.
-	 */
+	/* Enum declarations for modes. */
 	enum setmode { SM_SET, SM_DISPLAY,         };
 	enum fmtmode { FM_IN,  FM_OUT,     FM_TIME };
 
-	/*
-	 * Enum declaration for long options.
-	 */
+	/* Enum declaration for long options. */
 	enum dfmtopt {
+		/* Help option. */
 		DO_HELP = 0,
 
-		/*
-		 * Mode options.
-		 */
+		/* Mode options. */
 		DO_SET,
 		DO_DISPLAY,
 
-		/*
-		 * Format choice options.
-		 */
+		/* Format choice options. */
 		DO_TIME,
 		DO_IN,
 		DO_OUT,
 	};
 
-	/*
-	 * The current option, and the current long option
-	 */
+	/* The current option, and the current long option */
 	int opt, optidx;
-	
-	/*
-	 * Whether to set or display the format.
-	 */
+
+	/* Whether to set or display the format. */
 	enum setmode set;
 
-	/*
-	 * The format to display/modify.
-	 *
-	 * 0 is the input format, 1 is the output format.
-	 */
+	/* The format to display/modify. */
 	enum fmtmode fmt;
 
+	/* Set modes to sensible defaults. */
 	set = SM_DISPLAY;
 	fmt = FM_IN;
 
-	/*
-	 * Reinit getopt.
-	 */
+	/* Reinit getopt. */
 	optind = 1;
 
-	/*
-	 * Parse CLI args.
-	 *
-	 * -s turns on mode setting.
-	 * -d turns on mode displaying.
-	 * -i selects the input format.
-	 * -o selects the output format.
-	 */
+	/* Parse CLI args. */
 	while(1) {
+		/* Our usage message. */
 		char *usage = "Usage: datefmt [-stdioh] [--help] [--set|--display] [--time|--in|--out]\n";
 
+		/* The long options we take. */
 		static struct option opts[] = {
-			/*
-			 * Misc. options.
-			 */
+			/* Misc. options. */
 			{"help", no_argument, 0, 0},
 
-			/*
-			 * Mode options.
-			 */
+			/* Mode options. */
 			{"set",     no_argument, 0, 0},
 			{"display", no_argument, 0, 0},
 
-			/*
-			 * Format options.
-			 */
+			/* Format options. */
 			{"time", no_argument, 0, 0},
 			{"in",   no_argument, 0, 0},
 			{"out",  no_argument, 0, 0},
 
+			/* Terminating option. */
 			{0, 0, 0, 0}
 		};
 
+		/* Get an option. */
 		opt = getopt_long(argc, argv, "stdioh", opts, &optidx);
+		/* Break if we've processed every option. */
 		if(opt == -1) break;
 
+		/* Handle options. */
 		switch(opt) {
 		case 0:
 			/*
@@ -304,7 +255,7 @@ HANDLECOM(datefmt) {
 			 */
 			switch(optidx) {
 			case DO_HELP:
-				printf("%s\n", usage);
+				fprintf(ostate->output, "%s\n", usage);
 				return 0;
 			case DO_SET:
 				set = SM_SET;
@@ -322,8 +273,8 @@ HANDLECOM(datefmt) {
 				fmt = FM_OUT;
 				break;
 			default:
-				printf("ERROR: Invalid command-line argument\n");
-				printf("%s\n", usage);
+				fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
+				fprintf(ostate->output, "%s\n", usage);
 				return 1;
 			}
 			break;
@@ -343,11 +294,11 @@ HANDLECOM(datefmt) {
 			fmt = FM_TIME;
 			break;
 		case 'h':
-			printf("%s\n", usage);
+			fprintf(ostate->output, "%s\n", usage);
 			return 0;
 		default:
-			printf("ERROR: Invalid command-line argument.\n");
-			printf("%s\n", usage);
+			fprintf(ostate->output, "\tERROR: Invalid command-line argument.\n");
+			fprintf(ostate->output, "%s\n", usage);
 			return 1;
 		}
 	}
@@ -358,16 +309,16 @@ HANDLECOM(datefmt) {
 		 */
 		switch(fmt) {
 		case FM_IN:
-			printf("%s\n", ostate->in_datefmt);
+			fprintf(ostate->output, "%s\n", ostate->in_datefmt);
 			break;
 		case FM_OUT:
-			printf("%s\n", ostate->out_datefmt);
+			fprintf(ostate->output, "%s\n", ostate->out_datefmt);
 			break;
 		case FM_TIME:
-			printf("%s\n", ostate->time_datefmt);
+			fprintf(ostate->output, "%s\n", ostate->time_datefmt);
 			break;
 		default:
-			printf("INTERNAL ERROR: Invalid format setting.\n");
+			fprintf(ostate->output, "INTERNAL ERROR: Invalid format setting.\n");
 		}
 	} else {
 		/*
@@ -379,11 +330,11 @@ HANDLECOM(datefmt) {
 		/*
 		 * Prompt/read the new format.
 		 */
-		printf("Enter the new format: ");
+		fprintf(ostate->output, "Enter the new format: ");
 		lread = getline(&line, &lsize, ostate->strem);
 
 		if(lread < 1) {
-			printf("ERROR: No input available\n");
+			fprintf(ostate->output, "\tERROR: No input available\n");
 			return 1;
 		}
 
@@ -394,21 +345,23 @@ HANDLECOM(datefmt) {
 		if(line[llen-1] == '\n')
 			line[llen-1] = '\0';
 
+		if(llen >= 256) fprintf(ostate->output, "WARNING: Truncating format '%s' to '%.256s'\n", line, line);
+		
 		/*
 		 * Set the format.
 		 */
 		switch(fmt) {
 		case FM_IN:
-			sprintf(ostate->in_datefmt,  "%s", line);
+			sprintf(ostate->in_datefmt,  "%.256s", line);
 			break;
 		case FM_OUT:
-			sprintf(ostate->out_datefmt, "%s", line);
+			sprintf(ostate->out_datefmt, "%.256s", line);
 			break;
 		case FM_TIME:
-			sprintf(ostate->time_datefmt, "%s", line);
+			sprintf(ostate->time_datefmt, "%.256s", line);
 			break;
 		default:
-			printf("INTERNAL ERROR: Invalid format setting.\n");
+			fprintf(ostate->output, "INTERNAL ERROR: Invalid format setting.\n");
 			free(line);
 			return 1;
 		}
@@ -418,141 +371,127 @@ HANDLECOM(datefmt) {
 		 */
 		free(line);
 
-		printf("Format set\n");
+		fprintf(ostate->output, "Format set\n");
 	}
 
 	return 0;
 }
 
 HANDLECOM(setdate) {
-	/*
-	 * Variables for date input.
-	 */
+	/* Variables for date input. */
 	char *line;
 	size_t lsize, lread, llen;
 
-	/*
-	 * The time from the line, and any left-over bits.
-	 */
+	/* The time from the line, and any left-over bits. */
 	struct tm *datetime;
 	char	  *leftovers;
 
-	/*
-	 * The official time.
-	 */
+	/* The official time. */
 	time_t clocktime;
 
-	/*
-	 * Handle CLI args.
-	 */
+	/* Handle CLI args. */
 	if(argc > 1) {
-		if(argc > 2 || strcmp("-h", argv[1]) != 0 && strcmp("--help", argv[1]) != 0)
-			printf("ERROR: Invalid command-line arguments.\n");
-		printf("Usage: setdate [-h] [--help]\n");
-
-		return 0;
+		return checkhelpargs(argc, argv, "Usage: setdate [-h] [--help]\n", ostate);
 	}
 
-	/*
-	 * Get the current time.
-	 */
+	/* Get the current time. */
 	datetime  = ostate->datetime;
 
-	/*
-	 * Prompt/read the new date.
-	 */
-	printf("Enter the new date: ");
+	/* Prompt/read the new date. */
+	fprintf(ostate->output, "Enter the new date: ");
 	lread = getline(&line, &lsize, ostate->strem);
 
 	if(lread < 1) {
-		printf("ERROR: No input provided.\n");
+		fprintf(ostate->output, "\tERROR: No input provided.\n");
 		return 1;
 	}
 
-	/*
-	 * Trim trailing newline.
-	 */
+	/* Trim trailing newline. */
 	llen = strlen(line);
 	if(line[llen-1] == '\n')
 		line[llen-1] = '\0';
 
-	/*
-	 * Parse the input according to the format.
-	 */
+	/* Parse the input according to the format. */
 	leftovers = strptime(line, ostate->in_datefmt, datetime);
 	if(leftovers == NULL) {
-		printf("\tERROR: Input doesn't match format '%s'\n", ostate->in_datefmt);
+		/* The format didn't match correctly. */
+		fprintf(ostate->output, "\tERROR: Input '%s' doesn't match format '%s'\n", line, ostate->in_datefmt);
+		free(line);
 		return 1;
+	} else if(*leftovers != '\0') {
+		/* There were trailing characters in the input. */
+		fprintf(ostate->output, "\tWARNING: Trailing input '%s' unused by format\n", leftovers);
 	}
 
-	/*
-	 * Sanitize/set the time.
-	 */
+	/* Sanitize/set the time. */
 	clocktime        = mktime(datetime);
 	ostate->datetime = localtime(&clocktime);
+	if(ostate->datetime == NULL) {
+		fprintf(ostate->output, "\tFATAL ERROR: Date/time value overflowed.");
+		free(line);
+		return -1;
+	}
 
-	/*
-	 * Cleanup.
-	 */
+	/* Cleanup. */
 	free(line);
-
 	return 0;
 }
 
 HANDLECOM(help) {
-	char *usage = "Usage: help [-h] [--help] [<command-name>]";
+	/* Usage message. */
+	char *usage = "Usage: help [-h] [--help] [<command-name>]\n";
 
-	/*
-	 * Handle CLI args.
-	 */
+	/* Handle CLI args. */
 	if(argc == 1) {
+		/* Command index. */
 		int i;
 
-		printf("Available commands\n");
+		fprintf(ostate->output, "Available commands\n");
 		for(i = 0; i < NUM_COMMANDS; i++) {
 			struct command com;
 
 			com = commands[i];
 
-			printf("\t%s\t%s\n", com.name, com.brief);
+			fprintf(ostate->output, "\t%s\t%s\n", com.name, com.brief);
 		}
 	} else if(argc == 2){
+		/* The path to the man page. */
 		char *manpath;
 
+		/* The struct for checking if a file exists. */
 		struct stat scratch;
 
-		/*
-		 * Handle CLI args.
-		 */
+		int ret;
+
+		/* Handle CLI args. */
 		if(argv[1][0] == '-') {
-			if(strcmp("-h", argv[1]) != 0 && strcmp("--help", argv[1]) != 0)
-				printf("ERROR: Invalid command-line arguments.\n");
-		
-			printf("%s\n", usage);
+			checkhelpargs(argc, argv, usage, ostate);
 			return 1;
 		}
 
-		/*
-		 * Get the path we want to use.
-		 */
-		asprintf(&manpath, "help/%s.1", argv[1]);
+		/* Get the path we want to use. */
+		assert(asprintf(&manpath, "help/%s.1", argv[1]) != -1);
 
-		/*
-		 * Check if the file exists.
-		 */
-		stat(manpath, &scratch);
+		/* Check if the file exists. */
+		if(stat(manpath, &scratch) == -1) {
+			/* Something went wrong. */
+			fprintf(ostate->output, "\tINTERNAL ERROR: Something went wrong checking for the manpage");
+			free(manpath);
+			return 1;
+		}
 		if(S_ISREG(scratch.st_mode)) {
+			/* Command to run. */
 			char *compath;
 
-			/*
-			 * Create our command, then run it.
-			 */
-			asprintf(&compath, "man %s", manpath);
-			system(compath);
+			/* Create our command, then run it. */
+			assert(asprintf(&compath, "man %s", manpath) != -1);
+			if(system(compath) != 0) {
+				fprintf(ostate->output, "\tINTERNAL ERROR: Something went wrong displaying the manpage.\n");
+			}
 
 			free(compath);	
 		} else {
-			printf("ERROR: No help available for command '%s'\n", argv[1]);
+			fprintf(ostate->output, "\tERROR: No help available for command '%s'\n", argv[1]);
 
 			free(manpath);
 			return 1;
@@ -560,8 +499,8 @@ HANDLECOM(help) {
 
 		free(manpath);
 	} else {
-		printf("ERROR: Invalid command-line arguments\n");
-		printf("%s\n", usage);
+		fprintf(ostate->output, "\tERROR: Invalid command-line arguments\n");
+		fprintf(ostate->output, "\t%s", usage);
 	}
 
 	return 0;

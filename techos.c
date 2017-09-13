@@ -22,15 +22,17 @@ int main() {
 
 	/* Initialize commands. */
 	initcoms();
-	printf("Welcome to TechOS v%d.%d\n", major_ver, minor_ver);
 	/* Init. OS state. */
 	ostate        = makeosstate();
 	ostate->strem = stdin;
+	fprintf(ostate->strem, "Welcome to TechOS v%d.%d\n", major_ver, minor_ver);
 
 	comhan(ostate);
 
-	printf("Goodbye\n");
+	fprintf(ostate->strem, "Goodbye\n");
 
+	/* Cleanup after ourselves. */
+	killosstate(ostate);
 	disposecoms();
 }
 
@@ -45,7 +47,7 @@ void comhan(struct osstate *ostate) {
 	char   *line  = NULL;
 
 	/* Initial prompt. */
-	printf("TechOS(%d)>", lno);
+	fprintf(ostate->strem, "TechOS(%d)>", lno);
 
 	/* Loop until we don't read anything. */
 	while((lread = getline(&line, &lsize, ostate->strem)) > 0) {
@@ -78,9 +80,7 @@ void comhan(struct osstate *ostate) {
 			/* Determine the command to execute from the name. */
 			com = parsecom(name, ostate);
 
-			/*
-			 * Execute the command if we have one.
-			 */
+			/* Execute the command if we have one. */
 			if(com.comfun != NULL) {
 				char *newline;
 
@@ -89,7 +89,7 @@ void comhan(struct osstate *ostate) {
 				/*
 				 * Execute the command.
 				 *
-				 * The status should be 
+				 * The status should be one of: 
 				 * - zero for executing succesfully
 				 * - positive for non-fatal errors
 				 * - negative for fatal errors.
@@ -97,36 +97,24 @@ void comhan(struct osstate *ostate) {
 				comres = execcom(com, saveptr, newline, ostate);
 
 				free(newline);
-				/*
-				 * Exit the loop if something failed.
-				 */
+				/* Exit the loop if something failed. */
 				if(comres < 0) goto cleanup;
 			} else {
-				/*
-				 * No such command exists.
-				 */
-				printf("ERROR: No such command named '%s'\n", name);
+				/* No such command exists. */
+				fprintf(ostate->strem, "\tERROR: No such command named '%s'\n", name);
 			}
 		}
 
-		/*
-		 * Reprompt.
-		 */
-		printf("TechOS(%d)>", lno);
+		/* Reprompt. */
+		fprintf(ostate->strem, "TechOS(%d)>", lno);
 	}
 
-	/*
-	 * Cleanup after ourselves.
-	 */
+	/* Cleanup after ourselves. */
 cleanup: if(line != NULL)
 		free(line);
-
-	 killosstate(ostate);
 }
 
-/*
- * Get a command from its name.
- */
+/* Get a command from its name. */
 struct command parsecom(char *name, struct osstate *ostate) {
 	int i;
 
@@ -134,6 +122,8 @@ struct command parsecom(char *name, struct osstate *ostate) {
 	 * Go through all the commands.
 	 *
 	 * If one matches, return it.
+	 *
+	 * @TODO replace this
 	 */
 	for(i = 0; i < NUM_COMMANDS; i++) {
 		struct command com = commands[i];
@@ -143,52 +133,46 @@ struct command parsecom(char *name, struct osstate *ostate) {
 		}
 	}
 
-	/*
-	 * INVALID_COMMAND is the last command.
-	 */
+	/* INVALID_COMMAND is the last command. */
 	return INVALID_COMMAND;
 }
 
-/*
- * Execute a command, plus any arguments it has.
- */
+/* Execute a command, plus any arguments it has. */
 int execcom(struct command com, char *argmarker, char *argline, struct osstate *ostate) {
-	/*
-	 * Arg. array for commands.
-	 */
+	/* Arg. array for commands. */
 	char *argv[MAX_ARG_COUNT];
 	int   argc;
 
-	/*
-	 * Return status of commands.
-	 */
+	/* Return status of commands. */
 	int comret;
 
+	/* Current CLI arg. */
+	char *tok;
+	/* Index for arg parsing. */
 	int i;
 
-	/*
-	 * argv[0] is always the command name.
-	 */
+	/* argv[0] is always the command name. */
 	argv[0] = com.name;
 	argc    = 1;
 
-	/*
-	 * Gather space-seperated args into an array.
-	 */
+	/* Gather space-seperated args into an array. */
 	for(i = 1; i < MAX_ARG_COUNT; i++) {
-		char *tok;
 
 		tok = strtok_r(NULL, " \t", &argmarker);
 
+		/* No more tokens. */
 		if(tok == NULL) break;
 
 		argv[i] = tok;
 		argc   += 1;
 	}
 
-	/*
-	 * Execute the command.
-	 */
+	if(tok != NULL) {
+		/* Some CLI args were clipped. */
+		fprintf(ostate->strem, "\tWARNING: Excess command line arguments '%s' were ignored\n", argmarker);
+	}
+
+	/* Execute the command. */
 	comret = com.comfun(argc, argv, argline, ostate);
 
 	return comret;

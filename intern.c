@@ -4,8 +4,12 @@
 
 #include "intern.h"
 
-/* The number of hash buckets we use. */
-#define BUCKET_COUNT 10
+/* 
+ * The number of hash buckets we use.
+ *
+ * This should be a prime number.
+ */
+#define BUCKET_COUNT 13
 
 /* Convert a string to a hashcode. */
 unsigned long hashstring(const char *val) {
@@ -13,12 +17,16 @@ unsigned long hashstring(const char *val) {
 	unsigned long hash = 5381;
 	int c;
 
+	/* Get the current string character. */
 	c    = *val;
 	val += 1;
 
+	/* While we're not at the end of the string. */
 	while(c) {
-		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+		/* hash * 33 + c */
+		hash = ((hash << 5) + hash) + c; 
 
+		/* Advance to the next character. */
 		c    = *val;
 		val += 1;
 	}
@@ -26,19 +34,32 @@ unsigned long hashstring(const char *val) {
 	return hash;
 }
 
+/* Convert an integer to a hashcode. */
 unsigned long hashkey(const int val) {
 	/* @TODO check if there is a better hash func. to use. */
 	return val;
 }
 
+/* A bucket in the intern table */
 struct bucket {
+	/* The string in this bucket. */
 	char      *val;
+	/* The intern key for this string. */
 	internkey  key;
 
+	/*
+	 * Next/prev form a circular list of buckets.
+	 */
+
+	/* The next bucket in the chain. */
 	struct bucket *next;
+	/* The previous bucket in the chain. */
 	struct bucket *prev;
 };
 
+/*
+ * Definition of an intern table.
+ */
 struct interntab {
 	/* The next intern key to use. */
 	internkey nextkey;
@@ -51,7 +72,9 @@ struct interntab {
 
 /* Allocate/initialize an intern table. */
 struct interntab *makeinterntab() {
+	/* The table. */
 	struct interntab *tab;
+	/* The counter for entry initialization */
 	int i;
 
 	/* Create a new intern table, and set its key value. */
@@ -71,8 +94,9 @@ struct interntab *makeinterntab() {
 	return tab;
 }
 
+/* Add a bucket to a bucket chain. */
 void addbucket(struct bucket *bucket) {
-	/* The new bucket. */
+	/* Allocate a new bucket. */
 	struct bucket *nbucket;
 	nbucket = malloc(sizeof(struct bucket));
 	assert(nbucket != NULL);
@@ -91,9 +115,9 @@ void addbucket(struct bucket *bucket) {
 		struct bucket *nextbucket;
 		nextbucket = bucket->next;
 
+		/* Insert our bucket into the chain. */
 		bucket->next     = nbucket;
 		nextbucket->prev = nbucket;
-
 		nbucket->next = nextbucket;
 		nbucket->prev = bucket;
 	}
@@ -120,29 +144,38 @@ internkey internstring(struct interntab * table, const char *string) {
 	/* Make sure we never make the invalid key valid. */
 	assert(key != SIINVALID);
 
+	/* Get both hashes. */
 	shash = hashstring(string) % BUCKET_COUNT;
 	khash = hashkey(key)       % BUCKET_COUNT;
 
+	/* Get the buckets for each hash. */
 	sbucket = &(table->strings[shash]);
 	kbucket = &(table->keys[khash]);
 
 	if(sbucket->key != SIINVALID) {
-		/* Non-empty bucket. */
+		/*
+		 * Non-empty bucket. 
+		 *
+		 * Insert into a new one.
+		 */
 		sbucket = sbucket->prev;
 		kbucket = kbucket->prev;
 	}
 
+	/* Insert into the right bucket in both tables. */
 	sbucket->val = string;
 	sbucket->key = key;
-	addbucket(sbucket);
-
 	kbucket->val = string;
 	kbucket->key = key;
+
+	/* Add a new empty bucket to both tables. */
+	addbucket(sbucket);
 	addbucket(kbucket);
 
 	return key;
 }
 
+/* Lookup a interned key for a string. */
 internkey lookupstring(struct interntab *table, const char *string) {
 	/* The string hash. */
 	int shash;
@@ -169,11 +202,11 @@ internkey lookupstring(struct interntab *table, const char *string) {
 		/* Bail out if we've looped or hit an empty bucket. */
 	} while(sbucket->key != fkey && sbucket->key != SIINVALID);
 
-	/*
-	 * We didn't find anything. */
+	/* We didn't find anything. */
 	return SIINVALID;
 }
 
+/* Lookup the string for an interned key. */
 const char *lookupkey(struct interntab *table, const internkey key) {
 	/* The key hash. */
 	int khash;
