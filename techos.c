@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <time.h>
+#include "libs/argparser.h"
 
 #include "osstate.h"
 #include "commands.h"
@@ -76,32 +76,30 @@ int handleline(struct osstate *ostate, char *line) {
 	/* Actual length of read string. */
 	size_t llen;
 
-	/* Variables for parsing the command name/arguments. */
-	char *name;
-	char *saveptr;
+	/* The command line arguments. */
+	struct cliargs args;
+
+	/* A copy of the line. */
+	char *newline;
+	newline = strdup(line);
 
 	/* Remove the trailing newline from the command. */
 	llen = strlen(line);
 	if(line[llen-1] == '\n')
 		line[llen-1] = '\0';
 
-	/* Get the name from the command. */
-	name = strtok_r(line, " \t", &saveptr);
-	if(name != NULL) {
+	args = parseargs(line);
+	if(args.argv[0] != NULL) {
 		/* The command to execute. */
 		struct command com;
 
 		/* Determine the command to execute from the name. */
-		com = parsecom(name, ostate);
+		com = parsecom(args.argv[0], ostate);
 
 		/* Execute the command if we have one. */
 		if(com.comfun != NULL) {
 			/* The return status of the command. */
 			int comres;
-
-			char *newline;
-
-			newline = strdup(line);
 
 			/*
 			 * Execute the command.
@@ -111,18 +109,24 @@ int handleline(struct osstate *ostate, char *line) {
 			 * - positive for non-fatal errors
 			 * - negative for fatal errors.
 			 */
-			comres = execcom(com, saveptr, newline, ostate);
+			comres = execcom(com, args, newline, ostate);
 
 			free(newline);
 
 			return comres;
 		} else {
 			/* No such command exists. */
-			fprintf(ostate->output, "\tERROR: No such command named '%s'\n", name);
+			fprintf(ostate->output, "\tERROR: No such command named '%s'\n", args.argv[0]);
+
+			free(newline);
+
 			return 1;
 		}
 	} else {
 		fprintf(ostate->output, "\tERROR: Couldn't find command name in line '%s'\n", line);
+
+		free(newline);
+
 		return 1;
 	}
 }
@@ -150,42 +154,12 @@ struct command parsecom(char *name, struct osstate *ostate) {
 }
 
 /* Execute a command, plus any arguments it has. */
-int execcom(struct command com, char *argmarker, char *argline, struct osstate *ostate) {
-	/* Arg. array for commands. */
-	char *argv[MAX_ARG_COUNT];
-	int   argc;
-
+int execcom(struct command com, struct cliargs args, char *argline, struct osstate *ostate) {
 	/* Return status of commands. */
 	int comret;
 
-	/* Current CLI arg. */
-	char *tok;
-	/* Index for arg parsing. */
-	int i;
-
-	/* argv[0] is always the command name. */
-	argv[0] = com.name;
-	argc    = 1;
-
-	/* Gather space-seperated args into an array. */
-	for(i = 1; i < MAX_ARG_COUNT; i++) {
-
-		tok = strtok_r(NULL, " \t", &argmarker);
-
-		/* No more tokens. */
-		if(tok == NULL) break;
-
-		argv[i] = tok;
-		argc   += 1;
-	}
-
-	if(tok != NULL) {
-		/* Some CLI args were clipped. */
-		fprintf(ostate->output, "\tWARNING: Excess command line arguments '%s' were ignored\n", argmarker);
-	}
-
 	/* Execute the command. */
-	comret = com.comfun(argc, argv, argline, ostate);
+	comret = com.comfun(args.argc, args.argv, argline, ostate);
 
 	return comret;
 }

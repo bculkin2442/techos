@@ -4,7 +4,7 @@ DEPDIR := .d
 $(shell mkdir -p $(DEPDIR) >/dev/null)
 DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.Td
 
-COMPILE.c   = $(CC) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS)
+COMPILE.c   = $(CC) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS)
 POSTCOMPILE = @mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d && touch $@
 
 %.o : %.c
@@ -31,8 +31,11 @@ SRCS := $(wildcard *.c)
 # All of our documentation
 DOCS := $(wildcard help/*.1)
 
-# The flags we wan to pass to the C compiler
+# The flags we want to pass to the C compiler
 CFLAGS := -std=c11 -O0 -g -Wall -Wextra -Wpedantic -Wno-unused-variable -Wno-unused-parameter -Wno-implicit-function-declaration -Wno-unused-but-set-variable
+
+# The flags we want to pass to the linker
+LDFLAGS := -Llibs
 
 # None of these targets correspond to actual files
 .PHONY: all clean run
@@ -41,21 +44,28 @@ all: techos libs
 
 
 # TechOS depends on an .o file for each source file
-techos: $(patsubst %.c,%.o,$(SRCS))
-	gcc -O0 -g -o techos $(patsubst %.c,%.o,$(SRCS))
+techos: $(patsubst %.c,%.o,$(SRCS)) libs/libargparser.a
+	gcc $(CFLAGS) $(LDFLAGS) -o techos $(patsubst %.c,%.o,$(SRCS)) -largparser
 	
 run: techos
 	./techos
 
 # Make libraries
-libs: libintern.a
+libs: libs/libintern.a libs/libargparser.a
 
 # Make libintern
-libintern.a: libs/intern.o
+libs/libintern.a: libs/intern.o
 	ar rcs libs/libintern.a libs/intern.o
 
 libs/intern.o: libs/intern.c libs/intern.h
-	$(CC) $(CFLAGS) -c libs/intern.c -o libs/intern.o
+	$(CC) $(CFLAGS) -o libs/intern.o -c libs/intern.c
+
+# Make libargparser
+libs/libargparser.a: libs/argparser.o
+	ar rcs libs/libargparser.a libs/argparser.o
+
+libs/argparser.o: libs/argparser.c libs/argparser.h
+	$(CC) $(CFLAGS) -o libs/argparser.o -c libs/argparser.c 
 
 # Delete the binary and any object/library files, as well as the printed documentation
 clean: 

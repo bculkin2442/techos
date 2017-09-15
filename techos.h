@@ -1,6 +1,8 @@
 #ifndef TECHOS_HEADER
 #define TECHOS_HEADER
 
+#include "libs/argparser.h"
+
 #include "osstate.h"
 #include "commands.h"
 
@@ -40,5 +42,5 @@ struct command parsecom(char *, struct osstate *);
  *
  * Gathers the CLI args for a command, and then executes it.
  */
-int execcom(struct command, char *, char *, struct osstate *);
+int execcom(struct command, struct cliargs, char *, struct osstate *);
 #endif

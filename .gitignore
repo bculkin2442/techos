@@ -1,6 +1,7 @@
 .d/
 techos
 *.o
+*.a
 ccglue.*
 *.swp
 help/*.pdf

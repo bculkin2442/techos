@@ -1,5 +1,6 @@
-#ifndef TECHOS_INTERNH
-#define TECHOS_INTERNH
+#ifndef INTERN_HEADER
+#define INTERN_HEADER
+
 /*
  * Handle interning of string constants for quick equality checking.
  */
