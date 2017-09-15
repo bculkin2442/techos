@@ -21,6 +21,14 @@ static const int minor_ver = 2;
 void comhan(struct osstate *);
 
 /*
+ * Executes a command from a line of input.
+ *
+ * The reason this is seperated is so that things like file input and aliases
+ * (if we want them) can be more easily implemented.
+ */
+int handleline(struct osstate *, char *);
+
+/*
  * Command parser.
  *
  * Determines which command should be executed based off of a name.

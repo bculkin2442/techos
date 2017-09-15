@@ -23,13 +23,16 @@ int main() {
 	/* Initialize commands. */
 	initcoms();
 	/* Init. OS state. */
-	ostate        = makeosstate();
-	ostate->strem = stdin;
-	fprintf(ostate->strem, "Welcome to TechOS v%d.%d\n", major_ver, minor_ver);
+	ostate         = makeosstate();
+	ostate->strem  = stdin;
+	ostate->output = stdout;
 
+	fprintf(ostate->output, "Welcome to TechOS v%d.%d\n", major_ver, minor_ver);
+
+	/* Handle commands. */
 	comhan(ostate);
 
-	fprintf(ostate->strem, "Goodbye\n");
+	fprintf(ostate->output, "Goodbye\n");
 
 	/* Cleanup after ourselves. */
 	killosstate(ostate);
@@ -47,66 +50,20 @@ void comhan(struct osstate *ostate) {
 	char   *line  = NULL;
 
 	/* Initial prompt. */
-	fprintf(ostate->strem, "TechOS(%d)>", lno);
+	fprintf(ostate->output, "TechOS(%d)>", lno);
 
 	/* Loop until we don't read anything. */
 	while((lread = getline(&line, &lsize, ostate->strem)) > 0) {
-		/* Actual length of read string. */
-		size_t llen;
-
-		/* Variables for parsing the command name/arguments. */
-		char *name;
-		char *saveptr;
-
-		/* The return status of the command. */
-		int comres;
-
 		/* Exit the command loop if we've read EOF. */
 		if(feof(ostate->strem) != 0) goto cleanup;
 
 		lno += 1;
 
-		/* Remove the trailing newline from the command. */
-		llen = strlen(line);
-		if(line[llen-1] == '\n')
-			line[llen-1] = '\0';
-
-		/* Get the name from the command. */
-		name = strtok_r(line, " \t", &saveptr);
-		if(name != NULL) {
-			/* The command to execute. */
-			struct command com;
-
-			/* Determine the command to execute from the name. */
-			com = parsecom(name, ostate);
-
-			/* Execute the command if we have one. */
-			if(com.comfun != NULL) {
-				char *newline;
-
-				newline = strdup(line);
-
-				/*
-				 * Execute the command.
-				 *
-				 * The status should be one of: 
-				 * - zero for executing succesfully
-				 * - positive for non-fatal errors
-				 * - negative for fatal errors.
-				 */
-				comres = execcom(com, saveptr, newline, ostate);
-
-				free(newline);
-				/* Exit the loop if something failed. */
-				if(comres < 0) goto cleanup;
-			} else {
-				/* No such command exists. */
-				fprintf(ostate->strem, "\tERROR: No such command named '%s'\n", name);
-			}
-		}
+		/* Handle the line, and exit if a command failed */
+		if(handleline(ostate, line) < 0) break;
 
 		/* Reprompt. */
-		fprintf(ostate->strem, "TechOS(%d)>", lno);
+		fprintf(ostate->output, "TechOS(%d)>", lno);
 	}
 
 	/* Cleanup after ourselves. */
@@ -114,6 +71,61 @@ cleanup: if(line != NULL)
 		free(line);
 }
 
+/* Handle executing a line of input. */
+int handleline(struct osstate *ostate, char *line) {
+	/* Actual length of read string. */
+	size_t llen;
+
+	/* Variables for parsing the command name/arguments. */
+	char *name;
+	char *saveptr;
+
+	/* Remove the trailing newline from the command. */
+	llen = strlen(line);
+	if(line[llen-1] == '\n')
+		line[llen-1] = '\0';
+
+	/* Get the name from the command. */
+	name = strtok_r(line, " \t", &saveptr);
+	if(name != NULL) {
+		/* The command to execute. */
+		struct command com;
+
+		/* Determine the command to execute from the name. */
+		com = parsecom(name, ostate);
+
+		/* Execute the command if we have one. */
+		if(com.comfun != NULL) {
+			/* The return status of the command. */
+			int comres;
+
+			char *newline;
+
+			newline = strdup(line);
+
+			/*
+			 * Execute the command.
+			 *
+			 * The status should be one of: 
+			 * - zero for executing succesfully
+			 * - positive for non-fatal errors
+			 * - negative for fatal errors.
+			 */
+			comres = execcom(com, saveptr, newline, ostate);
+
+			free(newline);
+
+			return comres;
+		} else {
+			/* No such command exists. */
+			fprintf(ostate->output, "\tERROR: No such command named '%s'\n", name);
+			return 1;
+		}
+	} else {
+		fprintf(ostate->output, "\tERROR: Couldn't find command name in line '%s'\n", line);
+		return 1;
+	}
+}
 /* Get a command from its name. */
 struct command parsecom(char *name, struct osstate *ostate) {
 	int i;
@@ -169,7 +181,7 @@ int execcom(struct command com, char *argmarker, char *argline, struct osstate *
 
 	if(tok != NULL) {
 		/* Some CLI args were clipped. */
-		fprintf(ostate->strem, "\tWARNING: Excess command line arguments '%s' were ignored\n", argmarker);
+		fprintf(ostate->output, "\tWARNING: Excess command line arguments '%s' were ignored\n", argmarker);
 	}
 
 	/* Execute the command. */
