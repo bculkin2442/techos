@@ -25,7 +25,7 @@ $(DEPDIR)/%.d: ;
 %.pdf: %.ps
 	ps2pdf $< $@
 
-#  All our source files
+#  All our main source files
 SRCS := $(wildcard *.c)
 
 # All of our documentation
@@ -37,9 +37,8 @@ CFLAGS := -std=c11 -O0 -g -Wall -Wextra -Wpedantic -Wno-unused-variable -Wno-unu
 # None of these targets correspond to actual files
 .PHONY: all clean run
 
-all: techos
+all: techos libs
 
-docs: $(patsubst %.1,%.pdf,$(DOCS))
 
 # TechOS depends on an .o file for each source file
 techos: $(patsubst %.c,%.o,$(SRCS))
@@ -48,10 +47,24 @@ techos: $(patsubst %.c,%.o,$(SRCS))
 run: techos
 	./techos
 
-# Delete the binary and any object files, as well as the printed documentation
+# Make libraries
+libs: libintern.a
+
+# Make libintern
+libintern.a: libs/intern.o
+	ar rcs libs/libintern.a libs/intern.o
+
+libs/intern.o: libs/intern.c libs/intern.h
+	$(CC) $(CFLAGS) -c libs/intern.c -o libs/intern.o
+
+# Delete the binary and any object/library files, as well as the printed documentation
 clean: 
 	rm $(wildcard *.o)
+	rm $(wildcard libs/*.o)
+	rm $(wildcard libs/*.a)
 	rm techos
+
+docs: $(patsubst %.1,%.pdf,$(DOCS))
 
 # Include all of our dependancy info
 include $(wildcard $(patsubst %,$(DEPDIR)/%.d,$(basename $(SRCS))))
