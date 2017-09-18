@@ -20,4 +20,13 @@ struct command {
 
 /* An invalid command. */
 static struct command INVALID_COMMAND = {"invalid", "", NULL};
+
+/* Declare a command. */
+#define DECLCOM(name) int handle_##name(int, char **, char *, struct osstate *)
+
+/* Define a command handler. */
+#define HANDLECOM(nam) int handle_##nam(int argc, char **argv, char *argl, struct osstate *ostate)
+
+/* Check if a command that only takes the 'help' argument recieved it. */
+int checkhelpargs(int, char **, char *, struct osstate *);
 #endif
