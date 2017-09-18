@@ -7,7 +7,15 @@
 
 #include "osstate.h"
 #include "commands.h"
+#include "comlist.h"
 #include "techos.h"
+
+/* The major/minor version of TechOS. */
+const int major_ver = 1;
+const int minor_ver = 2;
+
+/* List of all commands. */
+struct comlist *all_commands;
 
 /*
  * Main function. 
@@ -26,6 +34,9 @@ int main() {
 	ostate         = makeosstate();
 	ostate->strem  = stdin;
 	ostate->output = stdout;
+	/* Add all the commands to the command list. */
+	all_commands = makecomlist();
+	addcommands(all_commands);
 
 	fprintf(ostate->output, "Welcome to TechOS v%d.%d\n", major_ver, minor_ver);
 
@@ -56,7 +67,6 @@ void comhan(struct osstate *ostate) {
 	while((lread = getline(&line, &lsize, ostate->strem)) > 0) {
 		/* Exit the command loop if we've read EOF. */
 		if(feof(ostate->strem) != 0) goto cleanup;
-
 		lno += 1;
 
 		/* Handle the line, and exit if a command failed */
@@ -81,23 +91,24 @@ int handleline(struct osstate *ostate, char *line) {
 
 	/* A copy of the line. */
 	char *newline;
-	newline = strdup(line);
+	newline = (char *)strdup(line);
 
 	/* Remove the trailing newline from the command. */
 	llen = strlen(line);
 	if(line[llen-1] == '\n')
 		line[llen-1] = '\0';
 
+	/* Parse CLI args. */
 	args = parseargs(line);
 	if(args.argv[0] != NULL) {
 		/* The command to execute. */
-		struct command com;
+		struct command *com;
 
 		/* Determine the command to execute from the name. */
-		com = parsecom(args.argv[0], ostate);
+		com = getcommand(all_commands, args.argv[0]);
 
 		/* Execute the command if we have one. */
-		if(com.comfun != NULL) {
+		if(com->comfun != NULL) {
 			/* The return status of the command. */
 			int comres;
 
@@ -117,49 +128,24 @@ int handleline(struct osstate *ostate, char *line) {
 		} else {
 			/* No such command exists. */
 			fprintf(ostate->output, "\tERROR: No such command named '%s'\n", args.argv[0]);
-
 			free(newline);
 
 			return 1;
 		}
 	} else {
 		fprintf(ostate->output, "\tERROR: Couldn't find command name in line '%s'\n", line);
-
 		free(newline);
 
 		return 1;
 	}
 }
-/* Get a command from its name. */
-struct command parsecom(char *name, struct osstate *ostate) {
-	int i;
-
-	/*
-	 * Go through all the commands.
-	 *
-	 * If one matches, return it.
-	 *
-	 * @TODO replace this
-	 */
-	for(i = 0; i < NUM_COMMANDS; i++) {
-		struct command com = commands[i];
-
-		if(strcmp(com.name, name) == 0) {
-			return com;
-		}
-	}
-
-	/* INVALID_COMMAND is the last command. */
-	return INVALID_COMMAND;
-}
 
 /* Execute a command, plus any arguments it has. */
-int execcom(struct command com, struct cliargs args, char *argline, struct osstate *ostate) {
+int execcom(struct command *com, struct cliargs args, char *argline, struct osstate *ostate) {
 	/* Return status of commands. */
 	int comret;
-
 	/* Execute the command. */
-	comret = com.comfun(args.argc, args.argv, argline, ostate);
+	comret = com->comfun(args.argc, args.argv, argline, ostate);
 
 	return comret;
 }

@@ -12,7 +12,7 @@ char *parsestr(char *lead, char delim, char **args) {
 	char *strang;
 
 	/* The rest of the strings contents. */
-	rest = strtok_r(NULL, &delim, args);
+	rest = (char *)strtok_r(NULL, &delim, args);
 
 	/* Print the string, and bail if that fails. */
 	if(asprintf(&strang, "%s %s", lead, rest) == -1) assert(0);
@@ -38,7 +38,7 @@ struct cliargs parseargs(char *strang) {
 	assert(args.argv != NULL);
 
 	/* Get the initial tokens. */
-	token     = strtok_r(strang, " ", &pSave);
+	token     = (char *)strtok_r(strang, " ", &pSave);
 
 	while(token != NULL && args.argc < MAX_CLI_ARGS) {
 		if(token[0] == '\'' || token[0] == '\"') {
@@ -46,11 +46,11 @@ struct cliargs parseargs(char *strang) {
 			args.argv[args.argc] = parsestr(token + 1, token[0], &pSave);
 		} else {
 			/* No string, just add the argument. */
-			args.argv[args.argc] = strdup(token);
+			args.argv[args.argc] = (char *)strdup(token);
 		}
 
 		/* Get the next token. */
-		token      = strtok_r(NULL, " ", &pSave);
+		token      = (char *)strtok_r(NULL, " ", &pSave);
 		args.argc += 1;
 	}
 

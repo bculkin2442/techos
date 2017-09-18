@@ -10,6 +10,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include "osstate.h"
+#include "command.h"
+#include "comlist.h"
 #include "commands.h"
 #include "techos.h"
 
@@ -34,6 +37,16 @@ void disposecoms() {
 	/*
 	 * Doing nothing at the moment.
 	 */
+}
+
+void addcommands(struct comlist *list) {
+	addcommand(list, "exit",    "Exit TechOS",                                    &handle_exit);
+	addcommand(list, "version", "Display version/author information",             &handle_version);
+	addcommand(list, "date",    "Display the current date/time",                  &handle_date);
+	addcommand(list, "datefmt", "Set the format the date is displayed/read in",   &handle_datefmt);
+	addcommand(list, "setdate", "Set the current date",                           &handle_setdate);
+	addcommand(list, "time",    "Display the current time",                       &handle_time);
+	addcommand(list, "help",    "Get help for commands, or list available ones.", &handle_help);
 }
 
 /* Check if a command that only takes the 'help' argument recieved it. */
@@ -412,7 +425,7 @@ HANDLECOM(setdate) {
 		line[llen-1] = '\0';
 
 	/* Parse the input according to the format. */
-	leftovers = strptime(line, ostate->in_datefmt, datetime);
+	leftovers = (char *)strptime(line, ostate->in_datefmt, datetime);
 	if(leftovers == NULL) {
 		/* The format didn't match correctly. */
 		fprintf(ostate->output, "\tERROR: Input '%s' doesn't match format '%s'\n", line, ostate->in_datefmt);
@@ -443,17 +456,9 @@ HANDLECOM(help) {
 
 	/* Handle CLI args. */
 	if(argc == 1) {
-		/* Command index. */
-		int i;
-
 		fprintf(ostate->output, "Available commands\n");
-		for(i = 0; i < NUM_COMMANDS; i++) {
-			struct command com;
 
-			com = commands[i];
-
-			fprintf(ostate->output, "\t%s\t%s\n", com.name, com.brief);
-		}
+		printcommands(all_commands, ostate->output);
 	} else if(argc == 2){
 		/* The path to the man page. */
 		char *manpath;

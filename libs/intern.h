@@ -8,9 +8,9 @@
 /* An intern key is a reference to a string in an intern table. */
 typedef int internkey;
 /* The invalid intern key. */
-static internkey SIINVALID = 0;
+static internkey SIINVALID = -1;
 /* The code that indicates the intern table is full. */
-static internkey SITABFULL = -1;
+static internkey SITABFULL = -2;
 
 /*
  * A interntab is a hash table that contains interned strings.

@@ -4,7 +4,7 @@ DEPDIR := .d
 $(shell mkdir -p $(DEPDIR) >/dev/null)
 DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.Td
 
-COMPILE.c   = $(CC) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS)
+COMPILE.c   = $(CC) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS)
 POSTCOMPILE = @mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d && touch $@
 
 %.o : %.c
@@ -37,15 +37,18 @@ CFLAGS := -std=c11 -O0 -g -Wall -Wextra -Wpedantic -Wno-unused-variable -Wno-unu
 # The flags we want to pass to the linker
 LDFLAGS := -Llibs
 
+# The libraries we want to link to
+LINKLIBS := -largparser -lintern
+
 # None of these targets correspond to actual files
-.PHONY: all clean run
+.PHONY: all clean run libs
 
 all: techos libs
 
 
 # TechOS depends on an .o file for each source file
-techos: $(patsubst %.c,%.o,$(SRCS)) libs/libargparser.a
-	gcc $(CFLAGS) $(LDFLAGS) -o techos $(patsubst %.c,%.o,$(SRCS)) -largparser
+techos: $(patsubst %.c,%.o,$(SRCS)) libs
+	gcc $(CFLAGS) $(LDFLAGS) -o techos $(patsubst %.c,%.o,$(SRCS)) $(LINKLIBS)
 	
 run: techos
 	./techos

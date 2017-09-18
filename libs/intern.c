@@ -57,17 +57,15 @@ struct bucket {
 	struct bucket *prev;
 };
 
-/*
- * Definition of an intern table.
- */
+/* Definition of an intern table. */
 struct interntab {
 	/* The next intern key to use. */
 	internkey nextkey;
 	
 	/* The table of strings */
-	struct bucket strings[BUCKET_COUNT];
+	struct bucket *strings[BUCKET_COUNT];
 	/* The table of keys */
-	struct bucket keys[BUCKET_COUNT];
+	struct bucket *keys[BUCKET_COUNT];
 };
 
 /* Allocate/initialize an intern table. */
@@ -84,14 +82,70 @@ struct interntab *makeinterntab() {
 
 	/* Initialize the tables. */
 	for(i = 0; i < BUCKET_COUNT; i++) {
-		tab->strings[i].val = NULL;
-		tab->strings[i].key = SIINVALID;
+		/* Initialize string table. */
+		tab->strings[i]       = malloc(sizeof(struct bucket));
+		tab->strings[i]->val  = NULL;
+		tab->strings[i]->key  = SIINVALID;
+		tab->strings[i]->next = NULL;
+		tab->strings[i]->prev = NULL;
 
-		tab->keys[i].val = NULL;
-		tab->keys[i].key = SIINVALID;
+		/* Initialize key table. */
+		tab->keys[i]       = malloc(sizeof(struct bucket));
+		tab->keys[i]->val  = NULL;
+		tab->keys[i]->key  = SIINVALID;
+		tab->keys[i]->next = NULL;
+		tab->keys[i]->prev = NULL;
 	}
 
 	return tab;
+}
+
+void killinterntab(struct interntab *table) {
+	int i;
+	/* Free strings table. */
+	for(i = 0; i < BUCKET_COUNT; i++) {
+		/* Get the initial bucket. */
+		struct bucket *buck;
+		buck = table->strings[i];
+
+		/* Terminate the chain. */
+		buck->prev->next = NULL;
+
+		while(buck != NULL && buck->next != NULL) {
+			/* Free each bucket in the chain. */
+			struct bucket *tmp;
+
+			tmp  = buck;
+			buck = buck->next;
+
+			/* Free the string we own. */
+			if(tmp->val != NULL) free(tmp->val);
+			free(tmp);
+		}
+	}
+
+	/* Free keys table. */
+	for(i = 0; i < BUCKET_COUNT; i++) {
+		/* Get the initial bucket. */
+		struct bucket *buck;
+		buck = table->strings[i];
+
+		/* Terminate the chain. */
+		buck->prev->next = NULL;
+
+		while(buck != NULL && buck->next != NULL) {
+			/* Free each bucket in the chain. */
+			struct bucket *tmp;
+
+			tmp  = buck;
+			buck = buck->next;
+
+			/* Free the bucket. */
+			free(tmp);
+		}
+	}
+
+	free(table);
 }
 
 /* Add a bucket to a bucket chain. */
@@ -109,7 +163,7 @@ void addbucket(struct bucket *bucket) {
 		nbucket->next = bucket;
 		nbucket->prev = bucket;
 	} else {
-		/* Chain sbucket. */
+		/* Chain bucket. */
 
 		/* The next bucket in the list. */
 		struct bucket *nextbucket;
@@ -124,7 +178,7 @@ void addbucket(struct bucket *bucket) {
 }
 
 /* Intern a string. */
-internkey internstring(struct interntab * table, const char *string) {
+internkey internstring(struct interntab *table, const char *string) {
 	/* The intern key we use. */
 	internkey key;
 	/* The key/string hashes. */
@@ -144,13 +198,16 @@ internkey internstring(struct interntab * table, const char *string) {
 	/* Make sure we never make the invalid key valid. */
 	assert(key != SIINVALID);
 
+	/* Create a copy of the string we own. */
+	char *strang = (char *)strdup(string);
+
 	/* Get both hashes. */
-	shash = hashstring(string) % BUCKET_COUNT;
+	shash = hashstring(strang) % BUCKET_COUNT;
 	khash = hashkey(key)       % BUCKET_COUNT;
 
 	/* Get the buckets for each hash. */
-	sbucket = &(table->strings[shash]);
-	kbucket = &(table->keys[khash]);
+	sbucket = table->strings[shash];
+	kbucket = table->keys[khash];
 
 	if(sbucket->key != SIINVALID) {
 		/*
@@ -159,13 +216,21 @@ internkey internstring(struct interntab * table, const char *string) {
 		 * Insert into a new one.
 		 */
 		sbucket = sbucket->prev;
+	}
+	if(kbucket->key != SIINVALID) {
+		/*
+		 * Non-empty bucket. 
+		 *
+		 * Insert into a new one.
+		 */
 		kbucket = kbucket->prev;
 	}
 
 	/* Insert into the right bucket in both tables. */
-	sbucket->val = string;
+	sbucket->val = strang;
+	kbucket->val = strang;
+
 	sbucket->key = key;
-	kbucket->val = string;
 	kbucket->key = key;
 
 	/* Add a new empty bucket to both tables. */
@@ -186,7 +251,7 @@ internkey lookupstring(struct interntab *table, const char *string) {
 
 	/* Get the bucket for this string. */
 	shash   = hashstring(string) % BUCKET_COUNT;
-	sbucket = &(table->strings[shash]);
+	sbucket = table->strings[shash];
 	fkey    = sbucket->key;
 
 	/* Bail out early if the bucket is empty. */
@@ -220,7 +285,7 @@ const char *lookupkey(struct interntab *table, const internkey key) {
 
 	/* Get the bucket for this key. */
 	khash   = hashkey(key) % BUCKET_COUNT;
-	kbucket = &(table->keys[khash]);
+	kbucket = table->keys[khash];
 	fkey    = kbucket->key;
 
 	/* Bail out early if the bucket is empty. */

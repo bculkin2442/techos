@@ -1,6 +1,10 @@
 #ifndef TECHOS_OSSTATEH
 #define TECHOS_OSSTATEH
 
+#include <stdio.h>
+
+#include <time.h>
+
 #define MAX_FMT_SIZE 256
 
 /* Default date formats. */

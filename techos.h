@@ -4,15 +4,18 @@
 #include "libs/argparser.h"
 
 #include "osstate.h"
-#include "commands.h"
+#include "command.h"
 
 /*
  * Main TechOS header.
  */
 
+/* List of all commands. */
+extern struct comlist *all_commands;
+
 /* The major/minor version of TechOS. */
-static const int major_ver = 1;
-static const int minor_ver = 2;
+extern const int major_ver;
+extern const int minor_ver;
 
 /*
  * Main command handler.
@@ -31,16 +34,9 @@ void comhan(struct osstate *);
 int handleline(struct osstate *, char *);
 
 /*
- * Command parser.
- *
- * Determines which command should be executed based off of a name.
- */
-struct command parsecom(char *, struct osstate *);
-
-/*
  * Command executor.
  *
  * Gathers the CLI args for a command, and then executes it.
  */
-int execcom(struct command, struct cliargs, char *, struct osstate *);
+int execcom(struct command *, struct cliargs, char *, struct osstate *);
 #endif

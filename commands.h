@@ -2,25 +2,18 @@
 #define TECHOS_COMMANDSH
 
 #include "osstate.h"
+#include "command.h"
+#include "comlist.h"
 
 /*
  * Header for commands.
  */
 
-/* Represents a command. */
-struct command {
-	/* The name of the command. */
-	const char *name;
-
-	/* A brief description of the command. */
-	const char *brief;
-
-	/* The function that implements the command. */
-	int (*comfun)(int, char **, char *, struct osstate *);
-};
-
 /* Initialize data for commands. */
 void initcoms();
+
+/* Add all registered commands to a comlist. */
+void addcommands(struct comlist *);
 
 /* Cleanup after commands. */
 void disposecoms();
@@ -62,13 +55,4 @@ static struct command commands[] = {
  */
 static const int NUM_COMMANDS = 7;
 
-/* An invalid command. */
-static struct command INVALID_COMMAND = {"invalid", "", NULL};
-
-/*
- * The max no. of arguments a command can take.
- *
- * Remember the first arg. of a command is its name.
- */
-#define MAX_ARG_COUNT 256
 #endif
