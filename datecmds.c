@@ -88,21 +88,6 @@ HANDLECOM(datefmt) {
 	enum setmode { SM_SET, SM_DISPLAY,         };
 	enum fmtmode { FM_IN,  FM_OUT,     FM_TIME };
 
-	/* Enum declaration for long options. */
-	enum dfmtopt {
-		/* Help option. */
-		DO_HELP = 0,
-
-		/* Mode options. */
-		DO_SET,
-		DO_DISPLAY,
-
-		/* Format choice options. */
-		DO_TIME,
-		DO_IN,
-		DO_OUT,
-	};
-
 	/* The current option, and the current long option */
 	int opt, optidx;
 
@@ -121,6 +106,21 @@ HANDLECOM(datefmt) {
 
 	/* Parse CLI args. */
 	while(1) {
+		/* Enum declaration for long options. */
+		enum dfmtopt {
+			/* Help option. */
+			DO_HELP = 0,
+
+			/* Mode options. */
+			DO_SET,
+			DO_DISPLAY,
+
+			/* Format choice options. */
+			DO_TIME,
+			DO_IN,
+			DO_OUT,
+		};
+
 		/* Our usage message. */
 		char *usage = "Usage: datefmt [-stdioh] [--help] [--set|--display] [--time|--in|--out]\n";
 
@@ -150,9 +150,7 @@ HANDLECOM(datefmt) {
 		/* Handle options. */
 		switch(opt) {
 		case 0:
-			/*
-			 * We picked a long option.
-			 */
+			/* We picked a long option. */
 			switch(optidx) {
 			case DO_HELP:
 				fprintf(ostate->output, "%s\n", usage);
@@ -246,7 +244,7 @@ HANDLECOM(datefmt) {
 			line[llen-1] = '\0';
 
 		if(llen >= 256) fprintf(ostate->output, "WARNING: Truncating format '%s' to '%.256s'\n", line, line);
-		
+
 		/*
 		 * Set the format.
 		 */
