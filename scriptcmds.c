@@ -1,11 +1,13 @@
+#include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <getopt.h>
 
 #include "osstate.h"
 #include "command.h"
-#include "scriptcmd.h"
+#include "scriptcmds.h"
 
 HANDLECOM(script) {
 	/* Reinit getopt. */
@@ -72,9 +74,10 @@ HANDLECOM(script) {
 	script = fopen(fname, "r");
 	if(script == NULL) {
 		/* Some error with opening the file. */
-	}
+		char *errmsg = strerror(errno);
 
-	{
+		fprintf(ostate->output, "\tERROR: Couldn't open file '%s' because '%s'\n", fname, errmsg);
+	} else {
 		/* Enclose I/O variables in their own scope. */
 		/* Variables for line input. */
 		size_t  lread = 0;

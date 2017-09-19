@@ -16,6 +16,7 @@
 #include "techos.h"
 
 #include "datecmds.h"
+#include "scriptcmds.h"
 
 /*
  * Initialize commands.
@@ -36,13 +37,14 @@ void disposecoms() {
 }
 
 void addcommands(struct comlist *list) {
-	addcommand(list, "exit",    "Exit TechOS",                                    &handle_exit);
-	addcommand(list, "version", "Display version/author information",             &handle_version);
 	addcommand(list, "date",    "Display the current date/time",                  &handle_date);
 	addcommand(list, "datefmt", "Set the format the date is displayed/read in",   &handle_datefmt);
-	addcommand(list, "setdate", "Set the current date",                           &handle_setdate);
-	addcommand(list, "time",    "Display the current time",                       &handle_time);
+	addcommand(list, "exit",    "Exit TechOS",                                    &handle_exit);
 	addcommand(list, "help",    "Get help for commands, or list available ones.", &handle_help);
+	addcommand(list, "setdate", "Set the current date",                           &handle_setdate);
+	addcommand(list, "script",  "Execute a script file",                          &handle_script);
+	addcommand(list, "time",    "Display the current time",                       &handle_time);
+	addcommand(list, "version", "Display version/author information",             &handle_version);
 }
 
 /* Check if a command that only takes the 'help' argument recieved it. */

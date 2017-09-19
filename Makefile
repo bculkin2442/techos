@@ -78,7 +78,6 @@ clean:
 	rm -rf bin/
 	rm $(wildcard libs/*.o)
 	rm $(wildcard libs/*.a)
-	rm techos
 
 docs: $(patsubst %.1,%.pdf,$(DOCS))
 

@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "libs/argparser.h"
+#include "argparser.h"
 
 int main() {
 	char   *line;

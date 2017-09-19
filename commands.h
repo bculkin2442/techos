@@ -5,8 +5,6 @@
 #include "command.h"
 #include "comlist.h"
 
-#include "datecmds.h"
-
 /*
  * Header for commands.
  */
