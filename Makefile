@@ -7,9 +7,12 @@ DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.Td
 COMPILE.c   = $(CC) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS)
 POSTCOMPILE = @mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d && touch $@
 
+OBJDIR := bin/
+$(shell mkdir -p $(OBJDIR) >/dev/null)
+
 %.o : %.c
-%.o : %.c $(DEPDIR)/%.d
-	$(COMPILE.c) -c $<
+$(OBJDIR)/%.o : %.c $(DEPDIR)/%.d
+	$(COMPILE.c) -c $< -o $@
 	$(POSTCOMPILE)
 
 $(DEPDIR)/%.d: ;
@@ -43,15 +46,15 @@ LINKLIBS := -largparser -lintern
 # None of these targets correspond to actual files
 .PHONY: all clean run libs
 
-all: techos libs
+all: bin/techos libs
 
 
 # TechOS depends on an .o file for each source file
-techos: $(patsubst %.c,%.o,$(SRCS)) libs
-	gcc $(CFLAGS) $(LDFLAGS) -o techos $(patsubst %.c,%.o,$(SRCS)) $(LINKLIBS)
+bin/techos: $(patsubst %.c,$(OBJDIR)/%.o,$(SRCS)) libs
+	gcc $(CFLAGS) $(LDFLAGS) -o bin/techos $(patsubst %.c,$(OBJDIR)/%.o,$(SRCS)) $(LINKLIBS)
 	
-run: techos
-	./techos
+run: bin/techos
+	./bin/techos
 
 # Make libraries
 libs: libs/libintern.a libs/libargparser.a
@@ -72,7 +75,7 @@ libs/argparser.o: libs/argparser.c libs/argparser.h
 
 # Delete the binary and any object/library files, as well as the printed documentation
 clean: 
-	rm $(wildcard *.o)
+	rm -rf bin/
 	rm $(wildcard libs/*.o)
 	rm $(wildcard libs/*.a)
 	rm techos
