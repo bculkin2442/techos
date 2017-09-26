@@ -42,6 +42,7 @@ struct cliargs parseargs(char *strang) {
 
 	while(token != NULL && args.argc < MAX_CLI_ARGS) {
 		if(token[0] == '\'' || token[0] == '\"') {
+			/* @TODO Handle single word strings. */
 			/* Parse a string. */
 			args.argv[args.argc] = parsestr(token + 1, token[0], &pSave);
 		} else {

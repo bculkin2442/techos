@@ -36,6 +36,7 @@ void disposecoms() {
 	 */
 }
 
+/* Add commands to a command list. */
 void addcommands(struct comlist *list) {
 	addcommand(list, "date",    "Display the current date/time",                  &handle_date);
 	addcommand(list, "datefmt", "Set the format the date is displayed/read in",   &handle_datefmt);
