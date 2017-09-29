@@ -5,6 +5,8 @@
 
 #include <time.h>
 
+#include "pcb.h"
+
 #define MAX_FMT_SIZE 256
 
 /* Default date formats. */
@@ -31,6 +33,19 @@ struct osstate {
 	FILE *strem;
 	/* The stream we output to. */
 	FILE *output;
+
+	/* Process Control Queues. */
+	struct pcbstate {
+		/* Ready PCBs. */
+		struct pcbqueue *qReady;
+		/* Blocked PCBs. */
+		struct pcbqueue *qBlocked;
+
+		/* Suspended Ready PCBs. */
+		struct pcbqueue *qsReady;
+		/* Suspended Blocked PCBs. */
+		struct pcbqueue *qsBlocked;
+	} pcbstat;
 };
 
 /* Create/delete an osstate. */

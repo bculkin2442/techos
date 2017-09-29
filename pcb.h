@@ -9,7 +9,7 @@ enum pcbclass {
 	PCB_SYSTEM,
 	/* An application process. */
 	PCB_APPLICATION,
-}
+};
 
 /* PCB run status. */
 enum pcbstatus {
@@ -19,7 +19,7 @@ enum pcbstatus {
 	PCB_READY,
 	/* The process is running. */
 	PCB_RUNNING,
-}
+};
 
 /* PCB Suspension status. */
 enum pcbsusp {
@@ -27,7 +27,7 @@ enum pcbsusp {
 	PCB_SUSPENDED,
 	/* The process is not suspended. */
 	PCB_FREE,
-}
+};
 
 /* Represents a running process. */
 struct pcb {
@@ -58,7 +58,7 @@ struct pcb {
 	struct pcb *next;
 	/* The previous process in whatever queue this PCB is in. */
 	struct pcb *prev;
-}
+};
 
 /* Represents a circular queue of PCBs. */
 struct pcbqueue {
@@ -67,5 +67,5 @@ struct pcbqueue {
 
 	/* The first process in this queue. */
 	struct pcb *head;
-}
+};
 #endif
