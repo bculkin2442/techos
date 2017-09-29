@@ -34,18 +34,8 @@ struct osstate {
 	/* The stream we output to. */
 	FILE *output;
 
-	/* Process Control Queues. */
-	struct pcbstate {
-		/* Ready PCBs. */
-		struct pcbqueue *qReady;
-		/* Blocked PCBs. */
-		struct pcbqueue *qBlocked;
-
-		/* Suspended Ready PCBs. */
-		struct pcbqueue *qsReady;
-		/* Suspended Blocked PCBs. */
-		struct pcbqueue *qsBlocked;
-	} pcbstat;
+	/* Process control state. */
+	struct pcbstate *pPCBstat;
 };
 
 /* Create/delete an osstate. */

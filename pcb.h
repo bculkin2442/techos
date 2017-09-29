@@ -3,6 +3,9 @@
 
 #include "libs/intern.h"
 
+#define PCB_MINPRIOR 0
+#define PCB_MAXPRIOR 9
+
 /* Represents the classification of a PCB. */
 enum pcbclass {
 	/* A system process. */
@@ -42,7 +45,7 @@ struct pcb {
 	 *
 	 * Stored as a interned string, for fast comparisons.
 	 */
-	internkey     name;
+	internkey     kName;
 	/* Process class. */
 	enum pcbclass clas;
 	/* Process priority. */
@@ -55,17 +58,44 @@ struct pcb {
 	enum pcbsusp   susp;
 
 	/* The next process in whatever queue this PCB is in. */
-	struct pcb *next;
+	struct pcb *pNext;
 	/* The previous process in whatever queue this PCB is in. */
-	struct pcb *prev;
+	struct pcb *pPrev;
 };
 
 /* Represents a circular queue of PCBs. */
-struct pcbqueue {
-	/* # of processes in this queue. */
-	int noprocs;
+struct pcbqueue;
 
-	/* The first process in this queue. */
-	struct pcb *head;
-};
+/* Contains all of the PCB queues. */
+struct pcbstate;
+
+/* Allocate a new PCB. */
+struct pcb *makepcb(struct pcbstate *, char *, enum pcbclass, int);
+/* Deallocate a PCB. */
+void        killpcb(struct pcb *);
+
+/*
+ * Find a PCB by its process number in a set of queues. 
+ *
+ * Returns NULL if the PCB wasn't found.
+ */
+struct pcb *findpcbnum(struct pcbstate *, int);
+/*
+ * Find a PCB by its process name in a set of queues.
+ *
+ * Returns NULL if the PCB wasn't found.
+ *
+ * WARNING: Will only return the first PCB by a given name, searching the
+ * queues in the following order:
+ *	1. Ready
+ * 	2. Blocked
+ *	3. Suspended Ready
+ *	4. Suspended Blocked.
+ */
+struct pcb *findpcbname(struct pcbstate *, char *);
+
+/* Insert a PCB into the proper queue. */
+void insertpcb(struct pcbstate *, struct pcb *);
+/* Remove a PCB from the queue it is in. */
+void removepcb(struct pcbstate *, struct pcb *);
 #endif
