@@ -14,29 +14,39 @@
 
 HANDLECOM(mkpcb) {
 
-
+	return 0;
 }
 
 HANDLECOM(rmpcb) {
 
+	return 0;
 }
 
 HANDLECOM(blpcb) {
 
+	return 0;
 }
 
 HANDLECOM(ubpcb) {
 
+	return 0;
 }
 
 HANDLECOM(sspcb) {
 
+	return 0;
 }
 
 HANDLECOM(rspcb) {
 
+	return 0;
+}
+
+HANDLECOM(sppcb) {
+
+	return 0;
 }
 
 HANDLECOM(shpcb) {
-
+	return 0;
 }
