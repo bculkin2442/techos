@@ -57,7 +57,7 @@ void addcommands(struct comlist *list) {
 	addcommand(list, "sspcb",     "Suspend PCB and reinsert into queue",       &handle_sspcb);
 	addcommand(list, "rspcb",     "Set PCB state to unsuspended and reinsert", &handle_rspcb);
 	addcommand(list, "sppcb",     "Set PCB priority and reinserts",            &handle_sppcb);
-	addcommand(list, "showpcb",   "Display PCB information",                   &handle_showpcb);
+	addcommand(list, "shpcb",     "Display PCB information",                   &handle_shpcb);
 
 	/* Misc. Commands. */
 	addcommand(list, "exit",    "Exit TechOS",                                    &handle_exit);

@@ -37,6 +37,6 @@ HANDLECOM(rspcb) {
 
 }
 
-HANDLECOM(showpcb) {
+HANDLECOM(shpcb) {
 
 }

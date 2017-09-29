@@ -12,6 +12,6 @@ DECLCOM(ubpcb);
 DECLCOM(sspcb);
 DECLCOM(rspcb);
 DECLCOM(sppcb);
-DECLCOM(showpcb);
+DECLCOM(shpcb);
 
 #endif
