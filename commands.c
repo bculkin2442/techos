@@ -17,6 +17,7 @@
 
 #include "datecmds.h"
 #include "scriptcmds.h"
+#include "pcbcmds.h"
 
 /*
  * Initialize commands.
@@ -47,6 +48,16 @@ void addcommands(struct comlist *list) {
 	/* Script commands. */
 	addcommand(list, "script",    "Execute a script file",        &handle_script);
 	addcommand(list, "scriptctl", "Do other things with scripts", &handle_scriptctl);
+
+	/* PCB commands. */
+	addcommand(list, "mkpcb",     "Create PCB and insert into queue",          &handle_mkpcb);
+	addcommand(list, "rmpcb",     "Remove PCB from queue and free memory",     &handle_rmpcb);
+	addcommand(list, "blpcb",     "Set PCB state to blocked and reinsert",     &handle_blpcb);
+	addcommand(list, "ubpcb",     "Set PCB state to unblocked and reinsert",   &handle_ubpcb);
+	addcommand(list, "sspcb",     "Suspend PCB and reinsert into queue",       &handle_sspcb);
+	addcommand(list, "rspcb",     "Set PCB state to unsuspended and reinsert", &handle_rspcb);
+	addcommand(list, "sppcb",     "Set PCB priority and reinserts",            &handle_sppcb);
+	addcommand(list, "showpcb",   "Display PCB information",                   &handle_showpcb);
 
 	/* Misc. Commands. */
 	addcommand(list, "exit",    "Exit TechOS",                                    &handle_exit);
