@@ -9,27 +9,27 @@
 /* Represents the classification of a PCB. */
 enum pcbclass {
 	/* A system process. */
-	PCB_SYSTEM,
+	PCB_SYSTEM      = 0,
 	/* An application process. */
-	PCB_APPLICATION,
+	PCB_APPLICATION = 1,
 };
 
 /* PCB run status. */
 enum pcbstatus {
 	/* The process is blocked. */
-	PCB_BLOCKED,
+	PCB_BLOCKED = 0,
 	/* The process is ready to run. */
-	PCB_READY,
+	PCB_READY   = 1,
 	/* The process is running. */
-	PCB_RUNNING,
+	PCB_RUNNING = 2,
 };
 
 /* PCB Suspension status. */
 enum pcbsusp {
 	/* The process is suspended. */
-	PCB_SUSPENDED,
+	PCB_SUSPENDED = 0,
 	/* The process is not suspended. */
-	PCB_FREE,
+	PCB_FREE      = 1,
 };
 
 /* Represents a running process. */
