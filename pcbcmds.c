@@ -18,7 +18,6 @@ HANDLECOM(mkpcb) {
 }
 
 HANDLECOM(rmpcb) {
-
 	return 0;
 }
 
@@ -38,6 +37,11 @@ HANDLECOM(sspcb) {
 }
 
 HANDLECOM(rspcb) {
+
+	return 0;
+}
+
+HANDLECOM(sppcb) {
 
 	return 0;
 }
