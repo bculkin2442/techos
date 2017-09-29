@@ -15,7 +15,7 @@ West Virginia University Institute of Technology
 .IP "\fB\\$1\fP"
 .IX "File Summary: \\$1"
 .XS
-.I \t\\$1
+.I "\t\\$1"
 .XE
 ..
 \# Begin an internal data structure description
@@ -117,6 +117,13 @@ West Virginia University Institute of Technology
 \# End typedef
 .de ETYPED
 .EIDATAST
+..
+\# Print a command declaration
+.de COMDECL
+.DATAST "DECLCOM(\\$1)" "\\$2"
+.USAGE
+Implement the \fB\\$1\fP command.
+.EDATAST
 ..
 \# Begin a section in the table of contents
 .de XSH
@@ -454,7 +461,7 @@ The command list to get commands from.
 The function to execute for every command.
 .EARGS
 .EFUNCT
-.TYPED "" "int (*comfun_t)(int , char **, char *, struct osstate *)" "command.h"
+.TYPED "" "int (*comfun_t)(int , char **, char *, struct osstate *)\0" "command.h"
 .USAGE
 Represents the type of a pointer to a command handler.
 .ARGS
@@ -517,6 +524,110 @@ The state of the OS.
 .EARGS
 .RETURN
 Always returns zero.
+.EFUNCT
+.FUNCT "void" "initcoms" "" "commands.h"
+.USAGE
+Initialize global state for commands.
+.EFUNCT
+.FUNCT "void" "addcommands" "struct comlist *" "commands.h"
+.USAGE
+Add all of the default commands to a command list.
+.ARGS
+.ARG "struct comlist *"
+The list to add the commands to.
+.EARGS
+.EFUNCT
+.FUNCT "void" "disposecoms" "" "commands.h"
+.USAGE
+Cleanup global state for commands.
+.EFUNCT
+.COMDECL "version" "commands.h"
+.COMDECL "exit" "commands.h"
+.COMDECL "help" "commands.h"
+.COMDECL "date" "datecmds.h"
+.COMDECL "datefmt" "datecmds.h"
+.COMDECL "setdate" "datecmds.h"
+.COMDECL "time" "datecmds.h"
+.DATAST "struct osstate" "osstate.h"
+.USAGE
+Contains general state for things the OS requires.
+.ATTRS
+.ATTR "char *" "in_datefmt"
+The current input format for dates.
+.EATTR
+.ATTR "char *" "out_datefmt"
+The current output format for dates.
+.EATTR
+.ATTR "char *" "time_datefmt"
+The current output format for times.
+.EATTR
+.ATTR "struct tm *" "datetime"
+The current date/time.
+.EATTR
+.ATTR "FILE *" "strem"
+The source for reading input from.
+.EATTR
+.ATTR "FILE *" "output"
+The source for writing output to.
+.EATTR
+.EATTRS
+.EDATAST
+.FUNCT "struct osstate *" "makeosstate" "" "osstate.h" "osstate.h"
+.USAGE
+Allocate and initialize a OS state struct.
+.EFUNCT
+.FUNCT "void" "killosstate" "struct osstate *" "osstate.h"
+.USAGE
+Deinitialize and deallocate an OS state struct.
+.EFUNCT
+.COMDECL "script" "scriptcmds.h"
+.COMDECL "scriptctl" "scriptcmds.h"
+.FUNCT "void" "comhan" "struct osstate *" "techos.h"
+.USAGE
+The main command handler.
+.PP
+Loops reading commands and handling them until either an EOF is reached, an exit
+command is executed, or a command fails in a fatal manner.
+.ARGS
+.ARG "struct osstate *"
+The state of the OS during command execution.
+.EARG
+.EARGS
+.EFUNCT
+.FUNCT "int" "handleline" "struct osstate *, char *" "techos.h"
+.USAGE
+Executes a command from a line of input.
+.ARGS
+.ARG "struct osstate *"
+The state of the OS for the line.
+.EARG
+.ARG "char *"
+The line to execute.
+.EARG
+.EARGS
+.RETURN
+The return status of the command. This is zero for success, positive for
+non-fatal failure, and negative for fatal failure.
+.EFUNCT
+.BFUNCT "int" "execcom" "struct command *, struct cliargs, char *, struct osstate *" "techos.h"
+.USAGE
+Execute a command, given its arguments.
+.ARGS
+.ARG "struct command *"
+The command to execute.
+.EARG
+.ARG "struct cliargs"
+The arguments to the command.
+.EARG
+.ARG "char *"
+The command-line as the user entered it.
+.EARG
+.ARG "struct osstate *"
+The state of the OS for the command.
+.EARG
+.EARGS
+.RETURN
+The return status of the command, the meaning of which is documented above.
 .EFUNCT
 .ESH
 \# Print the table of contents. This'll get moved to a different position after

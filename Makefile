@@ -44,7 +44,7 @@ LDFLAGS := -Llibs
 LINKLIBS := -largparser -lintern
 
 # None of these targets correspond to actual files
-.PHONY: all clean run libs
+.PHONY: all clean run libs docs
 
 all: bin/techos libs
 
@@ -78,7 +78,7 @@ clean:
 	rm -rf bin/
 	rm $(wildcard libs/*.o)
 	rm $(wildcard libs/*.a)
-	rm $(wildcard help/*.pdf)
+	@rm $(wildcard help/*.pdf)
 
 docs: $(patsubst %.1,%.pdf,$(DOCS))
 

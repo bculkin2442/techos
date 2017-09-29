@@ -125,6 +125,7 @@ void foreachcommand(struct comlist *list, void (*comitr)(struct command *)) {
 	for(i = 0; i < list->comcount; i++) comitr(list->commands[i]);
 }
 
+/* Print a command list. */
 void printcommands(struct comlist *list, FILE *fle) {
 	int i;
 	for(i = 0; i < list->comcount; i++) {

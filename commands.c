@@ -38,13 +38,19 @@ void disposecoms() {
 
 /* Add commands to a command list. */
 void addcommands(struct comlist *list) {
-	addcommand(list, "date",    "Display the current date/time",                  &handle_date);
-	addcommand(list, "datefmt", "Set the format the date is displayed/read in",   &handle_datefmt);
+	/* Date/time commands. */
+	addcommand(list, "date",    "Display the current date/time",                &handle_date);
+	addcommand(list, "datefmt", "Set the format the date is displayed/read in", &handle_datefmt);
+	addcommand(list, "setdate", "Set the current date",                         &handle_setdate);
+	addcommand(list, "time",    "Display the current time",                     &handle_time);
+
+	/* Script commands. */
+	addcommand(list, "script",    "Execute a script file",        &handle_script);
+	addcommand(list, "scriptctl", "Do other things with scripts", &handle_scriptctl);
+
+	/* Misc. Commands. */
 	addcommand(list, "exit",    "Exit TechOS",                                    &handle_exit);
 	addcommand(list, "help",    "Get help for commands, or list available ones.", &handle_help);
-	addcommand(list, "setdate", "Set the current date",                           &handle_setdate);
-	addcommand(list, "script",  "Execute a script file",                          &handle_script);
-	addcommand(list, "time",    "Display the current time",                       &handle_time);
 	addcommand(list, "version", "Display version/author information",             &handle_version);
 }
 
@@ -82,6 +88,7 @@ HANDLECOM(exit) {
 	lread = getline(&line, &lsize, stdin);
 
 	/* As long as we read at least one character, decide what to do off it. */
+	/* @TODO use rpmatch() instead. */
 	if(lread > 1) {
 		int ch = toupper(line[0]);
 
