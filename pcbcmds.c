@@ -11,9 +11,10 @@
 #include "commands.h"
 
 #include "pcbcmds.h"
+#include "pcb.h"
 
 HANDLECOM(mkpcb) { 
-	enum classEnum = argv[3];
+/*	enum classEnum = argv[3];
 	int priority = argv[2];
 	
 	if(priority < 0 || priority > 9)
@@ -21,12 +22,9 @@ HANDLECOM(mkpcb) {
 		fprintf("Priority entered is out of bounds.");
 		return 1;
 	}
-	else if(classEnum != 0 || classEnum = 1)
-	{
 	
-	}
 
-	makepcb(ostate->pPCBStat, argv[1], classEnum, priority);
+	makepcb(ostate->pPCBStat, argv[1], classEnum, priority);*/
 	
 	return 0;
 }
