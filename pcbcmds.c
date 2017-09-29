@@ -46,11 +46,6 @@ HANDLECOM(sppcb) {
 	return 0;
 }
 
-HANDLECOM(sppcb) {
-
-	return 0;
-}
-
 HANDLECOM(shpcb) {
 	return 0;
 }
