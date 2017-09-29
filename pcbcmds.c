@@ -32,7 +32,6 @@ HANDLECOM(mkpcb) {
 }
 
 HANDLECOM(rmpcb) {
-	
 	return 0;
 }
 
@@ -62,6 +61,5 @@ HANDLECOM(sppcb) {
 }
 
 HANDLECOM(shpcb) {
-
 	return 0;
 }
