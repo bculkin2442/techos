@@ -98,20 +98,18 @@ HANDLECOM(exit) {
 	fprintf(ostate->output, "Are you sure you want to exit? (y/n) ");
 	lread = getline(&line, &lsize, stdin);
 
-	/* As long as we read at least one character, decide what to do off it. */
-	/* @TODO use rpmatch() instead. */
+	/* Use rpmatch() to pick an action. */
 	if(lread > 1) {
-		int ch = toupper(line[0]);
-
-		switch(ch) {
-		case 'Y':
+		int result = rpmatch(line);
+		switch(result) {
+		case 0:
 			ret = -1;
 			break;
-		case 'N':
+		case 1:
 			ret = 0;
-			break;
+		case -1:
 		default:
-			fprintf(ostate->output, "Unknown answer '%c'\n", ch);
+			fprintf(ostate->output, "Unknown response '%c'\n", ch);
 		}
 	}
 
