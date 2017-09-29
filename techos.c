@@ -78,7 +78,7 @@ void comhan(struct osstate *ostate) {
 
 	/* Cleanup after ourselves. */
 cleanup: if(line != NULL)
-		free(line);
+		 free(line);
 }
 
 /* Handle executing a line of input. */
