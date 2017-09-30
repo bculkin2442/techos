@@ -94,8 +94,25 @@ struct pcb *findpcbnum(struct pcbstate *, int);
  */
 struct pcb *findpcbname(struct pcbstate *, char *);
 
-/* Insert a PCB into the proper queue. */
-void insertpcb(struct pcbstate *, struct pcb *);
-/* Remove a PCB from the queue it is in. */
+/* insertpcb() errors */
+#define PCBINVSUSP -1
+#define PCBINVSTAT -2
+#define PCBRUNNING -3
+/*
+ * Insert a PCB into the proper queue.
+ *
+ * Returns 0 on success or an error code on failure.
+ * Can have one of the following errors:
+ * - PCBINVSUSP: Invalid PCB suspension status
+ * - PCBINVSTAT: Invalid PCB run status
+ * - PCBRUNNING: Attempted to add a running PCB to a queue.
+ */
+int insertpcb(struct pcbstate *, struct pcb *);
+/*
+ * Remove a PCB from the queue it is in.
+ *
+ * WARNING: Attempting to remove a PCB that is not in a queue from a queue may
+ * cause weirdness to happen.
+ */
 void removepcb(struct pcbstate *, struct pcb *);
 #endif

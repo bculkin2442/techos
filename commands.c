@@ -109,7 +109,7 @@ HANDLECOM(exit) {
 			ret = 0;
 		case -1:
 		default:
-			fprintf(ostate->output, "Unknown response '%c'\n", ch);
+			fprintf(ostate->output, "Unknown response '%s'\n", line);
 		}
 	}
 
