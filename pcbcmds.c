@@ -96,6 +96,8 @@ HANDLECOM(mkpcb) {
 	int opt, optidx;
 	optind = 1;
 	
+	int priority;
+	
 	while(1)
 	{
 		char *usage = "Usage: mkpcb [name] [priority] [-h] [--class_sys|--class_app] [--help]\n";
@@ -152,7 +154,7 @@ HANDLECOM(mkpcb) {
 
 	}
 	if(argv[2] != NULL){
-		int priority = atoi(argv[2]);}
+		priority = atoi(argv[2]);}
 	else{
 		fprintf(ostate->output, "priority not given");}
 	
