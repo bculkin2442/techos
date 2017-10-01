@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include "pcb.h"
 #include "pcbinternals.h"
 
