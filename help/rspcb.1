@@ -1,0 +1,24 @@
+.TH SCRIPT 1
+.SH NAME
+rspcb \- unblock a PCB and place it back into a queue 
+.SH SYNOPSIS
+.B rspcb
+[
+.I \-h
+]
+[
+.I \-\-help
+]
+.I "<process-name>|<process_id>"
+.SH "DESCRIPTION"
+Executes commands read from a script line by line
+.SH OPTIONS
+.TP
+.B "\-h, \-\-help"
+Show a short usage message.
+.B "--proc name|num"
+Designate whether given value is process name or ID
+.SH NOTES
+--proc defaults to name if not specified
+.SH AUTHOR
+Lucas Darnell, Benjamin Culkin, and Jared Miller
