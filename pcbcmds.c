@@ -153,7 +153,7 @@ HANDLECOM(mkpcb) {
 	}
 	
 
-	pcb *madePCB = makepcb(ostate->pPCBStat, argv[1], class, priority);
+	struct pcb *madePCB = makepcb(ostate->pPCBstat, argv[1], class, priority);
 	insertpcb(ostate->pPCBStat, madePCB);
 	
 	return 0;
@@ -171,11 +171,11 @@ HANDLECOM(rmpcb) {
 		PID_NUM
 	};
 	
-	enum pidopt idtype;
+	enum pidopt idtype = PID_NAME;
 	
 	while(1)
 	{
-		char *usage = "Usage: rmpcb [name] [-h] [--help]\n";
+		char *usage = "Usage: rmpcb [name] [-h] [--help] [--proc]<name|num>\n";
 		/* The long options we take. */
 		static struct option opts[] = {
 			
@@ -286,7 +286,7 @@ HANDLECOM(blpcb) {
 	
 	while(1)
 	{
-		char *usage = "Usage: blpcb [name] [-h] [--help]\n";
+		char *usage = "Usage: blpcb [name] [-h] [--help] [--proc]<name|num>\n";
 		/* The long options we take. */
 		static struct option opts[] = {
 			
@@ -316,6 +316,17 @@ HANDLECOM(blpcb) {
 					case 0://Help
 						fprintf(ostate->output, "%s\n", usage);
 						return 0;
+					case 1://SH_PROC
+					if(strcmp(optarg, "name")) {
+						idtype = PID_NAME;
+						}
+					  else if(strcmp(optarg, "num")) {
+						idtype = PID_NUM;
+						}
+				      else {
+						fprintf(ostate->output, "ERROR: Invalid process ID type '%s'. Valid ID types are 'name' and 'num'\n", optarg);
+						return 1;
+						}
 					default:
 						fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
 						fprintf(ostate->output, "%s\n", usage);
@@ -335,6 +346,39 @@ HANDLECOM(blpcb) {
 	}
 	
 	pcb *foundPCB = findpcbname(ostate->pPCBStat, argv[1]);
+	
+	switch(idtype) {
+		case PID_NAME:
+			if(optind < argc) {
+				char *pszPCBName = argv[optind];
+				pPCB = findpcbname(ostate->pPCBstat, pszPCBName);
+				if(pPCB == NULL) {
+					fprintf(ostate->output, "ERROR: No PCB with name '%s'\n", pszPCBName);
+					return 1;
+				}
+			} else {
+				fprintf(ostate->output, "ERROR: Must specify PCB name as argument.\n");
+				return 1;
+			}
+			break;
+		case PID_NUM:
+			if(optind < argc) {
+				int pcbid = atoi(argv[optind]);
+				pPCB = findpcbnum(ostate->pPCBstat, pcbid);
+				if(pPCB == NULL) {
+					fprintf(ostate->output, "ERROR: No PCB with ID '%d'\n", pcbid);
+					return 1;
+				}
+			} else {
+				fprintf(ostate->output, "ERROR: Must specify PCB name as argument.\n");
+				return 1;
+			}
+			break;
+		default:
+			/* Shouldn't happen. */
+			assert(0);
+		}
+	
 	if(foundPCB == NULL){
 		fprintf(ostate->output, "\tERROR: PCB name can not be found\n");
 		return 1;
