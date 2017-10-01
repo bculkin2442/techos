@@ -677,9 +677,9 @@ HANDLECOM(shpcb) {
 				/* No. of processes. */
 				int nprocs;
 
-				nprocs = 
-					ostate->pPCBstat->pqReady->nprocs +
-					ostate->pPCBstat->pqsReady->nprocs;
+				nprocs = 0                                 +
+					 ostate->pPCBstat->pqReady->nprocs +
+					 ostate->pPCBstat->pqsReady->nprocs;
 
 				fprintf(ostate->output, "No. of Ready Processes: %d\n", nprocs);
 				foreachpcb(ostate->pPCBstat->pqReady,
@@ -693,9 +693,9 @@ HANDLECOM(shpcb) {
 				/* No. of processes. */
 				int nprocs;
 
-				nprocs = 
-					ostate->pPCBstat->pqBlocked->nprocs +
-					ostate->pPCBstat->pqsBlocked->nprocs;
+				nprocs = 0                                   +
+					 ostate->pPCBstat->pqBlocked->nprocs +
+					 ostate->pPCBstat->pqsBlocked->nprocs;
 
 				fprintf(ostate->output, "No. of Ready Processes: %d\n", nprocs);
 				foreachpcb(ostate->pPCBstat->pqReady,
@@ -708,12 +708,11 @@ HANDLECOM(shpcb) {
 			{
 				/* No. of processes. */
 				int nprocs;
-
-				nprocs = 
-					ostate->pPCBstat->pqReady->nprocs    +
-					ostate->pPCBstat->pqsReady->nprocs   + 
-					ostate->pPCBstat->pqBlocked->nprocs  +
-					ostate->pPCBstat->pqsBlocked->nprocs +
+				nprocs = 0                                    + 
+					 ostate->pPCBstat->pqReady->nprocs    +
+					 ostate->pPCBstat->pqsReady->nprocs   + 
+					 ostate->pPCBstat->pqBlocked->nprocs  +
+					 ostate->pPCBstat->pqsBlocked->nprocs +
 
 				fprintf(ostate->output, "No. of Ready Processes: %d\n", nprocs);
 				foreachpcb(ostate->pPCBstat->pqReady,
