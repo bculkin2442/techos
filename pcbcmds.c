@@ -16,7 +16,7 @@
 
 void printpcb(struct osstate *ostate, struct pcb *pPCB) {
 	/* The name of the PCB. */
-	char *pszPCBName 
+	char *pszPCBName; 
 	/* The class of the PCB. */
 	char *pszPCBClass;
 	/* The status of the PCB. */
