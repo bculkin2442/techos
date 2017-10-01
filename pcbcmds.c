@@ -104,7 +104,7 @@ HANDLECOM(mkpcb) {
 			/*class options*/
 			{"class_sys",  no_argument, 0, 0},
 			{"class_app",  no_argument, 0, 0},
-			
+
 			/* Misc. options. */
 			{"help", no_argument, 0, 0},
 
@@ -114,10 +114,10 @@ HANDLECOM(mkpcb) {
 		
 		//get an option
 		opt = getopt_long(argc, argv, "h", opts, &optidx);
-		
+
 		//break if we've processed every option
 		if(opt == -1) break;
-		
+
 		//Handle options
 		switch(opt)
 		{
@@ -148,8 +148,8 @@ HANDLECOM(mkpcb) {
 				fprintf(ostate->output, "\tERROR: Invalid command-line argument.\n");
 				fprintf(ostate->output, "%s\n", usage);
 				return 1;
-		}	
-		
+		}
+
 	}
 	
 	int priority = atoi(argv[2]);
@@ -159,12 +159,11 @@ HANDLECOM(mkpcb) {
 		fprintf(ostate->output, "Priority entered is out of bounds.");
 		return 1;
 	}
-	
 
 	struct pcb *madePCB = makepcb(ostate->pPCBstat, argv[1], class, priority);
 
 	insertpcb(ostate->pPCBstat, madePCB);
-	
+
 	return 0;
 }
 
@@ -172,7 +171,7 @@ HANDLECOM(rmpcb) {
 	//current option and long option
 	int opt, optidx;
 	optind = 1;
-	
+
 	enum pidopt {
 		/* Locate a PCB by name. */
 		PID_NAME,
@@ -181,13 +180,12 @@ HANDLECOM(rmpcb) {
 	};
 	
 	enum pidopt idtype = PID_NAME;
-	
 	while(1)
 	{
 		char *usage = "Usage: rmpcb [name] [-h] [--help] [--proc]<name|num>\n";
 		/* The long options we take. */
 		static struct option opts[] = {
-			
+
 			/* Misc. options. */
 			{"help", no_argument, 0, 0},
 			
@@ -197,13 +195,13 @@ HANDLECOM(rmpcb) {
 			/* Terminating option. */
 			{0, 0, 0, 0}
 		};
-		
+
 		//get an option
 		opt = getopt_long(argc, argv, "h", opts, &optidx);
-		
+
 		//break if we've processed every option
 		if(opt == -1) break;
-		
+
 		//Handle options
 		switch(opt)
 		{
@@ -477,7 +475,7 @@ HANDLECOM(sspcb) {
 		char *usage = "Usage: sspcb [name] [-h] [--help]\n";
 		/* The long options we take. */
 		static struct option opts[] = {
-			
+
 			/* Misc. options. */
 			{"help", no_argument, 0, 0},
 
@@ -487,10 +485,10 @@ HANDLECOM(sspcb) {
 		
 		//get an option
 		opt = getopt_long(argc, argv, "h", opts, &optidx);
-		
+
 		//break if we've processed every option
 		if(opt == -1) break;
-		
+
 		//Handle options
 		switch(opt)
 		{
@@ -515,20 +513,18 @@ HANDLECOM(sspcb) {
 				fprintf(ostate->output, "\tERROR: Invalid command-line argument.\n");
 				fprintf(ostate->output, "%s\n", usage);
 				return 1;
-		}	
-		
+		}
+
 	}
-	
 	struct pcb *foundPCB = findpcbname(ostate->pPCBstat, argv[1]);
 	if(foundPCB == NULL){
 		fprintf(ostate->output, "\tERROR: PCB name can not be found\n");
 		return 1;
 	}
-	
 	removepcb(ostate->pPCBstat, foundPCB);
 	foundPCB->susp = PCB_SUSPENDED;
 	insertpcb(ostate->pPCBstat, foundPCB);
-	
+
 	return 0;
 }
 
@@ -536,13 +532,13 @@ HANDLECOM(rspcb) {
 	//current option and long option
 	int opt, optidx;
 	optind = 1;
-	
+
 	while(1)
 	{
 		char *usage = "Usage: rspcb [name] [-h] [--help]\n";
 		/* The long options we take. */
 		static struct option opts[] = {
-			
+
 			/* Misc. options. */
 			{"help", no_argument, 0, 0},
 
@@ -666,7 +662,7 @@ HANDLECOM(shpcb) {
 		static struct option opts[] = {
 			/* Misc. options. */
 			{"help", no_argument, 0, 0},
-		
+
 			/* Mode options. */
 			{"mode",  required_argument, 0, 0},
 			{"queue", required_argument, 0, 0},
