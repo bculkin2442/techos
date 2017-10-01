@@ -261,8 +261,6 @@ internkey lookupstring(struct interntab *table, const char *string) {
 	if(sbucket->key == SIINVALID) return SIINVALID;
 
 	do {
-		printf("TRACE: string is '%s', bucket val is '%s'\n", string, sbucket->val);
-
 		/* Only check buckets with valid values. */
 		if(sbucket->val != NULL) {
 			/* Check if this is the right bucket. */

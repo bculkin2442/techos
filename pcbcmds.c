@@ -522,11 +522,11 @@ HANDLECOM(shpcb) {
 	};
 
 	/* Chosen mode. */
-	enum showopt  mode;
+	enum showopt  mode   = SHOW_QUEUE;
 	/* Chosen queue. */
-	enum queueopt queue;
+	enum queueopt queue  = QU_ALL;
 	/* Chosen ID method. */
-	enum pidopt   idtype;
+	enum pidopt   idtype = PID_NAME;
 
 	/* Reinit getopt. */
 	optind = 1;
@@ -549,7 +549,8 @@ HANDLECOM(shpcb) {
 		int opt, optidx;
 
 		/* Our usage message. */
-		static const char *usage = "Usage: shpcb [-h] [--help]\n";
+		static const char *usage = "Usage: shpcb [-h] [--help] [--mode pcb|queue] [--queue ready|blocked|all] [--proc name|num] <proc-name>|<proc-id>\n";
+
 
 		/* The long options we take. */
 		/* 
