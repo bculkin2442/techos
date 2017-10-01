@@ -88,9 +88,6 @@ HANDLECOM(datefmt) {
 	enum setmode { SM_SET, SM_DISPLAY,         };
 	enum fmtmode { FM_IN,  FM_OUT,     FM_TIME };
 
-	/* The current option, and the current long option */
-	int opt, optidx;
-
 	/* Whether to set or display the format. */
 	enum setmode set;
 
@@ -106,6 +103,9 @@ HANDLECOM(datefmt) {
 
 	/* Parse CLI args. */
 	while(1) {
+		/* The current option, and the current long option */
+		int opt, optidx;
+
 		/* Enum declaration for long options. */
 		enum dfmtopt {
 			/* Help option. */
@@ -122,7 +122,7 @@ HANDLECOM(datefmt) {
 		};
 
 		/* Our usage message. */
-		char *usage = "Usage: datefmt [-stdioh] [--help] [--set|--display] [--time|--in|--out]\n";
+		static const char *usage = "Usage: datefmt [-stdioh] [--help] [--set|--display] [--time|--in|--out]\n";
 
 		/* The long options we take. */
 		static struct option opts[] = {
