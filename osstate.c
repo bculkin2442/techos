@@ -5,10 +5,46 @@
 
 #include "osstate.h"
 
+#include "pcb.h"
+#include "pcbinternals.h"
+
 /* Set default date formats */
 char *defin_datefmt   = "%Y-%m-%d";
 char *deftime_datefmt = "%r (%Z)";
 char *defout_datefmt  = "%A, %d, %B, %Y";
+
+/* Allocate/initialize PCB queue. */
+struct pcbqueue *makepcbqueue() {
+	/* Allocate for the queue, and fail if that does. */
+	struct pcbqueue *pQueue = malloc(sizeof(struct pcbqueue));
+	assert(pQueue != NULL);
+
+	/* Initialize the queue. */
+	pQueue->nprocs = 0;
+	pQueue->pHead  = NULL;
+
+	return pQueue;
+}
+
+/* Allocate/initialize PCB state. */
+struct pcbstate *makepcbstate() {
+	/* Allocate the state, and fail if allocation fails. */
+	struct pcbstate *pState = malloc(sizeof(struct pcbstate));
+	assert(pState != NULL);
+
+	/* Setup name table. */
+	pState->ptPCBNames = makeinterntab();
+	/* Initialize proc. ids. */
+	pState->nProcid    = 1;
+
+	/* Setup queues. */
+	pState->pqReady    = makepcbqueue();
+	pState->pqBlocked  = makepcbqueue();
+	pState->pqsReady   = makepcbqueue();
+	pState->pqsBlocked = makepcbqueue();
+
+	return pState;
+}
 
 /* Allocate/initialize OS state. */
 struct osstate *makeosstate() {
@@ -38,6 +74,9 @@ struct osstate *makeosstate() {
 	/* Get current date/time. */
 	clocktime = time(NULL);
 	ostate->datetime = localtime(&clocktime);
+
+	/* Setup PCB state. */
+	ostate->pPCBstat = makepcbstate();
 
 	return ostate;
 }
