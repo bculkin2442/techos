@@ -16,13 +16,68 @@
 
 void printpcb(struct osstate *ostate, struct pcb *pPCB) {
 	/* The name of the PCB. */
-	char *pszPCBName;
+	char *pszPCBName 
 	/* The class of the PCB. */
-	char *pszPCBClass = lookupstring(ostate->pPCBstat->ptPCBNames, pPCB->kName);
+	char *pszPCBClass;
+	/* The status of the PCB. */
+	char *pszPCBStatus;
+	/* The suspension status of the PCB. */
+	char *pszPCBSusp;
+	
+	/* Get the PCB name. */
+	pszPCBName = lookupstring(ostate->pPCBstat->ptPCBNames, pPCB->kName);
 
-	fprintf(ostate->output, "PCB ID:    %d\n", pPCB->id);
-	fprintf(ostate->output, "PCB Name:  %s\n", pszPCBClass);
-	fprintf(ostate->output, "PCB Class: %s\n", pszPCBName);
+	/* Get the PCB class. */
+	switch(pPCB->clas) {
+	case PCB_SYSTEM:
+		pszPCBClass = "System";
+		break;
+	case PCB_APPLICATION:
+		pszPCBClass = "Application";
+		break;
+	default:
+		/* Shouldn't happen. */
+		assert(0);
+	}
+	
+	/* Get the PCB status. */
+	switch(pPCB->status) {
+	case PCB_READY:
+		pszPCBStatus = "Ready";
+		break;
+	case PCB_RUNNING:
+		pszPCBStatus = "Running";
+		break;
+	case PCB_BLOCKED:
+		pszPCBStatus = "Blocked";
+		break;
+	default:
+		/* Shouldn't happen. */
+		assert(0);
+	}
+
+	/* Get the PCB suspension status. */
+	switch(pPCB->susp) {
+	case PCB_SUSPENDED:
+		pszPCBSusp = "Yes";
+		break;
+	case PCB_FREE:
+		pszPCBSusp = "No";
+		break;
+	default:
+		/* Shouldn't happen. */
+		assert(0);
+	}
+
+	/* Print basic PCB information. */
+	fprintf(ostate->output, "PCB ID:           %d\n", pPCB->id);
+	fprintf(ostate->output, "PCB Name:         %s\n", pszPCBClass);
+	fprintf(ostate->output, "PCB Class:        %s\n", pszPCBName);
+	fprintf(ostate->output, "PCB Priority:     %d\n", pPCB->priority);
+
+	/* Print PCB status information. */
+	fprintf(ostate->output, "PCB Status:       %s\n", pszPCBStatus);
+	fprintf(ostate->output, "Is PCB Suspended: %s\n", pszPCBSusp);
 }
 
 HANDLECOM(mkpcb) { 
