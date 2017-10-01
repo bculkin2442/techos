@@ -14,7 +14,18 @@
 #include "pcb.h"
 
 HANDLECOM(mkpcb) { 
-/*	enum classEnum = argv[3];
+	
+	//current option and long option
+	int opt, optidx;
+	optind = 1;
+	
+	while(1)
+	{
+	
+		char *usage = "Usage: mkpcb [] [--help]\n";
+		
+	}
+	
 	int priority = argv[2];
 	
 	if(priority < 0 || priority > 9)
@@ -24,7 +35,7 @@ HANDLECOM(mkpcb) {
 	}
 	
 
-	makepcb(ostate->pPCBStat, argv[1], classEnum, priority);*/
+	makepcb(ostate->pPCBStat, argv[1], classEnum, priority);
 	
 	return 0;
 }
