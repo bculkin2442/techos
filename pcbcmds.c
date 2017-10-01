@@ -86,7 +86,8 @@ HANDLECOM(mkpcb) {
 	}
 	
 
-	makepcb(ostate->pPCBStat, argv[1], class, priority);
+	pcb *madePCB = makepcb(ostate->pPCBStat, argv[1], class, priority);
+	insertpcb(ostate->pPCBStat, madePCB);
 	
 	return 0;
 }
