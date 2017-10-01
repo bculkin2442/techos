@@ -41,7 +41,7 @@ HANDLECOM(mkpcb) {
 			/*class options*/
 			{"class_sys",  no_argument, 0, 0},
 			{"class_app",  no_argument, 0, 0},
-			
+
 			/* Misc. options. */
 			{"help", no_argument, 0, 0},
 
@@ -51,10 +51,10 @@ HANDLECOM(mkpcb) {
 		
 		//get an option
 		opt = getopt_long(argc, argv, "h", opts, &optidx);
-		
+
 		//break if we've processed every option
 		if(opt == -1) break;
-		
+
 		//Handle options
 		switch(opt)
 		{
@@ -85,22 +85,22 @@ HANDLECOM(mkpcb) {
 				fprintf(ostate->output, "\tERROR: Invalid command-line argument.\n");
 				fprintf(ostate->output, "%s\n", usage);
 				return 1;
-		}	
-		
+		}
+
 	}
-	
+
 	int priority = argv[2];
-	
+
 	if(priority < 0 || priority > 9)
 	{
-		fprintf("Priority entered is out of bounds.");
+		fprintf(ostate->output, "Priority entered is out of bounds.\n");
 		return 1;
 	}
-	
 
-	pcb *madePCB = makepcb(ostate->pPCBStat, argv[1], class, priority);
-	insertpcb(ostate->pPCBStat, madePCB);
-	
+
+	struct pcb *madePCB = makepcb(ostate->pPCBstat, argv[1], class, priority);
+	insertpcb(ostate->pPCBstat, madePCB);
+
 	return 0;
 }
 
@@ -108,26 +108,26 @@ HANDLECOM(rmpcb) {
 	//current option and long option
 	int opt, optidx;
 	optind = 1;
-	
+
 	while(1)
 	{
 		char *usage = "Usage: rmpcb [name] [-h] [--help]\n";
 		/* The long options we take. */
 		static struct option opts[] = {
-			
+
 			/* Misc. options. */
 			{"help", no_argument, 0, 0},
 
 			/* Terminating option. */
 			{0, 0, 0, 0}
 		};
-		
+
 		//get an option
 		opt = getopt_long(argc, argv, "h", opts, &optidx);
-		
+
 		//break if we've processed every option
 		if(opt == -1) break;
-		
+
 		//Handle options
 		switch(opt)
 		{
@@ -156,13 +156,13 @@ HANDLECOM(rmpcb) {
 		
 	}
 	
-	pcb *foundPCB = findpcbname(ostate->pPCBStat, argv[1]);
+	struct pcb *foundPCB = findpcbname(ostate->pPCBstat, argv[1]);
 	if(foundPCB == NULL){
 		fprintf(ostate->output, "\tERROR: PCB name can not be found\n");
 		return 1;
 	}
 	
-	removepcb(ostate->pPCBStat, foundPCB);
+	removepcb(ostate->pPCBstat, foundPCB);
 	free(foundPCB);
 	
 	return 0;
@@ -220,15 +220,15 @@ HANDLECOM(blpcb) {
 		
 	}
 	
-	pcb *foundPCB = findpcbname(ostate->pPCBStat, argv[1]);
+	struct pcb *foundPCB = findpcbname(ostate->pPCBstat, argv[1]);
 	if(foundPCB == NULL){
 		fprintf(ostate->output, "\tERROR: PCB name can not be found\n");
 		return 1;
 	}
 	
-	removepcb(ostate->pPCBStat, foundPCB);
+	removepcb(ostate->pPCBstat, foundPCB);
 	foundPCB->status = PCB_BLOCKED;
-	insertpcb(ostate->pPCBStat, foundPCB);
+	insertpcb(ostate->pPCBstat, foundPCB);
 	
 	return 0;
 }
@@ -285,15 +285,15 @@ HANDLECOM(ubpcb) {
 		
 	}
 	
-	pcb *foundPCB = findpcbname(ostate->pPCBStat, argv[1]);
+	struct pcb *foundPCB = findpcbname(ostate->pPCBstat, argv[1]);
 	if(foundPCB == NULL){
 		fprintf(ostate->output, "\tERROR: PCB name can not be found\n");
 		return 1;
 	}
 	
-	removepcb(ostate->pPCBStat, foundPCB);
+	removepcb(ostate->pPCBstat, foundPCB);
 	foundPCB->status = PCB_READY;
-	insertpcb(ostate->pPCBStat, foundPCB);
+	insertpcb(ostate->pPCBstat, foundPCB);
 	
 	return 0;
 }
@@ -308,7 +308,7 @@ HANDLECOM(sspcb) {
 		char *usage = "Usage: sspcb [name] [-h] [--help]\n";
 		/* The long options we take. */
 		static struct option opts[] = {
-			
+
 			/* Misc. options. */
 			{"help", no_argument, 0, 0},
 
@@ -318,10 +318,10 @@ HANDLECOM(sspcb) {
 		
 		//get an option
 		opt = getopt_long(argc, argv, "h", opts, &optidx);
-		
+
 		//break if we've processed every option
 		if(opt == -1) break;
-		
+
 		//Handle options
 		switch(opt)
 		{
@@ -346,19 +346,19 @@ HANDLECOM(sspcb) {
 				fprintf(ostate->output, "\tERROR: Invalid command-line argument.\n");
 				fprintf(ostate->output, "%s\n", usage);
 				return 1;
-		}	
-		
+		}
+
 	}
-	
-	pcb *foundPCB = findpcbname(ostate->pPCBStat, argv[1]);
+
+	struct pcb *foundPCB = findpcbname(ostate->pPCBstat, argv[1]);
 	if(foundPCB == NULL){
 		fprintf(ostate->output, "\tERROR: PCB name can not be found\n");
 		return 1;
 	}
-	
-	removepcb(ostate->pPCBStat, foundPCB);
+
+	removepcb(ostate->pPCBstat, foundPCB);
 	foundPCB->susp = PCB_SUSPENDED;
-	insertpcb(ostate->pPCBStat, foundPCB);
+	insertpcb(ostate->pPCBstat, foundPCB);
 	
 	return 0;
 }
@@ -415,15 +415,15 @@ HANDLECOM(rspcb) {
 		
 	}
 	
-	pcb *foundPCB = findpcbname(ostate->pPCBStat, argv[1]);
+	struct pcb *foundPCB = findpcbname(ostate->pPCBstat, argv[1]);
 	if(foundPCB == NULL){
 		fprintf(ostate->output, "\tERROR: PCB name can not be found\n");
 		return 1;
 	}
 	
-	removepcb(ostate->pPCBStat, foundPCB);
+	removepcb(ostate->pPCBstat, foundPCB);
 	foundPCB->susp = PCB_FREE;
-	insertpcb(ostate->pPCBStat, foundPCB);
+	insertpcb(ostate->pPCBstat, foundPCB);
 	
 	return 0;
 }
@@ -478,7 +478,7 @@ HANDLECOM(shpcb) {
 			/* Mode options. */
 			SH_MODE,       /* Specify the command mode. */
 			SH_QUEUE,      /* Specify the queue to show. */
-			SH_PID,        /* Specify the way to locate a process. */
+			SH_PROC,        /* Specify the way to locate a process. */
 
 		};
 
@@ -496,7 +496,7 @@ HANDLECOM(shpcb) {
 		static struct option opts[] = {
 			/* Misc. options. */
 			{"help", no_argument, 0, 0},
-		
+
 			/* Mode options. */
 			{"mode",  required_argument, 0, 0},
 			{"queue", required_argument, 0, 0},
@@ -588,7 +588,7 @@ HANDLECOM(shpcb) {
 		case PID_NUM:
 			if(optind < argc) {
 				int pcbid = atoi(argv[optind]);
-				pPCB = findpcbnu,(ostate->pPCBstat, pcbid);
+				pPCB = findpcbnu(ostate->pPCBstat, pcbid);
 				if(pPCB == NULL) {
 					fprintf(ostate->output, "ERROR: No PCB with ID '%d'\n", pcbid);
 					return 1;
