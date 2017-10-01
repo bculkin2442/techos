@@ -151,10 +151,10 @@ HANDLECOM(mkpcb) {
 		}
 
 	}
-	if(argv[2] != NULL)
-		int priority = atoi(argv[2]);
-	else
-		fprintf(ostate->output, "priority not given");
+	if(argv[2] != NULL){
+		int priority = atoi(argv[2]);}
+	else{
+		fprintf(ostate->output, "priority not given");}
 	
 	if(priority < 0 || priority > 9)
 	{
@@ -291,6 +291,18 @@ HANDLECOM(blpcb) {
 	//current option and long option
 	int opt, optidx;
 	optind = 1;
+	
+	/*The pcb to block*/
+	struct pcb *pPCB;
+	
+	enum pidopt {
+		/* Locate a PCB by name. */
+		PID_NAME,
+		/* Locate a PCB by number. */
+		PID_NUM
+	};
+	
+	enum pidopt idtype = PID_NAME;
 	
 	while(1)
 	{
