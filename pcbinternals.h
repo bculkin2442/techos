@@ -29,4 +29,7 @@ struct pcbstate {
 	/* Suspended Blocked PCBs. */
 	struct pcbqueue *pqsBlocked;
 };
+
+/* Execute an action for all of the PCBs in a queue. */
+void foreachpcb(struct pcbqueue *, void (*pcbitr)(struct pcb *, void *), void *);
 #endif

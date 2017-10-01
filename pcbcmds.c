@@ -11,21 +11,29 @@
 #include "command.h"
 #include "commands.h"
 
-#include "pcbcmds.h"
 #include "pcb.h"
+#include "pcbinternals.h"
+#include "pcbcmds.h"
 
-void printpcb(struct osstate *ostate, struct pcb *pPCB) {
+/* Print a PCB. */
+void printpcb(struct pcb *pPCB, void *pvState) {
+	/* The OS state. */
+	struct osstate *ostate;
+
 	/* The name of the PCB. */
-	char *pszPCBName 
+	const char *pszPCBName;
 	/* The class of the PCB. */
-	char *pszPCBClass;
+	const char *pszPCBClass;
 	/* The status of the PCB. */
-	char *pszPCBStatus;
+	const char *pszPCBStatus;
 	/* The suspension status of the PCB. */
-	char *pszPCBSusp;
+	const char *pszPCBSusp;
 	
+	/* Cast arg. */
+	ostate = (struct osstate *)(pvState);
+
 	/* Get the PCB name. */
-	pszPCBName = lookupstring(ostate->pPCBstat->ptPCBNames, pPCB->kName);
+	pszPCBName = lookupkey(ostate->pPCBstat->ptPCBNames, pPCB->kName);
 
 	/* Get the PCB class. */
 	switch(pPCB->clas) {
@@ -144,17 +152,17 @@ HANDLECOM(mkpcb) {
 		
 	}
 	
-	int priority = argv[2];
+	int priority = atoi(argv[2]);
 	
 	if(priority < 0 || priority > 9)
 	{
-		fprintf("Priority entered is out of bounds.");
+		fprintf(ostate->output, "Priority entered is out of bounds.");
 		return 1;
 	}
 	
 
-	pcb *madePCB = makepcb(ostate->pPCBStat, argv[1], class, priority);
-	insertpcb(ostate->pPCBStat, madePCB);
+	struct pcb *madePCB = makepcb(ostate->pPCBstat, argv[1], class, priority);
+	insertpcb(ostate->pPCBstat, madePCB);
 	
 	return 0;
 }
@@ -211,13 +219,13 @@ HANDLECOM(rmpcb) {
 		
 	}
 	
-	pcb *foundPCB = findpcbname(ostate->pPCBStat, argv[1]);
+	struct pcb *foundPCB = findpcbname(ostate->pPCBstat, argv[1]);
 	if(foundPCB == NULL){
 		fprintf(ostate->output, "\tERROR: PCB name can not be found\n");
 		return 1;
 	}
 	
-	removepcb(ostate->pPCBStat, foundPCB);
+	removepcb(ostate->pPCBstat, foundPCB);
 	free(foundPCB);
 	
 	return 0;
@@ -275,15 +283,15 @@ HANDLECOM(blpcb) {
 		
 	}
 	
-	pcb *foundPCB = findpcbname(ostate->pPCBStat, argv[1]);
+	struct pcb *foundPCB = findpcbname(ostate->pPCBstat, argv[1]);
 	if(foundPCB == NULL){
 		fprintf(ostate->output, "\tERROR: PCB name can not be found\n");
 		return 1;
 	}
 	
-	removepcb(ostate->pPCBStat, foundPCB);
+	removepcb(ostate->pPCBstat, foundPCB);
 	foundPCB->status = PCB_BLOCKED;
-	insertpcb(ostate->pPCBStat, foundPCB);
+	insertpcb(ostate->pPCBstat, foundPCB);
 	
 	return 0;
 }
@@ -340,15 +348,15 @@ HANDLECOM(ubpcb) {
 		
 	}
 	
-	pcb *foundPCB = findpcbname(ostate->pPCBStat, argv[1]);
+	struct pcb *foundPCB = findpcbname(ostate->pPCBstat, argv[1]);
 	if(foundPCB == NULL){
 		fprintf(ostate->output, "\tERROR: PCB name can not be found\n");
 		return 1;
 	}
 	
-	removepcb(ostate->pPCBStat, foundPCB);
+	removepcb(ostate->pPCBstat, foundPCB);
 	foundPCB->status = PCB_READY;
-	insertpcb(ostate->pPCBStat, foundPCB);
+	insertpcb(ostate->pPCBstat, foundPCB);
 	
 	return 0;
 }
@@ -405,15 +413,15 @@ HANDLECOM(sspcb) {
 		
 	}
 	
-	pcb *foundPCB = findpcbname(ostate->pPCBStat, argv[1]);
+	struct pcb *foundPCB = findpcbname(ostate->pPCBstat, argv[1]);
 	if(foundPCB == NULL){
 		fprintf(ostate->output, "\tERROR: PCB name can not be found\n");
 		return 1;
 	}
 	
-	removepcb(ostate->pPCBStat, foundPCB);
+	removepcb(ostate->pPCBstat, foundPCB);
 	foundPCB->susp = PCB_SUSPENDED;
-	insertpcb(ostate->pPCBStat, foundPCB);
+	insertpcb(ostate->pPCBstat, foundPCB);
 	
 	return 0;
 }
@@ -470,15 +478,15 @@ HANDLECOM(rspcb) {
 		
 	}
 	
-	pcb *foundPCB = findpcbname(ostate->pPCBStat, argv[1]);
+	struct pcb *foundPCB = findpcbname(ostate->pPCBstat, argv[1]);
 	if(foundPCB == NULL){
 		fprintf(ostate->output, "\tERROR: PCB name can not be found\n");
 		return 1;
 	}
 	
-	removepcb(ostate->pPCBStat, foundPCB);
+	removepcb(ostate->pPCBstat, foundPCB);
 	foundPCB->susp = PCB_FREE;
-	insertpcb(ostate->pPCBStat, foundPCB);
+	insertpcb(ostate->pPCBstat, foundPCB);
 	
 	return 0;
 }
@@ -533,7 +541,7 @@ HANDLECOM(shpcb) {
 			/* Mode options. */
 			SH_MODE,       /* Specify the command mode. */
 			SH_QUEUE,      /* Specify the queue to show. */
-			SH_PID,        /* Specify the way to locate a process. */
+			SH_PROC,       /* Specify the way to locate a process. */
 
 		};
 
@@ -623,49 +631,99 @@ HANDLECOM(shpcb) {
 
 	switch(mode) {
 	case SHOW_PCB:
-		/* The PCB to show. */
-		struct pcb *pPCB;
+		{
+			/* The PCB to show. */
+			struct pcb *pPCB;
 
-		switch(idtype) {
-		case PID_NAME:
-			if(optind < argc) {
-				char *pszPCBName = argv[optind];
-				pPCB = findpcbname(ostate->pPCBstat, pszPCBName);
-				if(pPCB == NULL) {
-					fprintf(ostate->output, "ERROR: No PCB with name '%s'\n", pszPCBName);
+			switch(idtype) {
+			case PID_NAME:
+				if(optind < argc) {
+					char *pszPCBName = argv[optind];
+					pPCB = findpcbname(ostate->pPCBstat, pszPCBName);
+					if(pPCB == NULL) {
+						fprintf(ostate->output, "ERROR: No PCB with name '%s'\n", pszPCBName);
+						return 1;
+					}
+				} else {
+					fprintf(ostate->output, "ERROR: Must specify PCB name as argument.\n");
 					return 1;
 				}
-			} else {
-				fprintf(ostate->output, "ERROR: Must specify PCB name as argument.\n");
-				return 1;
-			}
-			break;
-		case PID_NUM:
-			if(optind < argc) {
-				int pcbid = atoi(argv[optind]);
-				pPCB = findpcbnu,(ostate->pPCBstat, pcbid);
-				if(pPCB == NULL) {
-					fprintf(ostate->output, "ERROR: No PCB with ID '%d'\n", pcbid);
+				break;
+			case PID_NUM:
+				if(optind < argc) {
+					int pcbid = atoi(argv[optind]);
+					pPCB = findpcbnum(ostate->pPCBstat, pcbid);
+					if(pPCB == NULL) {
+						fprintf(ostate->output, "ERROR: No PCB with ID '%d'\n", pcbid);
+						return 1;
+					}
+				} else {
+					fprintf(ostate->output, "ERROR: Must specify PCB name as argument.\n");
 					return 1;
 				}
-			} else {
-				fprintf(ostate->output, "ERROR: Must specify PCB name as argument.\n");
-				return 1;
+				break;
+			default:
+				/* Shouldn't happen. */
+				assert(0);
 			}
-			break;
-		default:
-			/* Shouldn't happen. */
-			assert(0);
+			printpcb(pPCB, ostate);
 		}
-		printpcb(ostate, pPCB);
 		break;
 	case SHOW_QUEUE:
 		switch(queue) {
 		case QU_READY:
+			{
+				/* No. of processes. */
+				int nprocs;
+
+				nprocs = 
+					ostate->pPCBstat->pqReady->nprocs +
+					ostate->pPCBstat->pqsReady->nprocs;
+
+				fprintf(ostate->output, "No. of Ready Processes: %d\n", nprocs);
+				foreachpcb(ostate->pPCBstat->pqReady,
+						&printpcb, ostate);
+				foreachpcb(ostate->pPCBstat->pqsReady,
+						&printpcb, ostate);
+			}
 			break;
 		case QU_BLOCKED:
+			{
+				/* No. of processes. */
+				int nprocs;
+
+				nprocs = 
+					ostate->pPCBstat->pqBlocked->nprocs +
+					ostate->pPCBstat->pqsBlocked->nprocs;
+
+				fprintf(ostate->output, "No. of Ready Processes: %d\n", nprocs);
+				foreachpcb(ostate->pPCBstat->pqReady,
+						&printpcb, ostate);
+				foreachpcb(ostate->pPCBstat->pqsReady,
+						&printpcb, ostate);
+			}
 			break;
 		case QU_ALL:
+			{
+				/* No. of processes. */
+				int nprocs;
+
+				nprocs = 
+					ostate->pPCBstat->pqReady->nprocs    +
+					ostate->pPCBstat->pqsReady->nprocs   + 
+					ostate->pPCBstat->pqBlocked->nprocs  +
+					ostate->pPCBstat->pqsBlocked->nprocs +
+
+				fprintf(ostate->output, "No. of Ready Processes: %d\n", nprocs);
+				foreachpcb(ostate->pPCBstat->pqReady,
+						&printpcb, ostate);
+				foreachpcb(ostate->pPCBstat->pqBlocked,
+						&printpcb, ostate);
+				foreachpcb(ostate->pPCBstat->pqReady,
+						&printpcb, ostate);
+				foreachpcb(ostate->pPCBstat->pqsBlocked,
+						&printpcb, ostate);
+			}
 			break;
 		default:
 			/* Shouldn't happen. */
