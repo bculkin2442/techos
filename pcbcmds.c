@@ -18,11 +18,11 @@ void printpcb(struct osstate *ostate, struct pcb *pPCB) {
 	/* The name of the PCB. */
 	char *pszPCBName;
 	/* The class of the PCB. */
-	char *pszPCBClass;
+	char *pszPCBClass = lookupstring(ostate->pPCBstat->ptPCBNames, pPCB->kName);
 
-	fprintf(ostate->output, "PCB ID: %d\n", pPCB->id);
-	fprintf(ostate->output, "PCB Name: %s\n", lookupstring(ostate->pPCBstat->ptPCBNames, pPCB->kName));
-	fprintf(ostate->output, "PCB Class: 
+	fprintf(ostate->output, "PCB ID:    %d\n", pPCB->id);
+	fprintf(ostate->output, "PCB Name:  %s\n", pszPCBClass);
+	fprintf(ostate->output, "PCB Class: %s\n", pszPCBName);
 }
 
 HANDLECOM(mkpcb) { 
