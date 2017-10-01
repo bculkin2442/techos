@@ -174,6 +174,9 @@ HANDLECOM(rmpcb) {
 	int opt, optidx;
 	optind = 1;
 
+	/*The pcb to remove*/
+	struct pcb *pPCB;
+	
 	enum pidopt {
 		/* Locate a PCB by name. */
 		PID_NAME,
@@ -276,16 +279,10 @@ HANDLECOM(rmpcb) {
 			/* Shouldn't happen. */
 			assert(0);
 		}
-	
-	
-	struct pcb *foundPCB = findpcbname(ostate->pPCBstat, argv[1]);
-	if(foundPCB == NULL){
-		fprintf(ostate->output, "\tERROR: PCB name can not be found\n");
-		return 1;
 	}
 	
-	removepcb(ostate->pPCBstat, foundPCB);
-	free(foundPCB);
+	removepcb(ostate->pPCBstat, pPCB);
+	free(pPCB);
 	
 	return 0;
 }
