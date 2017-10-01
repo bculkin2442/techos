@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* Debugging. */
+#include <stdio.h>
+
 #include "intern.h"
 
 /* 
@@ -258,8 +261,13 @@ internkey lookupstring(struct interntab *table, const char *string) {
 	if(sbucket->key == SIINVALID) return SIINVALID;
 
 	do {
-		/* Check if this is the right bucket. */
-		if(strcmp(string, sbucket->val) == 0) return sbucket->key;
+		printf("TRACE: string is '%s', bucket val is '%s'\n", string, sbucket->val);
+
+		/* Only check buckets with valid values. */
+		if(sbucket->val != NULL) {
+			/* Check if this is the right bucket. */
+			if(strcmp(string, sbucket->val) == 0) return sbucket->key;
+		}
 
 		/* Move to next bucket. */
 		sbucket = sbucket->next;
