@@ -73,10 +73,12 @@ static struct pcb *queuefindpcbname(struct pcbqueue *pqQueue, int kPCBName) {
 	/* Initialize iteration. */
 	pPCB    = pqQueue->pHead;
 
-	if(pPCB==NULL)
+	if(pPCB == NULL) {
 		printf("\nError: PCB HEAD ID IS NULL\n");
-	else
+		return 0;
+	} else {
 		initPCB = pPCB->id;
+	}
 
 	do {
 		/* Return the PCB if it matches. */
@@ -115,10 +117,15 @@ struct pcb *findpcbname(struct pcbstate *pState, char *pszPCBName) {
 	kPCBName = lookupstring(pState->ptPCBNames, pszPCBName);
 	if(kPCBName == SIINVALID) return NULL;
 
-	pPCB                  = queuefindpcbname(pState->pqReady,    kPCBName);
-	if(pPCB == NULL) pPCB = queuefindpcbname(pState->pqBlocked,  kPCBName);
-	if(pPCB == NULL) pPCB = queuefindpcbname(pState->pqsReady,   kPCBName);
-	if(pPCB == NULL) pPCB = queuefindpcbname(pState->pqsBlocked, kPCBName);
+	/* Only look in non-empty queues. */
+	if(pState->pqReady->pHead != NULL)
+		                 pPCB = queuefindpcbname(pState->pqReady,    kPCBName);
+	if(pState->pqBlocked->pHead != NULL) 
+		if(pPCB == NULL) pPCB = queuefindpcbname(pState->pqBlocked,  kPCBName);
+	if(pState->pqsReady->pHead != NULL) 
+		if(pPCB == NULL) pPCB = queuefindpcbname(pState->pqsReady,   kPCBName);
+	if(pState->pqsBlocked->pHead != NULL) 
+		if(pPCB == NULL) pPCB = queuefindpcbname(pState->pqsBlocked, kPCBName);
 
 	return pPCB;
 }

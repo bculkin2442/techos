@@ -861,13 +861,13 @@ HANDLECOM(sppcb) {
 	if(argc >= (optind + 2)){
 		priorityN = atoi(argv[optind + 1]);
 	} else {
-		fprintf(ostate->output, "priority not given");
+		fprintf(ostate->output, "ERROR: Priority not given\n");
 		return 1;
 	}
 
 	if(priorityN < PCB_MINPRIOR || priorityN > PCB_MAXPRIOR)
 	{
-		fprintf(ostate->output, "Priority entered is out of bounds.");
+		fprintf(ostate->output, "Priority entered is out of bounds.\n");
 		return 1;
 	}
 	
@@ -1100,13 +1100,13 @@ HANDLECOM(shpcb) {
 				fprintf(ostate->output, "\nReady Processes:\n");
 				foreachpcb(ostate->pPCBstat->pqReady,
 						&printpcb, ostate);
-				fprintf(ostate->output, "\nSuspended Processes:\n");
+				fprintf(ostate->output, "\nBlocked Processes:\n");
 				foreachpcb(ostate->pPCBstat->pqBlocked,
 						&printpcb, ostate);
-				fprintf(ostate->output, "\nBlocked Ready Processes:\n");
+				fprintf(ostate->output, "\nSuspended Ready Processes:\n");
 				foreachpcb(ostate->pPCBstat->pqsReady,
 						&printpcb, ostate);
-				fprintf(ostate->output, "\nBlocked Suspended Processes:\n");
+				fprintf(ostate->output, "\nSuspended Suspended Processes:\n");
 				foreachpcb(ostate->pPCBstat->pqsBlocked,
 						&printpcb, ostate);
 			}
