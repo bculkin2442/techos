@@ -130,8 +130,7 @@ static int fillqueue(struct pcbqueue *pqQueue, struct pcb *pPCB) {
 }
 
 /* Insert a PCB into a FIFO queue. */
-void fifoinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {
-
+static void fifoinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {
 	/* Fill an queue if it is empty. */
 	if(fillqueue(pqQueue, pPCB)) return;
 
@@ -145,7 +144,7 @@ void fifoinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {
 }
 
 /* Insert a PCB into a FILO queue. */
-void filoinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {
+static void filoinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {
 	/* Fill an queue if it is empty. */
 	if(fillqueue(pqQueue, pPCB)) return;
 
@@ -157,7 +156,7 @@ void filoinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {
 }
 
 /* Insert a PCB into a priority queue. */
-void priorinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {
+static void priorinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {
 	/* Fill an queue if it is empty. */
 	if(fillqueue(pqQueue, pPCB)) return;
 

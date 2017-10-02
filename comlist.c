@@ -42,6 +42,7 @@ struct comlist *makecomlist() {
 }
 
 /* Deinitialize and deallocate a command list. */
+/* @TODO call this from somewhere. */
 void killcomlist(struct comlist *list) {
 	/* Free the intern table. */
 	killinterntab(list->interncoms);

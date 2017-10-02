@@ -5,7 +5,7 @@
 #include "argparser.h"
 
 /* Parse a string from a set of arguments. */
-char *parsestr(char *lead, char delim, char **args) {
+static char *parsestr(char *lead, char delim, char **args) {
 	/* The rest of the string from the arguments. */
 	char *rest;
 	/* The string we're returning. */

@@ -5,9 +5,7 @@
 #include "command.h"
 #include "comlist.h"
 
-/*
- * Header for commands.
- */
+/* Header for commands. */
 
 /* Initialize data for commands. */
 void initcoms();
@@ -18,11 +16,7 @@ void addcommands(struct comlist *);
 /* Cleanup after commands. */
 void disposecoms();
 
-/*
- * Declare all of the command handlers.
- *
- * @TODO organize these
- */
+/* Declare all of the command handlers. */
 DECLCOM(exit);
 DECLCOM(version);
 DECLCOM(help);

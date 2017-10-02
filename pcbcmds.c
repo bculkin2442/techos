@@ -16,7 +16,8 @@
 #include "pcbcmds.h"
 
 /* Print a PCB. */
-void printpcb(struct pcb *pPCB, void *pvState) {
+/* @TODO this should maybe be moved elsewhere. */
+static void printpcb(struct pcb *pPCB, void *pvState) {
 	/* The OS state. */
 	struct osstate *ostate;
 

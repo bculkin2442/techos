@@ -80,9 +80,7 @@ HANDLECOM(time) {
 }
 
 
-/*
- * Configure the date format.
- */
+/* Configure the date format. */
 HANDLECOM(datefmt) {
 	/* Enum declarations for modes. */
 	enum setmode { SM_SET, SM_DISPLAY,         };

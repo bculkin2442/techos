@@ -15,7 +15,7 @@
 #define BUCKET_COUNT 13
 
 /* Convert a string to a hashcode. */
-unsigned long hashstring(const char *val) {
+static unsigned long hashstring(const char *val) {
 	/* This is the DJB2K33 algorithm. It generally works quite well. */
 	unsigned long hash = 5381;
 	int c;
@@ -38,7 +38,7 @@ unsigned long hashstring(const char *val) {
 }
 
 /* Convert an integer to a hashcode. */
-unsigned long hashkey(const int val) {
+static unsigned long hashkey(const int val) {
 	/* @TODO check if there is a better hash func. to use. */
 	return val;
 }
@@ -152,7 +152,7 @@ void killinterntab(struct interntab *table) {
 }
 
 /* Add a bucket to a bucket chain. */
-void addbucket(struct bucket *bucket) {
+static void addbucket(struct bucket *bucket) {
 	/* Allocate a new bucket. */
 	struct bucket *nbucket;
 	nbucket = malloc(sizeof(struct bucket));

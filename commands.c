@@ -19,22 +19,14 @@
 #include "scriptcmds.h"
 #include "pcbcmds.h"
 
-/*
- * Initialize commands.
- */
+/* Initialize commands. */
 void initcoms() {
-	/*
-	 * Doing nothing at the moment.
-	 */
+	/* Doing nothing at the moment. */
 }
 
-/*
- * Dispose of commands.
- */
+/* Dispose of commands. */
 void disposecoms() {
-	/*
-	 * Doing nothing at the moment.
-	 */
+	/* Doing nothing at the moment. */
 }
 
 /* Add commands to a command list. */
@@ -63,17 +55,6 @@ void addcommands(struct comlist *list) {
 	addcommand(list, "exit",    "Exit TechOS",                                    &handle_exit);
 	addcommand(list, "help",    "Get help for commands, or list available ones.", &handle_help);
 	addcommand(list, "version", "Display version/author information",             &handle_version);
-}
-
-/* Check if a command that only takes the 'help' argument recieved it. */
-int checkhelpargs(int argc, char **argv, char *usage, struct osstate *ostate) {
-	if(argc > 2 || (strcmp("-h", argv[1]) != 0 && strcmp("--help", argv[1]) != 0)) {
-		fprintf(ostate->output, "\tERROR: Invalid command-line arguments.\n");
-	}
-
-	fprintf(ostate->output, "%s", usage);
-
-	return 0;
 }
 
 /*

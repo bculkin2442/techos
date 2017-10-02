@@ -33,6 +33,32 @@ West Virginia University Institute of Technology
 .RE
 .sp 1n
 ..
+\# Begin a global variable description
+.de GVAR
+.IDATAST "\\$1" "\\$2"
+.IX "Start Global Variable: \\$1"
+.XS
+\t\fI(\\$2)\fP\Global Variable: \\$1
+.XE
+..
+\# End a global variable
+.de EGVAR
+.EIDATAST
+.IX "End Global Variable"
+..
+\# Begin a cross reference
+.de CREF
+.IDATAST "\\$1" "\\$2"
+.IX "Start Cross Reference: \\$1"
+.XS
+\t\fI(\\$2)\fP\t\\$1
+.XE
+..
+\# End a cross reference
+.de ECREF
+.EIDATAST
+.IX "End Cross Reference"
+..
 \# Begin a data structure description
 .de DATAST
 .IDATAST "\\$1" "\\$2"
@@ -175,14 +201,15 @@ TechOS Programmers Manual
 .XSH "Overview"
 .PP
 Our TechOS is a command-line OS that is being made so that we can get a good
-perspective on how Operating Systems are made/operate. The current state is very
-simple, with this being only the first module, and having only a few commands
-implemented. The project is written in C, and we are using Git to keep track of
-files.
+perspective on how Operating Systems are made/operate. The current state is
+still quite simple, with this being only the second module, and having not that
+many commands implemented. The project is written in C, and we are using Git to
+keep track of files.
 .PP
-For this first module, it involves only the command handler, and the basic
-looping structure for reading commands. The commands that can currently be used
-are: date, datefmt, exit, help, setdate, script, time and version.
+For this second module, it involves everything from the first module, with the
+addition of PCBs and queues to put them in. The commands that can currently be
+used are: all the commands from the first version, mkpcb, rmpcb, blpcb, ubpcb,
+sspcb, rspcb, sppcb, shpcb and a non-pcb related addition, script.
 .ESH
 .XSH "File Summaries"
 .FILESUM "comlist.h"
@@ -202,6 +229,19 @@ Header file for declaration of OS state, which is where all the things we want
 to keep track of get put to cut down on globals.
 .FILESUM "osstate.c"
 Implementation of OS state.
+.FILESUM "pcb.h"
+Header file for declarations of PCBs (Process Control Blocks).
+.FILESUM "pcb.c"
+Implementation of PCBs.
+.FILESUM "pcbcmds.h"
+Header file for declaration of PCB commands.
+.FILESUM "pcbcmds.c"
+Implementation of PCB commands: mkpcb, rmpcb, blpcb, ubpcb, sspcb, rspcb, sppcb,
+shpcb
+.FILESUM "pcbinternals.h"
+Header file for implementation details on how PCBs and PCB queues work.
+.FILESUM "pcbinternals.c"
+Implementation for any PCB internals.
 .FILESUM "scriptcmds.h"
 Header file for declaration of script commands.
 .FILESUM "scriptcmds.c"
@@ -212,6 +252,10 @@ necessary global data.
 .FILESUM "techos.c"
 Implemenation of the interface for the OS. Is responsible for getting commands
 from the user, and then executing them.
+.FILESUM "test.tsh"
+A test file for the script command.
+.FILESUM "help/blpcb.1"
+Manual for the blpcb command.
 .FILESUM "help/date.1"
 Manual for the date command
 .FILESUM "help/datefmt.1"
@@ -220,10 +264,24 @@ Manual for the datefmt command
 Manual for the exit command
 .FILESUM "help/help.1"
 Manual for the help command
+.FILESUM "help/mkpcb.1"
+Manual for the mkpcb command.
+.FILESUM "help/rmpcb.1"
+Manual for the rmpcb command.
+.FILESUM "help/rspcb.1"
+Manual for the rspcb command.
+.FILESUM "help/script.1"
+Manual for the script command.
 .FILESUM "help/setdate.1"
 Manual for the setdate command
+.FILESUM "help/sppcb.1"
+Manual for the sppcb command.
+.FILESUM "help/sspcb.1"
+Manual for the sspcb command.
 .FILESUM "help/time.1"
 Manual for the time command.
+.FILESUM "help/ubpcb.1"
+Manual for the ubpcb command.
 .FILESUM "help/version.1"
 Manual for the version command.
 .FILESUM "libs/argparser.h"
@@ -461,6 +519,18 @@ The command list to get commands from.
 The function to execute for every command.
 .EARGS
 .EFUNCT
+.FUNCT "void" "printcommands" "struct comlist *, FILE *" "comlist.h"
+.USAGE
+Prints a command list.
+.ARGS
+.ARG "struct comlist *"
+The command list to print to.
+.EARG
+.ARG "FILE *"
+The stream to print to.
+.EARG
+.EARGS
+.EFUNCT
 \# @TODO add a 'BTYPED' to fix this line
 .TYPED "" "int (*comfun_t)(int , char **, char *, struct osstate *)" "command.h"
 .USAGE
@@ -570,6 +640,9 @@ The source for reading input from.
 .EATTR
 .ATTR "FILE *" "output"
 The source for writing output to.
+.EATTR
+.ATTR "struct pcbstate *" "pPCBstat"
+The state needed for PCBs.
 .EATTR
 .EATTRS
 .EDATAST
@@ -717,7 +790,7 @@ The process name to look for.
 The first process with the given name following the above search order, or NULL
 if no process by that name exists.
 .EFUNCT
-.DATAST "enum pcberror"
+.DATAST "enum pcberror" "pcb.h"
 .USAGE
 The errors possible for \f(BIinsertpcb()\fP
 .ATTRS
@@ -875,8 +948,267 @@ The state parameter to pass to the function.
 .EARG
 .EARGS
 .EFUNCT
+.DATAST "struct comlist" "comlist.c"
+.USAGE
+A list of commands, stored in an array indexed by an interned string (the
+command name).
+.ATTRS
+.ATTR "struct command **" "commands"
+All of the commands in this list, stored in a dynamically allocated array.
+.EATTR
+.ATTR "int" "comspace"
+The available number of slots in the command array.
+.EATTR
+.ATTR "int" "comcount"
+The total number of slots in the command array.
+.EATTR
+.ATTR "struct interntab *" "interncoms"
+The intern table that turns command names into indexes into the command array.
+.EATTR
+.EATTRS
+.EDATAST
+.FUNCT "struct pcbqueue *" "makepcbqueue" "" "osstate.c"
+.USAGE
+Allocate/initialize a PCB queue.
+.RETURN
+An allocated and initialized PCB queue.
+.EFUNCT
+.FUNCT "struct pcbstate *" "makepcbstate" "" "osstate.c"
+.USAGE
+Allocate and initialize PCB state.
+.RETURN
+An allocated and initialized set of PCB state.
+.EFUNCT
+.FUNCT "struct pcb *" "queuefindpcbnum" "struct pcbqueue *, int" "pcb.c"
+.USAGE
+Find something by process number in a PCB queue.
+.ARGS
+.ARG "struct pcbqueue *"
+The queue to look in.
+.EARG
+.ARG "int"
+The process number to look for.
+.EARG
+.EARGS
+.RETURN
+The PCB with that process number, or null if no such PCB exists.
+.EFUNCT
+.FUNCT "struct pcb *" "queuefindpcbname" "struct pcbqueue *, int" "pcb.c"
+.USAGE
+Find something by process name in a PCB queue.
+.IP "NOTE:"
+Since process names aren't guaranteed to be unique, will give the first PCB with
+that name.
+.ARGS
+.ARG "struct pcbqueue *"
+The queue to look in.
+.EARG
+.ARG "int"
+The string key for the process name to look for.
+.EARG
+.EARGS
+.RETURN
+The first PCB with that process name, or null if no such PCB exists.
+.EFUNCT
+.FUNCT "int" "fillqueue" "struct pcbqueue *, struct pcb *" "pcb.c"
+.USAGE
+Fill a PCB queue if it is empty.
+.ARGS
+.ARG "struct pcbqueue *"
+The queue to attempt to fill.
+.EARG
+.ARG "struct pcb *"
+The PCB to attempt to fill with.
+.EARG
+.EARGS
+.RETURN
+1 if the queue was succesfully filled, 0 if it already had something in it.
+.EFUNCT
+.FUNCT "void" "fifoinsertpcb" "struct pcbqueue *" "struct pcb *" "pcb.c"
+.USAGE
+Insert a PCB into a FIFO queue.
+.ARGS
+.ARG "struct pcbqueue *"
+The queue to insert into.
+.EARG
+.ARG "struct pcb *"
+The PCB to insert into the queue.
+.EARG
+.EARGS
+.EFUNCT
+.FUNCT "void" "filoinsertpcb" "struct pcbqueue *" "struct pcb *" "pcb.c"
+.USAGE
+Insert a PCB into a FILO queue.
+.ARGS
+.ARG "struct pcbqueue *"
+The queue to insert into.
+.EARG
+.ARG "struct pcb *"
+The PCB to insert into the queue.
+.EARG
+.EARGS
+.EFUNCT
+.FUNCT "void" "priorinsertpcb" "struct pcbqueue *" "struct pcb *" "pcb.c"
+.USAGE
+Insert a PCB into a priority queue.
+.ARGS
+.ARG "struct pcbqueue *"
+The queue to insert into.
+.EARG
+.ARG "struct pcb *"
+The PCB to insert into the queue.
+.EARG
+.EARGS
+.EFUNCT
+.FUNCT "void" "printpcb" "struct pcb *, void *" "pcbcmds.c"
+.USAGE
+Print a PCB.
+.ARGS
+.ARG "struct pcb *"
+The PCB to print.
+.EARG
+.ARG "void *"
+The state parameter. Must be valid to cast to a ``struct osstate *''
+.EARG
+.EARGS
+.EFUNCT
+.FUNCT "int" "main" "" "techos.c"
+.USAGE
+Entrance point for TechOS. Setups state, prints a greeting, invokes the command
+handler, then cleanups up the result and exits.
+.RETURN
+The status code for the program
+.EFUNCT
+.ESH
+.XSH "Global Variables"
+\# @TODO replace this with a custom macro for global vars.
+.GVAR "struct command INVALID_COMMAND" "command.h"
+.USAGE
+The command that is recognized as an invalid command.
+.EGVAR
+.GVAR "char * defin_datefmt" "osstate.h"
+.USAGE
+The default input date format.
+.EGVAR
+.GVAR "char * deftime_datefmt" "osstate.h"
+.USAGE
+The default time output format.
+.EGVAR
+.GVAR "char *" "defout_datefmt" "osstate.h"
+The default date output format.
+.EGVAR
+.GVAR "PCB_MINPRIOR" "pcb.h"
+.USAGE
+The minimum priority value for a PCB.
+.EGVAR
+.GVAR "PCB_MAXPRIOR" "pcb.h"
+.USAGE
+The maximum priority value for a PCB.
+.EGVAR
+.GVAR "struct comlist *all_commands" "techos.h"
+.USAGE
+List of all currently registered commands.
+.EGVAR
+.GVAR "int major_ver"
+.USAGE
+The major version of TechOS.
+.EGVAR
+.GVAR "int minor_ver"
+.USAGE
+The minor version of TechOS.
+.EGVAR
+.ESH
+\# @TODO write some kinda script to auto-generate this
+.XSH "Cross Reference"
+.CREF "main" "techos.c"
+.SUBH "Calls"
+initcoms(), makeosstate(), makecomlist(), addcommands(), comhan(), killosstate()
+disposecoms(), 
+.SUBH "Called By"
+None
+.ECREF
+.CREF "addcommand" "comlist.c"
+.SUBH "Called By"
+addcommands()
+.ECREF
+.CREF "addcommands" "commands.c"
+.SUBH "Called By"
+main()
+.ECREF
+.CREF "checkhelpargs" "command.c"
+.SUBH "Called By"
+handle_exit(), handle_version(), handle_help(), handle_date(), handle_time(),
+handle_setdate()
+.ECREF
+.CREF "comhan" "techos.c"
+.SUBH "Called By"
+main()
+.ECREF
+.CREF "disposecoms" "commands.c"
+.SUBH "Called By"
+main()
+.ECREF "execcom" "commands.c"
+.SUBH "Calls"
+All the handle_*() functions through com.comfun
+.SUBH "Called By"
+handleline()
+.ECREF
+.CREF "findpcbname" "pcb.c"
+.SUBH "Called By"
+handle_rmpcb(), handle_blpcb(), handle_ubpcb(), handle_sspcb(), handle_rspcb(),
+handle_shpcb()
+.ECREF
+.CREF "findpcbnum" "pcb.c"
+.SUBH "Called By"
+handle_rmpcb(), handle_blpcb(), handle_shpcb()
+.ECREF
+.CREF "foreachcommand" "comlist.c"
+.SUBH "Calls"
+Nothing
+.SUBH "Called By"
+Nothing
+.ECREF
+.CREF "foreachpcb" "pcbinternals.c"
+.SUBH "Called By"
+handle_shpcb()
+.ECREF
+.CREF "getcommand" "comlist.c"
+.SUBH "Called By"
+handleline()
+.ECREF
+.CREF "handle_*" "*cmds.c"
+.SUBH "Called By"
+execcom() through com.comfun
+.ECREF
+.CREF "handleline" "techos.c"
+.SUBH "Called By"
+handle_script(), comhan()
+.ECREF
+.CREF "initcoms" "commands.c"
+.SUBH "Called By"
+main()
+.ECREF
+.CREF "insertpcb" "pcb.c"
+.SUBH "Called By"
+handle_mkpcb(), handle_blpcb(), handle_ubpcb(), handle_sspcb(), handle_rspcb()
+.ECREF
+.CREF "internstring" "libs/intern.c"
+.SUBH "Called By"
+addcommand()
+.ECREF
+.CREF "killcomlist" "comlist.c"
+.SUBH "Called By"
+Nothing
+.ECREF
+.CREF "killinterntab" "libs/intern.c"
+.SUBH "Called By"
+killcomlist()
+.ECREF
+.CREF "killosstate"
 .ESH
 \# Print the table of contents. This'll get moved to a different position after
 \# the pdf has been created
+.bp
+\&
 .bp
 .TC

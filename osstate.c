@@ -14,7 +14,11 @@ char *deftime_datefmt = "%r (%Z)";
 char *defout_datefmt  = "%A, %d, %B, %Y";
 
 /* Allocate/initialize PCB queue. */
-struct pcbqueue *makepcbqueue() {
+/* 
+ * @TODO move this to pcbinternals.c, and add destructors as well, so that we
+ * don't leak memory.
+ */
+static struct pcbqueue *makepcbqueue() {
 	/* Allocate for the queue, and fail if that does. */
 	struct pcbqueue *pQueue = malloc(sizeof(struct pcbqueue));
 	assert(pQueue != NULL);
@@ -27,7 +31,7 @@ struct pcbqueue *makepcbqueue() {
 }
 
 /* Allocate/initialize PCB state. */
-struct pcbstate *makepcbstate() {
+static struct pcbstate *makepcbstate() {
 	/* Allocate the state, and fail if allocation fails. */
 	struct pcbstate *pState = malloc(sizeof(struct pcbstate));
 	assert(pState != NULL);

@@ -32,8 +32,9 @@ void addcommand(struct comlist *, char *, char *, comfun_t);
  */
 struct command *getcommand(struct comlist *, char *);
 
-/*
- * Execute a function for every command in a list.
- */
+/* Execute a function for every command in a list. */
 void foreachcommand(struct comlist *, void (*comitr)(struct command *));
+
+/* Print a command list. */
+void printcommands(struct comlist *, FILE *);
 #endif
