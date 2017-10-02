@@ -278,8 +278,6 @@ HANDLECOM(rmpcb) {
 		assert(0);
 	}
 
-	printf("TRACE: removing pcb\n");
-	printpcb(pPCB, ostate);
 	removepcb(ostate->pPCBstat, pPCB);
 	killpcb(pPCB);
 

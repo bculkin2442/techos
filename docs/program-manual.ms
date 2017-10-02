@@ -1109,11 +1109,11 @@ The maximum priority value for a PCB.
 .USAGE
 List of all currently registered commands.
 .EGVAR
-.GVAR "int major_ver"
+.GVAR "int major_ver" "techos.h"
 .USAGE
 The major version of TechOS.
 .EGVAR
-.GVAR "int minor_ver"
+.GVAR "int minor_ver" "techos.h"
 .USAGE
 The minor version of TechOS.
 .EGVAR
@@ -1128,10 +1128,14 @@ disposecoms(),
 None
 .ECREF
 .CREF "addcommand" "comlist.c"
+.SUBH "Calls"
+internstring()
 .SUBH "Called By"
 addcommands()
 .ECREF
 .CREF "addcommands" "commands.c"
+.SUBH "Calls"
+addcommand()
 .SUBH "Called By"
 main()
 .ECREF
@@ -1141,24 +1145,33 @@ handle_exit(), handle_version(), handle_help(), handle_date(), handle_time(),
 handle_setdate()
 .ECREF
 .CREF "comhan" "techos.c"
+.SUBH "Calls"
+handleline()
 .SUBH "Called By"
 main()
 .ECREF
 .CREF "disposecoms" "commands.c"
+.SUBH "Calls"
+Nothing
 .SUBH "Called By"
 main()
-.ECREF "execcom" "commands.c"
+.ECREF
+.CREF "execcom" "commands.c"
 .SUBH "Calls"
 All the handle_*() functions through com.comfun
 .SUBH "Called By"
 handleline()
 .ECREF
 .CREF "findpcbname" "pcb.c"
+.SUBH "Calls"
+Nothing
 .SUBH "Called By"
 handle_rmpcb(), handle_blpcb(), handle_ubpcb(), handle_sspcb(), handle_rspcb(),
 handle_shpcb()
 .ECREF
 .CREF "findpcbnum" "pcb.c"
+.SUBH "Calls"
+Nothing
 .SUBH "Called By"
 handle_rmpcb(), handle_blpcb(), handle_shpcb()
 .ECREF
@@ -1169,10 +1182,14 @@ Nothing
 Nothing
 .ECREF
 .CREF "foreachpcb" "pcbinternals.c"
+.SUBH "Calls"
+Nothing
 .SUBH "Called By"
 handle_shpcb()
 .ECREF
 .CREF "getcommand" "comlist.c"
+.SUBH "Calls"
+getcommand()
 .SUBH "Called By"
 handleline()
 .ECREF
@@ -1181,22 +1198,32 @@ handleline()
 execcom() through com.comfun
 .ECREF
 .CREF "handleline" "techos.c"
+.SUBH "Calls"
+parseargs(), getcommand(), execcom()
 .SUBH "Called By"
 handle_script(), comhan()
 .ECREF
 .CREF "initcoms" "commands.c"
+.SUBH "Calls"
+Nothing
 .SUBH "Called By"
 main()
 .ECREF
 .CREF "insertpcb" "pcb.c"
+.SUBH "Calls"
+priorinsertpcb(), fifoinsertpcb()
 .SUBH "Called By"
 handle_mkpcb(), handle_blpcb(), handle_ubpcb(), handle_sspcb(), handle_rspcb()
 .ECREF
 .CREF "internstring" "libs/intern.c"
+.SUBH "Calls"
+lookupstring(), hashstring(), hashkey(), addbucket()
 .SUBH "Called By"
 addcommand()
 .ECREF
 .CREF "killcomlist" "comlist.c"
+.SUBH "Calls"
+killinterntab()
 .SUBH "Called By"
 Nothing
 .ECREF
@@ -1204,7 +1231,68 @@ Nothing
 .SUBH "Called By"
 killcomlist()
 .ECREF
-.CREF "killosstate"
+.CREF "killosstate" "osstate.c"
+.SUBH "Called By"
+main()
+.ECREF
+.CREF "killpcb" "pcb.c"
+.SUBH "Called By"
+handle_rmpcb()
+.ECREF
+.CREF "lookupkey" "libs/intern.c"
+.SUBH "Calls"
+hashkey()
+.SUBH "Called By"
+printpcb()
+.ECREF
+.CREF "lookupstring" "libs/intern.c"
+.SUBH "Calls"
+hashstring()
+.SUBH "Called By"
+lookupstrings()
+.ECREF
+.CREF "makecomlist" "comlist.c"
+.SUBH "Calls"
+Nothing
+.SUBH "Called By"
+main()
+.ECREF
+.CREF "makeinterntab" "libs/intern.c"
+.SUBH "Calls"
+Nothing
+.SUBH "Called By"
+Nothing
+.ECREF
+.CREF "makeosstate" "osstate.c"
+.SUBH "Calls"
+Nothing
+.SUBH "Called By"
+main()
+.ECREF
+.CREF "makepcb" "pcb.c"
+.SUBH "Calls"
+Nothing
+.SUBH "Called By"
+handle_mkpcb()
+.ECREF
+.CREF "parseargs" "libs/argparser.c"
+.SUBH "Calls"
+Nothing
+.SUBH "Called by"
+handleline()
+.ECREF
+.CREF "printcommands" "comlist.c"
+.SUBH "Calls"
+Nothing
+.SUBH "Called By"
+printcommands()
+.ECREF
+.CREF "removepcb" "pcb.c"
+.SUBH "Calls"
+Nothing
+.SUBH "Called By"
+hadle_rmpcb(), handle_blpcb(), handle_ubpcb(), handle_sspcb(), handle_rspcb()
+.ECREF
 .ESH
 \# Print the table of contents. This'll get moved to a different position after
 \# the pdf has been created
