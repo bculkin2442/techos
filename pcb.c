@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #include "libs/intern.h"
-
+#include <stdio.h>
 #include "pcb.h"
 #include "pcbinternals.h"
 
@@ -72,7 +72,11 @@ static struct pcb *queuefindpcbname(struct pcbqueue *pqQueue, int kPCBName) {
 
 	/* Initialize iteration. */
 	pPCB    = pqQueue->pHead;
-	initPCB = pPCB->id;
+
+	if(pPCB==NULL)
+		printf("\nError: PCB HEAD ID IS NULL\n");
+	else
+		initPCB = pPCB->id;
 
 	do {
 		/* Return the PCB if it matches. */

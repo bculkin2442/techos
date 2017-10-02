@@ -185,7 +185,7 @@ HANDLECOM(rmpcb) {
 		/* Locate a PCB by number. */
 		PID_NUM
 	};
-
+	
 	enum pidopt idtype = PID_NAME;
 	while(1)
 	{
@@ -205,10 +205,8 @@ HANDLECOM(rmpcb) {
 
 		//get an option
 		opt = getopt_long(argc, argv, "h", opts, &optidx);
-
 		//break if we've processed every option
 		if(opt == -1) break;
-
 		//Handle options
 		switch(opt)
 		{
@@ -253,6 +251,7 @@ HANDLECOM(rmpcb) {
 			if(optind < argc) {
 				char *pszPCBName = argv[optind];
 				pPCB = findpcbname(ostate->pPCBstat, pszPCBName);
+				fprintf(ostate->output, "weve taken charlie");
 				if(pPCB == NULL) {
 					fprintf(ostate->output, "ERROR: No PCB with name '%s'\n", pszPCBName);
 					return 1;
@@ -280,7 +279,6 @@ HANDLECOM(rmpcb) {
 			assert(0);
 		
 	}
-	
 	removepcb(ostate->pPCBstat, pPCB);
 	free(pPCB);
 
