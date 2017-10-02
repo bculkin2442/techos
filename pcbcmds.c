@@ -80,8 +80,8 @@ static void printpcb(struct pcb *pPCB, void *pvState) {
 
 	/* Print basic PCB information. */
 	fprintf(ostate->output, "PCB ID:           %d\n", pPCB->id);
-	fprintf(ostate->output, "PCB Name:         %s\n", pszPCBClass);
-	fprintf(ostate->output, "PCB Class:        %s\n", pszPCBName);
+	fprintf(ostate->output, "PCB Name:         %s\n", pszPCBName);
+	fprintf(ostate->output, "PCB Class:        %s\n", pszPCBClass);
 	fprintf(ostate->output, "PCB Priority:     %d\n", pPCB->priority);
 
 	/* Print PCB status information. */
@@ -101,7 +101,7 @@ HANDLECOM(mkpcb) {
 
 	while(1)
 	{
-		char *usage = "Usage: mkpcb [name] [priority] [-h] [--class_sys|--class_app] [--help]\n";
+		char *usage = "Usage: mkpcb [-h] [--class_sys|--class_app] [--help]<name> <priority>\n";
 		/* The long options we take. */
 		static struct option opts[] = {
 			/*class options*/
@@ -154,18 +154,20 @@ HANDLECOM(mkpcb) {
 		}
 
 	}
-	if(argv[2] != NULL){
-		priority = atoi(argv[2]);}
-	else{
-		fprintf(ostate->output, "priority not given");}
+	if(argc >= (optind + 2)){
+		priority = atoi(argv[optind + 1]);
+	} else {
+		fprintf(ostate->output, "priority not given");
+		return 1;
+	}
 
-	if(priority < 0 || priority > 9)
+	if(priority < PCB_MINPRIOR || priority > PCB_MAXPRIOR)
 	{
 		fprintf(ostate->output, "Priority entered is out of bounds.");
 		return 1;
 	}
 
-	struct pcb *madePCB = makepcb(ostate->pPCBstat, argv[1], class, priority);
+	struct pcb *madePCB = makepcb(ostate->pPCBstat, argv[optind], class, priority);
 
 	insertpcb(ostate->pPCBstat, madePCB);
 
@@ -188,9 +190,8 @@ HANDLECOM(rmpcb) {
 	};
 
 	enum pidopt idtype = PID_NAME;
-	while(1)
-	{
-		char *usage = "Usage: rmpcb [name] [-h] [--help] [--proc]<name|num>\n";
+	while(1) {
+		char *usage = "Usage: rmpcb [name] [-h] [--help] [--proc name|num] <proc-name>|<proc-id>\n";
 		/* The long options we take. */
 		static struct option opts[] = {
 
@@ -206,13 +207,10 @@ HANDLECOM(rmpcb) {
 
 		//get an option
 		opt = getopt_long(argc, argv, "h", opts, &optidx);
-
 		//break if we've processed every option
 		if(opt == -1) break;
-
 		//Handle options
-		switch(opt)
-		{
+		switch(opt) {
 		case 0:
 			//Long options
 			switch(optidx)
@@ -221,10 +219,10 @@ HANDLECOM(rmpcb) {
 				fprintf(ostate->output, "%s\n", usage);
 				return 0;
 			case 1://SH_PROC
-				if(strcmp(optarg, "name")) {
+				if(strcmp(optarg, "name") == 0) {
 					idtype = PID_NAME;
 				}
-				else if(strcmp(optarg, "num")) {
+				else if(strcmp(optarg, "num") == 0) {
 					idtype = PID_NUM;
 				}
 				else {
@@ -246,7 +244,6 @@ HANDLECOM(rmpcb) {
 			fprintf(ostate->output, "%s\n", usage);
 			return 1;
 		}	
-
 	}
 
 	switch(idtype) {
@@ -281,8 +278,15 @@ HANDLECOM(rmpcb) {
 		assert(0);
 	}
 
+	if(pPCB == NULL) {
+		fprintf(ostate->output, "INTERNAL ERROR: NULL PCB\n");
+		return 1;
+	}
+
+	printf("TRACE: removing pcb\n");
+	printpcb(pPCB, ostate);
 	removepcb(ostate->pPCBstat, pPCB);
-	free(pPCB);
+	killpcb(pPCB);
 
 	return 0;
 }
@@ -306,7 +310,7 @@ HANDLECOM(blpcb) {
 
 	while(1)
 	{
-		char *usage = "Usage: blpcb [name] [-h] [--help] [--proc]<name|num>\n";
+		char *usage = "Usage: blpcb [name] [-h] [--help] [--proc name|num] <proc-name>|<proc-id>\n";
 		/* The long options we take. */
 		static struct option opts[] = {
 
@@ -337,10 +341,10 @@ HANDLECOM(blpcb) {
 				fprintf(ostate->output, "%s\n", usage);
 				return 0;
 			case 1://SH_PROC
-				if(strcmp(optarg, "name")) {
+				if(strcmp(optarg, "name") == 0) {
 					idtype = PID_NAME;
 				}
-				else if(strcmp(optarg, "num")) {
+				else if(strcmp(optarg, "num") == 0) {
 					idtype = PID_NUM;
 				}
 				else {
@@ -418,7 +422,7 @@ HANDLECOM(ubpcb) {
 
 	while(1)
 	{
-		char *usage = "Usage: ubpcb [name] [-h] [--help]\n";
+		char *usage = "Usage: ubpcb [name] [-h] [--help] [--proc name|num] <proc-name>|<proc-id>\n";
 		/* The long options we take. */
 		static struct option opts[] = {
 
@@ -483,7 +487,7 @@ HANDLECOM(sspcb) {
 
 	while(1)
 	{
-		char *usage = "Usage: sspcb [name] [-h] [--help]\n";
+		char *usage = "Usage: sspcb [name] [-h] [--help] [--proc name|num] <proc-name>|<proc-id>\n";
 		/* The long options we take. */
 		static struct option opts[] = {
 
@@ -546,7 +550,7 @@ HANDLECOM(rspcb) {
 
 	while(1)
 	{
-		char *usage = "Usage: rspcb [name] [-h] [--help]\n";
+		char *usage = "Usage: rspcb [name] [-h] [--help] [--proc name|num] <proc-name>|<proc-id>\n";
 		/* The long options we take. */
 		static struct option opts[] = {
 
@@ -698,20 +702,21 @@ HANDLECOM(shpcb) {
 				fprintf(ostate->output, "%s\n", usage);
 				return 0;
 			case SH_MODE:
-				if(strcmp(optarg, "pcb")) {
+				if(strcmp(optarg, "pcb") == 0) {
 					mode = SHOW_PCB;
-				} else if(strcmp(optarg, "queue")) {
+				} else if(strcmp(optarg, "queue") == 0) {
 					mode = SHOW_QUEUE;
 				} else {
 					fprintf(ostate->output, "ERROR: Invalid mode '%s'. Valid modes are 'pcb' and 'queue'\n", optarg);
 					return 1;
 				}
+				break;
 			case SH_QUEUE:
-				if(strcmp(optarg, "ready")) {
+				if(strcmp(optarg, "ready") == 0) {
 					queue = QU_READY;
-				} else if(strcmp(optarg, "blocked")) {
+				} else if(strcmp(optarg, "blocked") == 0) {
 					queue = QU_BLOCKED;
-				} else if(strcmp(optarg, "all")) {
+				} else if(strcmp(optarg, "all") == 0) {
 					queue = QU_ALL;
 				} else {
 					fprintf(ostate->output, "ERROR: Invalid queue '%s'. Valid queues are 'ready', 'blocked' and 'all'\n", optarg);
@@ -719,9 +724,9 @@ HANDLECOM(shpcb) {
 				}
 				break;
 			case SH_PROC:
-				if(strcmp(optarg, "name")) {
+				if(strcmp(optarg, "name") == 0) {
 					idtype = PID_NAME;
-				} else if(strcmp(optarg, "num")) {
+				} else if(strcmp(optarg, "num") == 0) {
 					idtype = PID_NUM;
 				} else {
 					fprintf(ostate->output, "ERROR: Invalid process ID type '%s'. Valid ID types are 'name' and 'num'\n", optarg);
@@ -791,7 +796,7 @@ HANDLECOM(shpcb) {
 				/* No. of processes. */
 				int nprocs;
 
-				nprocs = 0                                 +
+				nprocs = 0                                +
 					ostate->pPCBstat->pqReady->nprocs +
 					ostate->pPCBstat->pqsReady->nprocs;
 
@@ -807,14 +812,14 @@ HANDLECOM(shpcb) {
 				/* No. of processes. */
 				int nprocs;
 
-				nprocs = 0                                   +
+				nprocs = 0                                  +
 					ostate->pPCBstat->pqBlocked->nprocs +
 					ostate->pPCBstat->pqsBlocked->nprocs;
 
-				fprintf(ostate->output, "No. of Ready Processes: %d\n", nprocs);
-				foreachpcb(ostate->pPCBstat->pqReady,
+				fprintf(ostate->output, "No. of Blocked Processes: %d\n", nprocs);
+				foreachpcb(ostate->pPCBstat->pqBlocked,
 						&printpcb, ostate);
-				foreachpcb(ostate->pPCBstat->pqsReady,
+				foreachpcb(ostate->pPCBstat->pqsBlocked,
 						&printpcb, ostate);
 			}
 			break;
@@ -822,19 +827,23 @@ HANDLECOM(shpcb) {
 			{
 				/* No. of processes. */
 				int nprocs;
-				nprocs = 0                                    + 
+				nprocs = 0                                   + 
 					ostate->pPCBstat->pqReady->nprocs    +
-					ostate->pPCBstat->pqsReady->nprocs   + 
 					ostate->pPCBstat->pqBlocked->nprocs  +
-					ostate->pPCBstat->pqsBlocked->nprocs +
+					ostate->pPCBstat->pqsReady->nprocs   + 
+					ostate->pPCBstat->pqsBlocked->nprocs;
 
-					fprintf(ostate->output, "No. of Ready Processes: %d\n", nprocs);
+				fprintf(ostate->output, "No. of Processes: %d\n", nprocs);
+				fprintf(ostate->output, "\nReady Processes:\n");
 				foreachpcb(ostate->pPCBstat->pqReady,
 						&printpcb, ostate);
+				fprintf(ostate->output, "\nSuspended Processes:\n");
 				foreachpcb(ostate->pPCBstat->pqBlocked,
 						&printpcb, ostate);
-				foreachpcb(ostate->pPCBstat->pqReady,
+				fprintf(ostate->output, "\nBlocked Ready Processes:\n");
+				foreachpcb(ostate->pPCBstat->pqsReady,
 						&printpcb, ostate);
+				fprintf(ostate->output, "\nBlocked Suspended Processes:\n");
 				foreachpcb(ostate->pPCBstat->pqsBlocked,
 						&printpcb, ostate);
 			}

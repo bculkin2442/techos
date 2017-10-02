@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #include "libs/intern.h"
-
+#include <stdio.h>
 #include "pcb.h"
 #include "pcbinternals.h"
 
@@ -72,7 +72,11 @@ static struct pcb *queuefindpcbname(struct pcbqueue *pqQueue, int kPCBName) {
 
 	/* Initialize iteration. */
 	pPCB    = pqQueue->pHead;
-	initPCB = pPCB->id;
+
+	if(pPCB==NULL)
+		printf("\nError: PCB HEAD ID IS NULL\n");
+	else
+		initPCB = pPCB->id;
 
 	do {
 		/* Return the PCB if it matches. */
@@ -201,14 +205,14 @@ int insertpcb(struct pcbstate *pState, struct pcb *pPCB) {
 	struct pcbqueue *pqBlocked;
 
 	/* Don't insert a PCB that is already in a queue. */
-	if(pPCB->pNext == pPCB && pPCB->pPrev == pPCB) return PCBINQUEUE;
+	if(pPCB->pNext != pPCB || pPCB->pPrev != pPCB) return PCBINQUEUE;
 
 	switch(pPCB->susp) {
-	case PCB_SUSPENDED:
+	case PCB_FREE:
 		pqReady   = pState->pqReady;
 		pqBlocked = pState->pqBlocked;
 		break;
-	case PCB_FREE:
+	case PCB_SUSPENDED:
 		pqReady   = pState->pqsReady;
 		pqBlocked = pState->pqsBlocked;
 		break;
@@ -217,13 +221,13 @@ int insertpcb(struct pcbstate *pState, struct pcb *pPCB) {
 	}
 
 	switch(pPCB->status) {
-	case PCB_BLOCKED:
+	case PCB_READY:
 		priorinsertpcb(pqReady, pPCB);
 		pqReady->nprocs += 1;
 		break;
-	case PCB_READY:
+	case PCB_BLOCKED:
 		fifoinsertpcb(pqBlocked, pPCB);
-		pqReady->nprocs += 1;
+		pqBlocked->nprocs += 1;
 		break;
 	case PCB_RUNNING:
 		return PCBRUNNING;
@@ -242,15 +246,16 @@ void removepcb(struct pcbstate *pState, struct pcb *pPCB) {
 	struct pcbqueue *pqQueue;
 
 	if(pPCB->susp == PCB_SUSPENDED && pPCB->status == PCB_READY) {
-		pqQueue = pState->pqReady;
-	} else if(pPCB->susp == PCB_SUSPENDED && pPCB->status == PCB_BLOCKED) {
-		pqQueue = pState->pqBlocked;
-	} else if(pPCB->susp == PCB_FREE && pPCB->status == PCB_READY) {
 		pqQueue = pState->pqsReady;
-	} else if(pPCB->susp == PCB_FREE && pPCB->status == PCB_BLOCKED) {
+	} else if(pPCB->susp == PCB_SUSPENDED && pPCB->status == PCB_BLOCKED) {
 		pqQueue = pState->pqsBlocked;
+	} else if(pPCB->susp == PCB_FREE && pPCB->status == PCB_READY) {
+		pqQueue = pState->pqReady;
+	} else if(pPCB->susp == PCB_FREE && pPCB->status == PCB_BLOCKED) {
+		pqQueue = pState->pqBlocked;
 	} else {
 		/* Attempted to remove a PCB that wasn't in a queue. */
+		printf("BANG! Attempted to remove a PCB not in a queue.\n");
 		assert(0);
 	}
 

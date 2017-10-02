@@ -1,4 +1,6 @@
 #include <stdlib.h>
+/* Debugging. */
+#include <stdio.h>
 
 #include "pcb.h"
 #include "pcbinternals.h"

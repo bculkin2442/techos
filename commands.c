@@ -83,11 +83,12 @@ HANDLECOM(exit) {
 	if(lread > 1) {
 		int result = rpmatch(line);
 		switch(result) {
-		case 0:
+		case 1:
 			ret = -1;
 			break;
-		case 1:
+		case 0:
 			ret = 0;
+			break;
 		case -1:
 		default:
 			fprintf(ostate->output, "Unknown response '%s'\n", line);
