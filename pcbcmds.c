@@ -86,7 +86,7 @@ static void printpcb(struct pcb *pPCB, void *pvState) {
 
 	/* Print PCB status information. */
 	fprintf(ostate->output, "PCB Status:       %s\n", pszPCBStatus);
-	fprintf(ostate->output, "Is PCB Suspended: %s\n", pszPCBSusp);
+	fprintf(ostate->output, "Is PCB Suspended: %s\n\n", pszPCBSusp);
 }
 
 HANDLECOM(mkpcb) { 
