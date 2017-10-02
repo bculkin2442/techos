@@ -189,7 +189,7 @@ HANDLECOM(rmpcb) {
 	enum pidopt idtype = PID_NAME;
 	while(1)
 	{
-		char *usage = "Usage: rmpcb [name] [-h] [--help] [--proc]<name|num>\n";
+		char *usage = "Usage: rmpcb [name] [-h] [--help] [--proc name|num] <proc-name>|<proc-id>\\n";
 		/* The long options we take. */
 		static struct option opts[] = {
 
@@ -278,9 +278,9 @@ HANDLECOM(rmpcb) {
 		default:
 			/* Shouldn't happen. */
 			assert(0);
-		}
-
-
+		
+	}
+	
 	removepcb(ostate->pPCBstat, pPCB);
 	free(pPCB);
 
@@ -306,7 +306,7 @@ HANDLECOM(blpcb) {
 	
 	while(1)
 	{
-		char *usage = "Usage: blpcb [name] [-h] [--help] [--proc]<name|num>\n";
+		char *usage = "Usage: blpcb [name] [-h] [--help] [--proc name|num] <proc-name>|<proc-id>\n";
 		/* The long options we take. */
 		static struct option opts[] = {
 			
@@ -418,7 +418,7 @@ HANDLECOM(ubpcb) {
 	
 	while(1)
 	{
-		char *usage = "Usage: ubpcb [name] [-h] [--help]\n";
+		char *usage = "Usage: ubpcb [name] [-h] [--help] [--proc name|num] <proc-name>|<proc-id>\n";
 		/* The long options we take. */
 		static struct option opts[] = {
 			
@@ -483,7 +483,7 @@ HANDLECOM(sspcb) {
 	
 	while(1)
 	{
-		char *usage = "Usage: sspcb [name] [-h] [--help]\n";
+		char *usage = "Usage: sspcb [name] [-h] [--help] [--proc name|num] <proc-name>|<proc-id>\n";
 		/* The long options we take. */
 		static struct option opts[] = {
 
@@ -546,7 +546,7 @@ HANDLECOM(rspcb) {
 
 	while(1)
 	{
-		char *usage = "Usage: rspcb [name] [-h] [--help]\n";
+		char *usage = "Usage: rspcb [name] [-h] [--help] [--proc name|num] <proc-name>|<proc-id>\n";
 		/* The long options we take. */
 		static struct option opts[] = {
 
