@@ -189,7 +189,7 @@ HANDLECOM(rmpcb) {
 	enum pidopt idtype = PID_NAME;
 	while(1)
 	{
-		char *usage = "Usage: rmpcb [name] [-h] [--help] [--proc name|num] <proc-name>|<proc-id>\\n";
+		char *usage = "Usage: rmpcb [name] [-h] [--help] [--proc name|num] <proc-name>|<proc-id>\n";
 		/* The long options we take. */
 		static struct option opts[] = {
 
