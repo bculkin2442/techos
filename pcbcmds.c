@@ -178,14 +178,14 @@ HANDLECOM(rmpcb) {
 
 	/*The pcb to remove*/
 	struct pcb *pPCB;
-	
+
 	enum pidopt {
 		/* Locate a PCB by name. */
 		PID_NAME,
 		/* Locate a PCB by number. */
 		PID_NUM
 	};
-	
+
 	enum pidopt idtype = PID_NAME;
 	while(1)
 	{
@@ -236,7 +236,7 @@ HANDLECOM(rmpcb) {
 						return 1;
 				}
 				break;
-			//Short options	
+			//Short options
 			case 'h':
 				fprintf(ostate->output, "%s\n", usage);
 				return 0;
@@ -244,10 +244,10 @@ HANDLECOM(rmpcb) {
 				fprintf(ostate->output, "\tERROR: Invalid command-line argument.\n");
 				fprintf(ostate->output, "%s\n", usage);
 				return 1;
-		}	
-		
+		}
+
 	}
-	
+
 	switch(idtype) {
 		case PID_NAME:
 			if(optind < argc) {
@@ -279,11 +279,11 @@ HANDLECOM(rmpcb) {
 			/* Shouldn't happen. */
 			assert(0);
 		}
-	}
-	
+
+
 	removepcb(ostate->pPCBstat, pPCB);
 	free(pPCB);
-	
+
 	return 0;
 }
 
