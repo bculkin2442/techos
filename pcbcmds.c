@@ -86,12 +86,12 @@ static void printpcb(struct pcb *pPCB, void *pvState) {
 
 	/* Print PCB status information. */
 	fprintf(ostate->output, "PCB Status:       %s\n", pszPCBStatus);
-	fprintf(ostate->output, "Is PCB Suspended: %s\n", pszPCBSusp);
+	fprintf(ostate->output, "Is PCB Suspended: %s\n\n", pszPCBSusp);
 }
 
 HANDLECOM(mkpcb) { 
 
-	int class = 1;
+	enum pcbclass class = PCB_APPLICATION;
 
 	//current option and long option
 	int opt, optidx;
@@ -128,11 +128,11 @@ HANDLECOM(mkpcb) {
 			//Long options
 			switch(optidx)
 			{
-			case PCB_SYSTEM:
-				class = 0;
+			case 0:
+				class = PCB_SYSTEM;
 				break;
-			case PCB_APPLICATION:
-				class = 1;
+			case 1:
+				class = PCB_APPLICATION;
 				break;
 			case 2://Help
 				fprintf(ostate->output, "%s\n", usage);
