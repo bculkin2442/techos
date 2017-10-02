@@ -131,6 +131,7 @@ static int fillqueue(struct pcbqueue *pqQueue, struct pcb *pPCB) {
 
 /* Insert a PCB into a FIFO queue. */
 void fifoinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {
+
 	/* Fill an queue if it is empty. */
 	if(fillqueue(pqQueue, pPCB)) return;
 
@@ -199,6 +200,9 @@ int insertpcb(struct pcbstate *pState, struct pcb *pPCB) {
 	/* The two queues to select from. */
 	struct pcbqueue *pqReady;
 	struct pcbqueue *pqBlocked;
+
+	/* Don't insert a PCB that is already in a queue. */
+	if(pPCB->pNext == pPCB && pPCB->pPrev == pPCB) return PCBINQUEUE;
 
 	switch(pPCB->susp) {
 	case PCB_SUSPENDED:

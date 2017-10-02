@@ -461,7 +461,8 @@ The command list to get commands from.
 The function to execute for every command.
 .EARGS
 .EFUNCT
-.TYPED "" "int (*comfun_t)(int , char **, char *, struct osstate *)\0" "command.h"
+\# @TODO add a 'BTYPED' to fix this line
+.TYPED "" "int (*comfun_t)(int , char **, char *, struct osstate *)" "command.h"
 .USAGE
 Represents the type of a pointer to a command handler.
 .ARGS
@@ -580,6 +581,192 @@ Allocate and initialize a OS state struct.
 .USAGE
 Deinitialize and deallocate an OS state struct.
 .EFUNCT
+.DATAST "enum pcbclass" "pcb.h"
+.USAGE
+Represents the classification of a PCB.
+.ATTRS
+.ATTR "" "PCB_SYSTEM"
+This PCB represents a system process.
+.ATTR "" "PCB_APPLICATION"
+This PCB represents a user process.
+.EATTRS
+.EDATAST
+.DATAST "enum pcbstatus" "pcb.h"
+.USAGE
+The run status of a PCB.
+.ATTRS
+.ATTR "" "PCB_BLOCKED"
+The PCB is blocked, waiting for something.
+.ATTR "" "PCB_READY"
+The PCB is ready to run.
+.ATTR "" "PCB_RUNNING"
+The PCB is currently running.
+.EATTRS
+.EDATAST
+.DATAST "enum pcbsusp" "pcb.h"
+.USAGE
+The suspension status of a PCB.
+.ATTRS
+.ATTR "" "PCB_SUSPENDED"
+This PCB is currently suspended.
+.ATTR "" "PCB_FREE"
+This PCB is currently not suspended.
+.EATTRS
+.EDATAST
+.DATAST "struct pcb" "pcb.h"
+Represents a running process.
+.ATTRS
+.ATTR "int" "id"
+The unique numeric ID for the process.
+.EATTR
+.ATTR "internkey" "kName"
+The name for the process. Stored as a interned string, for fast equality
+checking and space savings.
+.EATTR
+.ATTR "enum pcbclass" "class"
+The classification of this process (System/Application).
+.EATTR
+.ATTR "int" "priority"
+The priority of this process, on a scale from 0 to 9, with higher numbers being
+higher priority.
+.EATTR
+.ATTR "enum pcbstatus" "status"
+Indicates whether the PCB is running, ready to run, or blocked.
+.EATTR
+.ATTR "enum pcbsusp" "susp"
+Indicates whether the PCB is suspended or not.
+.EATTR
+.ATTR "struct pcb *" "pNext"
+The next process in the queue this PCB is in.
+.EATTR
+.ATTR "struct pcb *" "pPrev"
+The previous process in the queue this PCB is in.
+.EATTR
+.EATTRS
+.EDATAST
+.BFUNCT "struct pcb *" "makepcb" "struct pcbstate *, char *, enum pcbclass, int" "pcb.h"
+.USAGE
+Allocate/initialize a new PCB.
+.ARGS
+.ARG "struct pcbstate *"
+The current state for all PCBs.
+.EARG
+.ARG "char *"
+The name of the PCB.
+.EARG
+.ARG "enum pcbclass"
+The classification of the PCB.
+.EARG
+.ARG "int"
+The priority of the PCB.
+.EARG
+.EARGS
+.RETURN
+An allocated and initialized PCB.
+.EFUNCT
+.FUNCT "void" "killpcb" "struct pcb *" "pcb.h"
+.USAGE
+Deinitialize and deallocate a PCB.
+.ARGS
+.ARG "struct pcb *"
+The PCB to deallocate.
+.EARG
+.EARGS
+.EFUNCT
+.FUNCT "struct pcb *" "findpcbnum" "struct pcbstate *, int" "pcb.h"
+.USAGE
+Find a PCB by its numeric ID in a set of queues.
+.ARGS
+.ARG "struct pcbstate *"
+The set of queues to search in.
+.EARG
+.ARG "int"
+The process number to look for.
+.EARG
+.EARGS
+.RETURN
+The PCB with the corresponding number, or NULL if no process with that number
+exists.
+.EFUNCT
+.FUNCT "struct pcb *" "findpcbname" "struct pcbstate *, char *" "pcb.h"
+.USAGE
+Find a PCB by its name in a set of queues.
+.IP "NOTE:"
+Since process names are not guaranteed to be unique, the queues are searched in
+the following order, with the first PCB with a matching name being returned.
+.RS
+.nr pcbnamenum 0 1
+.IP \n+[pcbnamenum].
+Ready
+.IP \n+[pcbnamenum].
+Blocked
+.IP \n+[pcbnamenum].
+Suspended Ready
+.IP \n+[pcbnamenum].
+Suspended Blocked
+.RE
+.ARGS
+.ARG "struct pcbstate *"
+The set of queues to look in.
+.EARG
+.ARG "char *"
+The process name to look for.
+.EARG
+.EARGS
+.RETURN
+The first process with the given name following the above search order, or NULL
+if no process by that name exists.
+.EFUNCT
+.DATAST "enum pcberror"
+.USAGE
+The errors possible for \f(BIinsertpcb()\fP
+.ATTRS
+.ATTR "" "PCBSUCCESS"
+No error occured.
+.EATTR
+.ATTR "" "PCBINVSUSP"
+The provided PCB has an invalid suspension status
+.EATTR
+.ATTR "" "PCBINVSTAT"
+The provided PCB has an invalid run status
+.EATTR
+.ATTR "" "PCBRUNNING"
+The provided PCB is currently running.
+.EATTR
+.ATTR "" "PCBINQUEUE"
+The provided PCB is already in a queue.
+.EATTR
+.EATTRS
+.EDATAST
+.FUNCT "enum pcberror" "insertpcb" "struct pcbstate *, struct pcb *" "pcb.h"
+.USAGE
+Insert a PCB into the proper queue, based off of its status.
+.ARGS
+.ARG "struct pcbstate *"
+The set of queues to insert the PCB into.
+.EARG
+.ARG "struct pcb *"
+The PCB to insert into a queue.
+.EARG
+.EARGS
+.RETURN
+The status of the insertion operation.
+.EFUNCT
+.FUNCT "void" "removepcb" "struct pcbstate *, struct pcb *" "pcb.h"
+.USAGE
+Remove a PCB from the queue it is currently in.
+.IP "NOTE:"
+Attempting to remove a PCB that is not in a queue from a queue may cause various
+degrees of weird things to happen. Don't do it.
+.ARGS
+.ARG "struct pcbstate *"
+The set of queues to remove a PCB from.
+.EARG
+.ARG "struct pcb *"
+The PCB to remove from the queues.
+.EARG
+.EARGS
+.EFUNCT
 .COMDECL "script" "scriptcmds.h"
 .COMDECL "scriptctl" "scriptcmds.h"
 .FUNCT "void" "comhan" "struct osstate *" "techos.h"
@@ -628,6 +815,65 @@ The state of the OS for the command.
 .EARGS
 .RETURN
 The return status of the command, the meaning of which is documented above.
+.EFUNCT
+.COMDECL "mkpcb" "pcbcmds.h"
+.COMDECL "rmpcb" "pcbcmds.h"
+.COMDECL "blpcb" "pcbcmds.h"
+.COMDECL "ubpcb" "pcbcmds.h"
+.COMDECL "sspcb" "pcbcmds.h"
+.COMDECL "rspcb" "pcbcmds.h"
+.COMDECL "sppcb" "pcbcmds.h"
+.COMDECL "shpcb" "pcbcmds.h"
+.DATAST "struct pcbqueue" "pcbinternals.h"
+.USAGE
+Represents a circular, doubly-linked list of PCBs
+.ATTRS
+.ATTR "int" "nprocs"
+The number of processes in this queue.
+.EATTR
+.ATTR "struct pcb *" "pHead"
+The head of the queue.
+.EATTR
+.EATTRS
+.EDATAST
+.DATAST "struct pcbstate" "pcbinternals.h"
+.USAGE
+Contains all of the state needed for PCBs
+.ATTRS
+.ATTR "struct interntab *" "ptPCBNames"
+The table where process names are stored.
+.EATTR
+.ATTR "int" "nProcid"
+The next process ID to be assigned.
+.EATTR
+.ATTR "struct pcbqueue *" "pqReady"
+The queue of ready PCBs.
+.EATTR
+.ATTR "struct pcbqueue *" "pqBlocked"
+The queue of blocked PCBs.
+.EATTR
+.ATTR "struct pcbqueue *" "pqsReady"
+The queue of suspended ready PCBs.
+.EATTR
+.ATTR "struct pcbqueue *" "pqsBlocked"
+The queue of suspended blocked PCBs.
+.EATTR
+.EATTRS
+.EDATAST
+.BFUNCT "void" "foreachpcb" "struct pcbqueue *, void (*pcbitr)(struct pcb *, void *), void *" "pcbinternals.h"
+.USAGE
+Execute a function once for each PCB in a queue.
+.ARGS
+.ARG "struct pcbqueue *"
+The queue of PCBs to process.
+.EARG
+.ARG "void (*pcbitr)(struct pcb *, void *)"
+The function to execute for each PCB. Takes an extra state parameter.
+.EARG
+.ARG "void *"
+The state parameter to pass to the function.
+.EARG
+.EARGS
 .EFUNCT
 .ESH
 \# Print the table of contents. This'll get moved to a different position after
