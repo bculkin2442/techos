@@ -156,7 +156,9 @@ HANDLECOM(mkpcb) {
 	if(argv[2] != NULL){
 		priority = atoi(argv[2]);}
 	else{
-		fprintf(ostate->output, "priority not given");}
+		fprintf(ostate->output, "priority not given");
+		return 1;
+		}
 	
 	if(priority < 0 || priority > 9)
 	{
