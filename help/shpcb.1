@@ -1,0 +1,36 @@
+.TH SHPCB 1
+.SH NAME
+shpcb \- display one or multiple PCBs
+.SH SYNOPSIS
+.B shpcb
+[
+.I \-h
+]
+[
+.I \-\-help
+]
+.I "<process-name>|<process_id>"
+[
+.I \-\-proc
+]
+[
+.I \-\-mode
+]
+[
+.I \-\-queue
+]
+.SH "DESCRIPTION"
+Executes commands read from a script line by line
+.SH OPTIONS
+.TP
+.B "\-h, \-\-help"
+Show a short usage message.
+.B "--proc name|num"
+Designate whether given value is process name or ID
+.B "--mode pcb|queue"
+Display a single PCB or an entire queue
+.B "--queue ready|blocked|all"
+.SH NOTES
+--proc defaults to name if not specified
+.SH AUTHOR
+Lucas Darnell, Benjamin Culkin, and Jared Miller
