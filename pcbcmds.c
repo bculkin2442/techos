@@ -425,10 +425,10 @@ HANDLECOM(ubpcb) {
 			{"help", no_argument, 0, 0},
 			
 			/*Mode options*/
-			{"proc", required_argument, 0 , 0};
+			{"proc", required_argument, 0 , 0},
 			
 			/* Terminating option. */
-			{0, 0, 0, 0}
+			{0, 0, 0, 0},
 		};
 
 		//get an option
@@ -541,10 +541,10 @@ HANDLECOM(sspcb) {
 			{"help", no_argument, 0, 0},
 			
 			/*Mode options*/
-			{"proc", required_argument, 0 , 0};
+			{"proc", required_argument, 0 , 0},
 			
 			/* Terminating option. */
-			{0, 0, 0, 0}
+			{0, 0, 0, 0},
 		};
 
 		//get an option
@@ -656,10 +656,10 @@ HANDLECOM(rspcb) {
 			{"help", no_argument, 0, 0},
 			
 			/*Mode options*/
-			{"proc", required_argument, 0 , 0};
+			{"proc", required_argument, 0 , 0},
 			
 			/* Terminating option. */
-			{0, 0, 0, 0}
+			{0, 0, 0, 0},
 		};
 
 		//get an option
@@ -775,10 +775,10 @@ HANDLECOM(sppcb) {
 			{"help", no_argument, 0, 0},
 			
 			/*Mode options*/
-			{"proc", required_argument, 0 , 0};
+			{"proc", required_argument, 0 , 0},
 			
 			/* Terminating option. */
-			{0, 0, 0, 0}
+			{0, 0, 0, 0},
 		};
 
 		//get an option
@@ -873,7 +873,7 @@ HANDLECOM(sppcb) {
 		return 1;
 	}
 	
-	foundPCB->priority = priority;
+	foundPCB->priority = priorityN;
 	
 	return 0;
 }

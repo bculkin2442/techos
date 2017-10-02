@@ -11,8 +11,8 @@
 #include "techos.h"
 
 /* The major/minor version of TechOS. */
-const int major_ver = 1;
-const int minor_ver = 2;
+const int major_ver = 2;
+const int minor_ver = 0;
 
 /* List of all commands. */
 struct comlist *all_commands;

@@ -39,7 +39,7 @@ void addcommands(struct comlist *list) {
 
 	/* Script commands. */
 	addcommand(list, "script",    "Execute a script file",        &handle_script);
-	addcommand(list, "scriptctl", "Do other things with scripts", &handle_scriptctl);
+	/* addcommand(list, "scriptctl", "Do other things with scripts", &handle_scriptctl); */
 
 	/* PCB commands. */
 	addcommand(list, "mkpcb",     "Create PCB and insert into queue",          &handle_mkpcb);
