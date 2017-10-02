@@ -117,7 +117,7 @@ HANDLECOM(mkpcb) {
 
 		//get an option
 		opt = getopt_long(argc, argv, "h", opts, &optidx);
-
+		
 		//break if we've processed every option
 		if(opt == -1) break;
 
@@ -157,13 +157,13 @@ HANDLECOM(mkpcb) {
 	if(argc >= (optind + 2)){
 		priority = atoi(argv[optind + 1]);
 	} else {
-		fprintf(ostate->output, "priority not given");
+		fprintf(ostate->output, "Priority not given.\n");
 		return 1;
 	}
 
 	if(priority < PCB_MINPRIOR || priority > PCB_MAXPRIOR)
 	{
-		fprintf(ostate->output, "Priority entered is out of bounds.");
+		fprintf(ostate->output, "Priority entered is out of bounds.\n");
 		return 1;
 	}
 
