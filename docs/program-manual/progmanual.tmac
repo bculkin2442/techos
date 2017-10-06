@@ -1,0 +1,190 @@
+\##############################################################################
+\# MACROS AND OTHER GENERAL THINGS
+\##############################################################################
+\# Typeset in 12pt font
+.nr PS 12p
+\# Set an author from WVU Tech
+.de WVUAU
+.AU
+\\$1
+.AI
+West Virginia University Institute of Technology
+..
+\# Print a file summary
+.de FILESUM
+.IP "\fB\\$1\fP"
+.IX "File Summary: \\$1"
+.XS
+.I "\t\\$1"
+.XE
+..
+\# Begin an internal data structure description
+.de IDATAST
+.KS
+.IP "\fB\\$1\fP"
+.rj 1
+\# This line is typeset on the same line as the structure name
+.I "\r(File: \\$2)"
+.RS
+..
+\# End a internal data structure description
+.de EIDATAST
+.KE
+.RE
+.sp 1n
+..
+\# Begin a global variable description
+.de GVAR
+.IDATAST "\\$1" "\\$2"
+.IX "Start Global Variable: \\$1"
+.XS
+\t\fI(\\$2)\fP\Global Variable: \\$1
+.XE
+..
+\# End a global variable
+.de EGVAR
+.EIDATAST
+.IX "End Global Variable"
+..
+\# Begin a cross reference
+.de CREF
+.IDATAST "\\$1" "\\$2"
+.IX "Start Cross Reference: \\$1"
+.XS
+\t\fI(\\$2)\fP\t\\$1
+.XE
+..
+\# End a cross reference
+.de ECREF
+.EIDATAST
+.IX "End Cross Reference"
+..
+\# Begin a data structure description
+.de DATAST
+.IDATAST "\\$1" "\\$2"
+.IX "Start Data Structure: \\$1"
+.XS
+\t\fI(\\$2)\fP\tData Structure: \\$1
+.XE
+..
+\# Begin the attributes of a data structure
+.de ATTRS
+.SUBH "Attributes"
+.RS
+..
+\# Print an attribute
+.de ATTR
+.BULT "\f(BI\\$1\fB \\$2\fP:"
+..
+\# End the attributes of a data structure
+.de EATTRS
+.RE
+..
+\# End a data structure description
+.de EDATAST
+.EIDATAST
+.IX "End Data Structure"
+..
+\# Print usage header for a data structure
+.de USAGE
+.SUBH "Usage"
+..
+\# Function item
+.de FUNCT
+.IDATAST "\f(BI\\$1\fB \\$2(\f(BI\\$3)\fP" "\\$4"
+.IX "Start Function: \\$2"
+.XS
+\t\fI(\\$4)\fP\tFunction: \\$2
+.XE
+..
+\# A function whose file entry needs to go on a new line
+.de BFUNCT
+.KS
+.IP "\f(BI\\$1\fB \\$2(\f(BI\\$3)\fP"
+.rj 1
+\# This line is typeset on the same line as the structure name
+.I "(File: \\$4)"
+.IX "Start Function: \\$2"
+.XS
+\t\fI(\\$4)\fP\tFunction: \\$2
+.XE
+.RS
+..
+\# Start function arguments
+.de ARGS
+.SUBH "Arguments"
+.RS
+..
+\# Print function argument
+.de ARG
+.IBULT "\\$1"
+..
+\# End function arguments.
+.de EARGS
+.RE
+..
+\# Print return header
+.de RETURN
+.SUBH "Return"
+..
+\# End function
+.de EFUNCT
+.IX "End Function"
+.EIDATAST
+..
+\# Start typedef
+.de TYPED
+.IDATAST "typedef \f(BI\\$1\fB \\$2\fP" "\\$3"
+.IX "Typedef: \\$2"
+.XS
+\t\fI(\\$3)\fP\tTypedef: \\$2
+.XE
+..
+\# End typedef
+.de ETYPED
+.EIDATAST
+..
+\# Print a command declaration
+.de COMDECL
+.DATAST "DECLCOM(\\$1)" "\\$2"
+.USAGE
+Implement the \fB\\$1\fP command.
+.EDATAST
+..
+\# Begin a section in the table of contents
+.de XSH
+.SH
+\\$1
+.XS
+.B "\\$1"
+.XE
+.IX "Start Section: \\$1"
+.RS
+..
+\# End a section
+.de ESH
+.IX "End Section"
+.RE
+..
+\# Do a section that is loaded from an external file
+.de LXSH
+.XSH "\\$1"
+.so \\$2
+..ESH
+..
+\# Bulleted list item
+.de BULT
+.IP "\[bu] \\$1"
+..
+\# Italic bullet list item
+.de IBULT
+.BULT "\fI\\$1\fP"
+..
+\# Hanging subheader
+.de SUBH
+.IP "\fB\\$1\fP:"
+..
+\# Print page number on first page
+.P1
+\# Don't print date on title page.
+.ND ""
