@@ -193,6 +193,7 @@ static void addbucket(struct bucket *bucket) {
 		/* Insert our bucket into the chain. */
 		bucket->next     = nbucket;
 		nextbucket->prev = nbucket;
+
 		nbucket->next = nextbucket;
 		nbucket->prev = bucket;
 	}

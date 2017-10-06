@@ -25,9 +25,9 @@ static struct pcbstate *makepcbstate() {
 	pState->nProcid    = 1;
 
 	/* Setup queues. */
-	pState->pqReady    = makepcbqueue();
+	pState->pqReady    = maketypedpcbqueue(QT_PRIORITY);
 	pState->pqBlocked  = makepcbqueue();
-	pState->pqsReady   = makepcbqueue();
+	pState->pqsReady   = maketypedpcbqueue(QT_PRIORITY);
 	pState->pqsBlocked = makepcbqueue();
 
 	return pState;

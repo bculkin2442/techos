@@ -19,9 +19,9 @@ struct pcb *makepcb(struct pcbstate *pState, char *pszPCBName, enum pcbclass cla
 	assert(pPCB != NULL);
 
 	/* Set PCB ID. */
-	pPCB->id = pState->nProcid++;
+	pPCB->id    = pState->nProcid++;
 	/* Intern the string for the PCB name. */
-	pPCB->kName    = internstring(pState->ptPCBNames, pszPCBName);
+	pPCB->kName = internstring(pState->ptPCBNames, pszPCBName);
 
 	/* Initialize passed in properties. */
 	pPCB->clas     = clas;
@@ -30,6 +30,7 @@ struct pcb *makepcb(struct pcbstate *pState, char *pszPCBName, enum pcbclass cla
 	/* Initialize PCB status. */
 	pPCB->status = PCB_READY;
 	pPCB->susp   = PCB_FREE;
+
 	/* Initialize PCB queue. */
 	pPCB->pNext = pPCB;
 	pPCB->pPrev = pPCB;
@@ -44,50 +45,106 @@ void killpcb(struct pcb * pPCB) {
 
 /* Find something by number in a PCB queue. */
 static struct pcb *queuefindpcbnum(struct pcbqueue *pqQueue, int pcbnum) {
-	/* The number of the first PCB. */
-	int initPCB;
-	/* The current PCB to search. */
-	struct pcb *pPCB;
+	switch(pqQueue->type) {
+	case QT_NORMAL:
+		{
+			/* The number of the first PCB. */
+			int initPCB;
+			/* The current PCB to search. */
+			struct pcb *pPCB;
 
-	/* Initialize iteration. */
-	pPCB    = pqQueue->pHead;
-	initPCB = pPCB->id;
+			/* Initialize iteration. */
+			pPCB    = pqQueue->pHead;
+			initPCB = pPCB->id;
 
-	do {
-		/* Return the PCB if it matches. */
-		if(pPCB->id == pcbnum) return pPCB;
-		/* Advance to the next PCB in the queue. */
-		pPCB = pPCB->pNext;
-	} while(pPCB->id != initPCB);
+			do {
+				/* Return the PCB if it matches. */
+				if(pPCB->id == pcbnum) return pPCB;
+				/* Advance to the next PCB in the queue. */
+				pPCB = pPCB->pNext;
+			} while(pPCB->id != initPCB);
 
-	return NULL;
+			return NULL;
+		}
+	case QT_PRIORITY:
+		{
+			/* Loop index for queues. */
+			int i;
+			/* Cast queue. */
+			struct pcbqueueprior *pqrQueue;
+
+			pqrQueue = (struct pcbqueueprior *)pqQueue;
+			for(i = 0; i <= PCB_MAXPRIOR; i++) {
+				/* The PCB we possibly found. */
+				struct pcb *pPCB;
+
+				/* Find in each priority level. */
+				pPCB = queuefindpcbnum(pqrQueue->apqQueues[i], pcbnum);
+				if(pPCB != NULL) return pPCB;
+			}
+			
+			/* We found nothing. */
+			return NULL;
+		}
+	default:
+		/* Shouldn't happen. */
+		assert(0);
+	}
 }
 
 /* Find something by name in a PCB queue. */
 static struct pcb *queuefindpcbname(struct pcbqueue *pqQueue, int kPCBName) {
-	/* The number of the first PCB. */
-	int initPCB;
-	/* The current PCB to search. */
-	struct pcb *pPCB;
+	switch(pqQueue->type) {
+	case QT_NORMAL:
+		{
+			/* The number of the first PCB. */
+			int initPCB;
+			/* The current PCB to search. */
+			struct pcb *pPCB;
 
-	/* Initialize iteration. */
-	pPCB    = pqQueue->pHead;
+			/* Initialize iteration. */
+			pPCB    = pqQueue->pHead;
 
-	if(pPCB == NULL) {
-		printf("\nError: PCB HEAD ID IS NULL\n");
-		return 0;
-	} else {
-		initPCB = pPCB->id;
+			if(pPCB == NULL) {
+				printf("\nError: PCB HEAD ID IS NULL\n");
+				return 0;
+			} else {
+				initPCB = pPCB->id;
+			}
+
+			do {
+				/* Return the PCB if it matches. */
+				if(pPCB->kName == kPCBName) return pPCB;
+				/* Advance to the next PCB in the queue. */
+				pPCB = pPCB->pNext;
+			} while(pPCB->id != initPCB);
+
+			return NULL;
+		}
+	case QT_PRIORITY:
+		{
+			/* Loop index for queues. */
+			int i;
+			/* Cast queue. */
+			struct pcbqueueprior *pqrQueue;
+
+			pqrQueue = (struct pcbqueueprior *)pqQueue;
+			for(i = 0; i <= PCB_MAXPRIOR; i++) {
+				/* The PCB we possibly found. */
+				struct pcb *pPCB;
+
+				/* Find in each priority level. */
+				pPCB = queuefindpcbname(pqrQueue->apqQueues[i], kPCBName);
+				if(pPCB != NULL) return pPCB;
+			}
+			
+			/* We found nothing. */
+			return NULL;
+		}
+	default:
+		/* Shouldn't happen. */
+		assert(0);
 	}
-
-	do {
-		/* Return the PCB if it matches. */
-		if(pPCB->kName == kPCBName) return pPCB;
-		/* Advance to the next PCB in the queue. */
-		pPCB = pPCB->pNext;
-	} while(pPCB->id != initPCB);
-
-	return NULL;
 }
 /* Find a PCB by number in all of the queues. */
 struct pcb *findpcbnum(struct pcbstate *pState, int pcbnum) {
@@ -119,11 +176,11 @@ struct pcb *findpcbname(struct pcbstate *pState, char *pszPCBName) {
 
 	/* Only look in non-empty queues. */
 	if(pState->pqReady->pHead != NULL)
-		                 pPCB = queuefindpcbname(pState->pqReady,    kPCBName);
+		pPCB = queuefindpcbname(pState->pqReady, kPCBName);
 	if(pState->pqBlocked->pHead != NULL) 
-		if(pPCB == NULL) pPCB = queuefindpcbname(pState->pqBlocked,  kPCBName);
+		if(pPCB == NULL) pPCB = queuefindpcbname(pState->pqBlocked, kPCBName);
 	if(pState->pqsReady->pHead != NULL) 
-		if(pPCB == NULL) pPCB = queuefindpcbname(pState->pqsReady,   kPCBName);
+		if(pPCB == NULL) pPCB = queuefindpcbname(pState->pqsReady, kPCBName);
 	if(pState->pqsBlocked->pHead != NULL) 
 		if(pPCB == NULL) pPCB = queuefindpcbname(pState->pqsBlocked, kPCBName);
 
@@ -132,6 +189,9 @@ struct pcb *findpcbname(struct pcbstate *pState, char *pszPCBName) {
 
 /* Fill an queue if it is empty. */
 static int fillqueue(struct pcbqueue *pqQueue, struct pcb *pPCB) {
+	/* Only valid on normal queues. */
+	assert(pqQueue->type == QT_NORMAL);
+
 	if(pqQueue->pHead == NULL) {
 		pqQueue->pHead = pPCB;
 		return 1;
@@ -142,6 +202,9 @@ static int fillqueue(struct pcbqueue *pqQueue, struct pcb *pPCB) {
 
 /* Insert a PCB into a FIFO queue. */
 static void fifoinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {
+	/* Only valid on normal queues. */
+	assert(pqQueue->type == QT_NORMAL);
+
 	/* The current head of the chain. */
 	struct pcb *pHead;
 	/* The current tail of the chain. */
@@ -164,6 +227,9 @@ static void fifoinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {
 
 /* Insert a PCB into a FILO queue. */
 static void filoinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {
+	/* Only valid on normal queues. */
+	assert(pqQueue->type == QT_NORMAL);
+
 	/* Fill an queue if it is empty. */
 	if(fillqueue(pqQueue, pPCB)) return;
 
@@ -176,46 +242,32 @@ static void filoinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {
 
 /* Insert a PCB into a priority queue. */
 static void priorinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {
-	/* Fill an queue if it is empty. */
-	if(fillqueue(pqQueue, pPCB)) return;
+	/* Cast queue. */
+	struct pcbqueueprior *pqrQueue;
 
-	/* ID number of the first PCB. */
-	int fid;
+	/* Only valid on priority queues. */
+	assert(pqQueue->type == QT_PRIORITY);
 
-	/* Current member of the queue. */
-	struct pcb *pCur;
-	
-	/* Initialize state. */
-	pCur = pqQueue->pHead;
-	fid  = pqQueue->pHead->id;
-	
-	/* Find a slot to insert it into. */
-	/* 
-	 * @TODO figure out why PCBs of lower priority are getting put in the
-	 * wrong spot. 
-	 */
-	do {
-		if(pPCB->priority > pCur->priority) {
-			/* This is where we insert. */
-			/* Chain the PCB to where it goes. */
-			pPCB->pNext = pCur;
-			pPCB->pPrev = pCur->pPrev;
+	pqrQueue = (struct pcbqueueprior *)pqQueue;
 
-			/* Adjust the queue members. */
-			pCur->pPrev->pNext = pPCB;
-			pCur->pPrev        = pPCB;
-
-			/* Update the head if we need to. */
-			if(pCur->id == fid) pqQueue->pHead = pPCB;
-
-			return;
-		}
-	} while(pCur->id != fid);
-
-	/* Insert it at the back then. */
-	fifoinsertpcb(pqQueue, pPCB);
+	/* Insert it into the proper queue. */
+	fifoinsertpcb(pqrQueue->apqQueues[pPCB->priority], pPCB);
+	pqrQueue->apqQueues[pPCB->priority]->nprocs += 1;
 }
 
+void doinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {
+	switch(pqQueue->type) {
+	case QT_NORMAL:
+		fifoinsertpcb(pqQueue, pPCB);
+		break;
+	case QT_PRIORITY:
+		priorinsertpcb(pqQueue, pPCB);
+		break;
+	default:
+		/* Shouldn't happen. */
+		assert(0);
+	}
+}
 /* Insert a PCB into the proper queue. */
 enum pcberror insertpcb(struct pcbstate *pState, struct pcb *pPCB) {
 	/* The two queues to select from. */
@@ -240,11 +292,11 @@ enum pcberror insertpcb(struct pcbstate *pState, struct pcb *pPCB) {
 
 	switch(pPCB->status) {
 	case PCB_READY:
-		priorinsertpcb(pqReady, pPCB);
+		doinsertpcb(pqReady, pPCB);
 		pqReady->nprocs += 1;
 		break;
 	case PCB_BLOCKED:
-		fifoinsertpcb(pqBlocked, pPCB);
+		doinsertpcb(pqBlocked, pPCB);
 		pqBlocked->nprocs += 1;
 		break;
 	case PCB_RUNNING:
@@ -272,7 +324,6 @@ void removepcb(struct pcbstate *pState, struct pcb *pPCB) {
 	} else if(pPCB->susp == PCB_FREE && pPCB->status == PCB_BLOCKED) {
 		pqQueue = pState->pqBlocked;
 	} else {
-		/* Attempted to remove a PCB that wasn't in a queue. */
 		printf("BANG! Attempted to remove a PCB not in a queue.\n");
 		assert(0);
 	}
@@ -284,6 +335,19 @@ void removepcb(struct pcbstate *pState, struct pcb *pPCB) {
 	/* Remove the PCB from the queue. */
 	pPCB->pNext = pPCB;
 	pPCB->pPrev = pPCB;
+
+	/* Set the proper queue. */
+	switch(pqQueue->type) {
+	case QT_NORMAL:
+		break;
+	case QT_PRIORITY:
+		pqQueue->nprocs -= 1;
+		pqQueue = ((struct pcbqueueprior *)pqQueue)->apqQueues[pPCB->priority];
+		break;
+	default:
+		/* Shouldn't happen. */
+		assert(0);
+	}
 
 	pqQueue->nprocs -= 1;
 

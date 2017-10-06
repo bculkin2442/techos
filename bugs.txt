@@ -1,5 +1,4 @@
 //----------- Bugs ---------------//
 
-1) double free/corruption on exit after any pcb methods
-2) after removing a PCB, shpcb shows empty queues, but correctly shows process count
-3) suspend and block do not move PCB to correct queue
+1) double free/corruption on exit after any pcb methods on ubuntu (maybe others,
+   not on gentoo)
