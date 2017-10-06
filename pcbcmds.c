@@ -313,7 +313,7 @@ HANDLECOM(rmpcb) {
 			char *pszPCBID;
 
 			pszPCBID = argv[optind];
-			if(sscanf(argv, "%d", &pcbid) < 1) {
+			if(sscanf(pszPCBID, "%d", &pcbid) < 1) {
 				fprintf(ostate->output, "ERROR: '%s' is not a valid PCB id (must be a positive integer)\n", pszPCBID);
 				return 1;
 			}

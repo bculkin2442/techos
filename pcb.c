@@ -142,16 +142,24 @@ static int fillqueue(struct pcbqueue *pqQueue, struct pcb *pPCB) {
 
 /* Insert a PCB into a FIFO queue. */
 static void fifoinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {
+	/* The current head of the chain. */
+	struct pcb *pHead;
+	/* The current tail of the chain. */
+	struct pcb *pTail;
+
 	/* Fill an queue if it is empty. */
 	if(fillqueue(pqQueue, pPCB)) return;
 
+	pHead = pqQueue->pHead;
+	pTail = pHead->pPrev;
+
 	/* Chain the PCB to the back. */
-	pPCB->pNext = pqQueue->pHead;
-	pPCB->pPrev = pqQueue->pHead->pPrev;
+	pPCB->pNext = pHead;
+	pPCB->pPrev = pTail;
 
 	/* Adjust the queue members. */
-	pqQueue->pHead->pPrev->pNext = pPCB;
-	pqQueue->pHead->pPrev        = pPCB;
+	pTail->pNext = pPCB;
+	pHead->pPrev = pPCB;
 }
 
 /* Insert a PCB into a FILO queue. */
@@ -182,7 +190,10 @@ static void priorinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {
 	fid  = pqQueue->pHead->id;
 	
 	/* Find a slot to insert it into. */
-	/* @TODO ensure this works. */
+	/* 
+	 * @TODO figure out why PCBs of lower priority are getting put in the
+	 * wrong spot. 
+	 */
 	do {
 		if(pPCB->priority > pCur->priority) {
 			/* This is where we insert. */
@@ -266,16 +277,27 @@ void removepcb(struct pcbstate *pState, struct pcb *pPCB) {
 		assert(0);
 	}
 
+	/* Save the links to restore. */
 	pNext = pPCB->pNext;
 	pPrev = pPCB->pPrev;
 
-	if(pNext == pPrev) {
+	/* Remove the PCB from the queue. */
+	pPCB->pNext = pPCB;
+	pPCB->pPrev = pPCB;
+
+	pqQueue->nprocs -= 1;
+
+	if(pqQueue->nprocs < 1) {
 		/* Empty a queue. */
 		pqQueue->pHead = NULL;
 	} else {
+		/* Restore the queue links. */
 		pNext->pPrev = pPrev;
 		pPrev->pNext = pNext;
-	}
 
-	pqQueue->nprocs -= 1;
+		if(pqQueue->pHead == pPCB) {
+			/* Reset queue head. */
+			pqQueue->pHead = pNext;
+		}
+	}
 }
