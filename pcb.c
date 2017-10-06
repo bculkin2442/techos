@@ -206,7 +206,7 @@ static void priorinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {
 }
 
 /* Insert a PCB into the proper queue. */
-int insertpcb(struct pcbstate *pState, struct pcb *pPCB) {
+enum pcberror insertpcb(struct pcbstate *pState, struct pcb *pPCB) {
 	/* The two queues to select from. */
 	struct pcbqueue *pqReady;
 	struct pcbqueue *pqBlocked;

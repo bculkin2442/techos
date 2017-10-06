@@ -89,22 +89,32 @@ static void printpcb(struct pcb *pPCB, void *pvState) {
 	fprintf(ostate->output, "Is PCB Suspended: %s\n\n", pszPCBSusp);
 }
 
+/* Handle creating a PCB. */
 HANDLECOM(mkpcb) { 
-
-	enum pcbclass class = PCB_APPLICATION;
-
-	//current option and long option
+	/* Class of the PCB. */
+	enum pcbclass clas = PCB_APPLICATION;
+	/* Priority of the PCB. */
+	int priority;
+	/* Current option/long option. */
 	int opt, optidx;
+	/* Reinit getopt. */
 	optind = 1;
 
-	int priority;
+	/* Process options. */
+	while(1) {
+		enum mopt {
+			MO_CSYS = 0,
+			MO_CAPP = 1,
+			MO_HELP = 2,
+		};
 
-	while(1)
-	{
+		/* Usage message. */
 		char *usage = "Usage: mkpcb [-h] [--class_sys|--class_app] [--help]<name> <priority>\n";
+
 		/* The long options we take. */
 		static struct option opts[] = {
 			/*class options*/
+			/* @TODO make this one option taking a string argument. */
 			{"class_sys",  no_argument, 0, 0},
 			{"class_app",  no_argument, 0, 0},
 
@@ -115,26 +125,24 @@ HANDLECOM(mkpcb) {
 			{0, 0, 0, 0}
 		};
 
-		//get an option
+		/* Get an option. */
 		opt = getopt_long(argc, argv, "h", opts, &optidx);
 		
-		//break if we've processed every option
+		/* Break if we've processed every option. */
 		if(opt == -1) break;
 
-		//Handle options
-		switch(opt)
-		{
+		/* Handle options. */
+		switch(opt) {
 		case 0:
-			//Long options
-			switch(optidx)
-			{
-			case 0:
-				class = PCB_SYSTEM;
+			/* Long options. */
+			switch(optidx) {
+			case MO_CSYS:
+				clas = PCB_SYSTEM;
 				break;
-			case 1:
-				class = PCB_APPLICATION;
+			case MO_CAPP:
+				clas = PCB_APPLICATION;
 				break;
-			case 2://Help
+			case MO_HELP:
 				fprintf(ostate->output, "%s\n", usage);
 				return 0;
 			default:
@@ -143,7 +151,6 @@ HANDLECOM(mkpcb) {
 				return 1;
 			}
 			break;
-			//Short options	
 		case 'h':
 			fprintf(ostate->output, "%s\n", usage);
 			return 0;
@@ -154,30 +161,67 @@ HANDLECOM(mkpcb) {
 		}
 
 	}
+
+	/* Check if we have a priority as the second non-arg option. */
 	if(argc >= (optind + 2)){
-		priority = atoi(argv[optind + 1]);
+		/* Priority argument. */
+		char *prarg;
+		prarg = argv[optind + 1];
+
+		/* Parse priority. */
+		if(sscanf(prarg, "%d", &priority) < 1) {
+			fprintf(ostate->output, "ERROR: '%s' is not a valid priority (must be an integer)\n", prarg);
+			return 1;
+		}
 	} else {
-		fprintf(ostate->output, "Priority not given.\n");
+		fprintf(ostate->output, "ERROR: Priority not given.\n");
 		return 1;
 	}
 
-	if(priority < PCB_MINPRIOR || priority > PCB_MAXPRIOR)
+	/* Check the PCB priority is valid. */
+	if(priority < PCB_MINPRIOR || priority > PCB_MAXPRIOR) {
+		fprintf(ostate->output, "ERROR: Priority entered is out of bounds (must be between %d and %d)\n", PCB_MINPRIOR, PCB_MAXPRIOR);
+		return 1;
+	}
+
+	/* Bind the PCB name. */
+	char *pszPCBName = argv[optind];
+
+	/* Create the PCB. */
+	struct pcb *madePCB = makepcb(ostate->pPCBstat, pszPCBName, clas, priority);
+	if(madePCB == NULL) {
+		fprintf(ostate->output, "INTERNAL ERROR: PCB named '%s' created as null.\n", pszPCBName);
+		return 1;
+	}
+
 	{
-		fprintf(ostate->output, "Priority entered is out of bounds.\n");
+		/* Return from insertpcb. */
+		int pcbstat;
+		pcbstat = insertpcb(ostate->pPCBstat, madePCB);
+		if(pcbstat == PCBSUCCESS) return 0;
+		else switch(pcbstat) {
+		case PCBINVSUSP:
+			fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') has invalid suspension type %d\n", madePCB->id, pszPCBName, madePCB->susp);
+			break;
+		case PCBINVSTAT:
+			fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') has invalid run state %d\n", madePCB->id, pszPCBName, madePCB->status);
+			break;
+		case PCBRUNNING:
+			fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') is already running\n", madePCB->id, pszPCBName);
+			break;
+		case PCBINQUEUE:
+			fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') is already in a queue%d\n", madePCB->id, pszPCBName);
+			break;
+		default:
+			fprintf(ostate->output, "INTERNAL ERROR: Unknown return %d from attempting to insert new PCB %d (named '%s)\n", pcbstat, madePCB->id, pszPCBName);
+		}
 		return 1;
 	}
-
-	struct pcb *madePCB = makepcb(ostate->pPCBstat, argv[optind], class, priority);
-
-	insertpcb(ostate->pPCBstat, madePCB);
-
-	return 0;
 }
 
 HANDLECOM(rmpcb) {
-	//current option and long option
+	/* Current option/long option. */
 	int opt, optidx;
-	optind = 1;
 
 	/*The pcb to remove*/
 	struct pcb *pPCB;
@@ -189,12 +233,16 @@ HANDLECOM(rmpcb) {
 		PID_NUM
 	};
 
+	/* Reinit getopt. */
+	optind = 1;
+	
+	/* The default PCB id type. */
 	enum pidopt idtype = PID_NAME;
 	while(1) {
+		/* Our usage method. */
 		char *usage = "Usage: rmpcb [name] [-h] [--help] [--proc name|num] <proc-name>|<proc-id>\n";
 		/* The long options we take. */
 		static struct option opts[] = {
-
 			/* Misc. options. */
 			{"help", no_argument, 0, 0},
 
@@ -205,27 +253,25 @@ HANDLECOM(rmpcb) {
 			{0, 0, 0, 0}
 		};
 
-		//get an option
+		/* Get an option. */
 		opt = getopt_long(argc, argv, "h", opts, &optidx);
-		//break if we've processed every option
+		/* Break if we've processed every option. */
 		if(opt == -1) break;
-		//Handle options
+
+		/* Handle options. */
 		switch(opt) {
 		case 0:
-			//Long options
-			switch(optidx)
-			{
-			case 0://Help
+			/* Long options. */
+			switch(optidx) {
+			case 0:
 				fprintf(ostate->output, "%s\n", usage);
 				return 0;
-			case 1://SH_PROC
+			case 1:
 				if(strcmp(optarg, "name") == 0) {
 					idtype = PID_NAME;
-				}
-				else if(strcmp(optarg, "num") == 0) {
+				} else if(strcmp(optarg, "num") == 0) {
 					idtype = PID_NUM;
-				}
-				else {
+				} else {
 					fprintf(ostate->output, "ERROR: Invalid process ID type '%s'. Valid ID types are 'name' and 'num'\n", optarg);
 					return 1;
 				}
@@ -235,7 +281,6 @@ HANDLECOM(rmpcb) {
 				return 1;
 			}
 			break;
-			//Short options	
 		case 'h':
 			fprintf(ostate->output, "%s\n", usage);
 			return 0;
@@ -256,20 +301,34 @@ HANDLECOM(rmpcb) {
 				return 1;
 			}
 		} else {
-			fprintf(ostate->output, "ERROR: Must specify PCB name as argument.\n");
+			fprintf(ostate->output, "ERROR: Must specify PCB name as argument\n");
 			return 1;
 		}
 		break;
 	case PID_NUM:
 		if(optind < argc) {
-			int pcbid = atoi(argv[optind]);
+			/* PCB ID. */
+			int pcbid;
+			/* Tentative PCB ID. */
+			char *pszPCBID;
+
+			pszPCBID = argv[optind];
+			if(sscanf(argv"%d", &pcbid) < 1) {
+				fprintf(ostate->output, "ERROR: '%s' is not a valid PCB id (must be a positive integer)\n", pszPCBID);
+				return 1;
+			}
+			if(pcbid < 0) {
+				fprintf(ostate->output, "ERROR: PCB ID %d is not valid (must be a positive integer)\n", pcbid);
+				return 1;
+			}
+
 			pPCB = findpcbnum(ostate->pPCBstat, pcbid);
 			if(pPCB == NULL) {
-				fprintf(ostate->output, "ERROR: No PCB with ID '%d'\n", pcbid);
+				fprintf(ostate->output, "ERROR: No PCB with ID %d\n", pcbid);
 				return 1;
 			}
 		} else {
-			fprintf(ostate->output, "ERROR: Must specify PCB name as argument.\n");
+			fprintf(ostate->output, "ERROR: Must specify PCB ID as argument.\n");
 			return 1;
 		}
 		break;
