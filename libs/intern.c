@@ -112,29 +112,46 @@ void killinterntab(struct interntab *table) {
 		buck = table->strings[i];
 
 		/* Terminate the chain. */
-		buck->prev->next = NULL;
+		/*
+		 * NOTE:
+		 * 	buck->prev is only null in the case where nothing has
+		 * 	been inserted into this bucket before. 
+		 */
+		if(buck->prev != NULL) {
+			buck->prev->next = NULL;
+		}
 
 		while(buck != NULL && buck->next != NULL) {
-			/* Free each bucket in the chain. */
+			/* Next bucket. */
 			struct bucket *tmp;
 
+			/* Advance the queue. */
 			tmp  = buck;
 			buck = buck->next;
 
 			/* Free the string we own. */
 			if(tmp->val != NULL) free(tmp->val);
+			/* Free the bucket. */
 			free(tmp);
 		}
 	}
 
 	/* Free keys table. */
+	/* @TODO deduplicate this code with the above loop. */
 	for(i = 0; i < BUCKET_COUNT; i++) {
 		/* Get the initial bucket. */
 		struct bucket *buck;
 		buck = table->strings[i];
 
 		/* Terminate the chain. */
-		buck->prev->next = NULL;
+		/*
+		 * NOTE:
+		 * 	buck->prev is only null in the case where nothing has
+		 * 	been inserted into this bucket before. 
+		 */
+		if(buck->prev != NULL) {
+			buck->prev->next = NULL;
+		}
 
 		while(buck != NULL && buck->next != NULL) {
 			/* Free each bucket in the chain. */

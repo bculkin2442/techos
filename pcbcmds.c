@@ -109,7 +109,7 @@ HANDLECOM(mkpcb) {
 		};
 
 		/* Usage message. */
-		char *usage = "Usage: mkpcb [-h] [--class_sys|--class_app] [--help]<name> <priority>\n";
+		char *usage = "Usage: mkpcb [-h] [--class_sys|--class_app] [--help] <name> <priority>\n";
 
 		/* The long options we take. */
 		static struct option opts[] = {
@@ -210,7 +210,7 @@ HANDLECOM(mkpcb) {
 			fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') is already running\n", madePCB->id, pszPCBName);
 			break;
 		case PCBINQUEUE:
-			fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') is already in a queue%d\n", madePCB->id, pszPCBName);
+			fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') is already in a queue\n", madePCB->id, pszPCBName);
 			break;
 		default:
 			fprintf(ostate->output, "INTERNAL ERROR: Unknown return %d from attempting to insert new PCB %d (named '%s)\n", pcbstat, madePCB->id, pszPCBName);
@@ -313,7 +313,7 @@ HANDLECOM(rmpcb) {
 			char *pszPCBID;
 
 			pszPCBID = argv[optind];
-			if(sscanf(argv"%d", &pcbid) < 1) {
+			if(sscanf(argv, "%d", &pcbid) < 1) {
 				fprintf(ostate->output, "ERROR: '%s' is not a valid PCB id (must be a positive integer)\n", pszPCBID);
 				return 1;
 			}

@@ -32,4 +32,13 @@ struct pcbstate {
 
 /* Execute an action for all of the PCBs in a queue. */
 void foreachpcb(struct pcbqueue *, void (*pcbitr)(struct pcb *, void *), void *);
+
+/* Allocate/initialize PCB queue. */
+struct pcbqueue *makepcbqueue();
+/* 
+ * Deinitialize/deallocate PCB queue.
+ *
+ * NOTE: Killing a PCB queue kills all PCBs currently enqueued.
+ */
+void             killpcbqueue(struct pcbqueue *);
 #endif

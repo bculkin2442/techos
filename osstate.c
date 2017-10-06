@@ -13,23 +13,6 @@ char *defin_datefmt   = "%Y-%m-%d";
 char *deftime_datefmt = "%r (%Z)";
 char *defout_datefmt  = "%A, %d, %B, %Y";
 
-/* Allocate/initialize PCB queue. */
-/* 
- * @TODO move this to pcbinternals.c, and add destructors as well, so that we
- * don't leak memory.
- */
-static struct pcbqueue *makepcbqueue() {
-	/* Allocate for the queue, and fail if that does. */
-	struct pcbqueue *pQueue = malloc(sizeof(struct pcbqueue));
-	assert(pQueue != NULL);
-
-	/* Initialize the queue. */
-	pQueue->nprocs = 0;
-	pQueue->pHead  = NULL;
-
-	return pQueue;
-}
-
 /* Allocate/initialize PCB state. */
 static struct pcbstate *makepcbstate() {
 	/* Allocate the state, and fail if allocation fails. */
@@ -48,6 +31,21 @@ static struct pcbstate *makepcbstate() {
 	pState->pqsBlocked = makepcbqueue();
 
 	return pState;
+}
+
+/* Deinitialize/deallocate PCB state. */
+static void killpcbstate(struct pcbstate *pState) {
+	/* Free associated queues. */
+	killpcbqueue(pState->pqReady);
+	killpcbqueue(pState->pqBlocked);
+	killpcbqueue(pState->pqsReady);
+	killpcbqueue(pState->pqsBlocked);
+
+	/* Free interned names. */
+	killinterntab(pState->ptPCBNames);
+
+	/* Free state. */
+	free(pState);
 }
 
 /* Allocate/initialize OS state. */
@@ -87,9 +85,14 @@ struct osstate *makeosstate() {
 
 /* Free/destroy OS state. */
 void killosstate(struct osstate *state) {
+	/* Free PCB state. */
+	killpcbstate(state->pPCBstat);
+
+	/* Free date/time vars. */
 	free(state->in_datefmt);
 	free(state->time_datefmt);
 	free(state->out_datefmt);
 
+	/* Free state. */
 	free(state);
 }
