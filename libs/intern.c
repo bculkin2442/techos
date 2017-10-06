@@ -161,6 +161,7 @@ void killinterntab(struct interntab *table) {
 			buck = buck->next;
 
 			/* Free the bucket. */
+			/* @TODO this causes a double free bug on ubuntu. Why? */
 			free(tmp);
 		}
 	}
