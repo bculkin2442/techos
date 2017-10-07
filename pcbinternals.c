@@ -148,3 +148,39 @@ void foreachpcb(struct pcbqueue *pqQueue, void(*pcbitr)(struct pcb *, void *), v
 		assert(0);
 	}
 }
+
+/* Allocate/initialize PCB state. */
+struct pcbstate *makepcbstate() {
+	/* Allocate the state, and fail if allocation fails. */
+	struct pcbstate *pState = malloc(sizeof(struct pcbstate));
+	assert(pState != NULL);
+
+	/* Setup name table. */
+	pState->ptPCBNames = makeinterntab();
+	/* Initialize proc. ids. */
+	pState->nProcid    = 1;
+
+	/* Setup queues. */
+	pState->pqReady    = maketypedpcbqueue(QT_PRIORITY);
+	pState->pqBlocked  = makepcbqueue();
+	pState->pqsReady   = maketypedpcbqueue(QT_PRIORITY);
+	pState->pqsBlocked = makepcbqueue();
+
+	return pState;
+}
+
+/* Deinitialize/deallocate PCB state. */
+void killpcbstate(struct pcbstate *pState) {
+	/* Free associated queues. */
+	killpcbqueue(pState->pqReady);
+	killpcbqueue(pState->pqBlocked);
+	killpcbqueue(pState->pqsReady);
+	killpcbqueue(pState->pqsBlocked);
+
+	/* Free interned names. */
+	killinterntab(pState->ptPCBNames);
+
+	/* Free state. */
+	free(pState);
+}
+

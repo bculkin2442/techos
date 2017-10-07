@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -6,16 +7,16 @@
 #include "libs/argparser.h"
 
 #include "osstate.h"
+
 #include "commands.h"
 #include "comlist.h"
+#include "commandstate.h"
+
 #include "techos.h"
 
 /* The major/minor version of TechOS. */
 const int major_ver = 2;
 const int minor_ver = 0;
-
-/* List of all commands. */
-struct comlist *all_commands;
 
 /*
  * Main function. 
@@ -35,8 +36,7 @@ int main() {
 	ostate->strem  = stdin;
 	ostate->output = stdout;
 	/* Add all the commands to the command list. */
-	all_commands = makecomlist();
-	addcommands(all_commands);
+	addcommands(ostate->pComstate->plCommands);
 
 	fprintf(ostate->output, "Welcome to TechOS v%d.%d\n", major_ver, minor_ver);
 
@@ -105,7 +105,11 @@ int handleline(struct osstate *ostate, char *line) {
 		struct command *com;
 
 		/* Determine the command to execute from the name. */
-		com = getcommand(all_commands, args.argv[0]);
+		/* 
+		 * @TODO may have to change this to a local function to better
+		 * support aliases, among other things.
+		 */
+		com = getcommand(ostate->pComstate->plCommands, args.argv[0]);
 
 		/* Execute the command if we have one. */
 		if(com->comfun != NULL) {

@@ -8,45 +8,12 @@
 #include "pcb.h"
 #include "pcbinternals.h"
 
+#include "commandstate.h"
+
 /* Set default date formats */
 char *defin_datefmt   = "%Y-%m-%d";
 char *deftime_datefmt = "%r (%Z)";
 char *defout_datefmt  = "%A, %d, %B, %Y";
-
-/* Allocate/initialize PCB state. */
-static struct pcbstate *makepcbstate() {
-	/* Allocate the state, and fail if allocation fails. */
-	struct pcbstate *pState = malloc(sizeof(struct pcbstate));
-	assert(pState != NULL);
-
-	/* Setup name table. */
-	pState->ptPCBNames = makeinterntab();
-	/* Initialize proc. ids. */
-	pState->nProcid    = 1;
-
-	/* Setup queues. */
-	pState->pqReady    = maketypedpcbqueue(QT_PRIORITY);
-	pState->pqBlocked  = makepcbqueue();
-	pState->pqsReady   = maketypedpcbqueue(QT_PRIORITY);
-	pState->pqsBlocked = makepcbqueue();
-
-	return pState;
-}
-
-/* Deinitialize/deallocate PCB state. */
-static void killpcbstate(struct pcbstate *pState) {
-	/* Free associated queues. */
-	killpcbqueue(pState->pqReady);
-	killpcbqueue(pState->pqBlocked);
-	killpcbqueue(pState->pqsReady);
-	killpcbqueue(pState->pqsBlocked);
-
-	/* Free interned names. */
-	killinterntab(pState->ptPCBNames);
-
-	/* Free state. */
-	free(pState);
-}
 
 /* Allocate/initialize OS state. */
 struct osstate *makeosstate() {
@@ -80,19 +47,25 @@ struct osstate *makeosstate() {
 	/* Setup PCB state. */
 	ostate->pPCBstat = makepcbstate();
 
+	/* Setup command state. */
+	ostate->pComstate = makecommandstate();
+
 	return ostate;
 }
 
 /* Free/destroy OS state. */
-void killosstate(struct osstate *state) {
+void killosstate(struct osstate *ostate) {
+	/* Free command state. */
+	killcommandstate(ostate->pComstate);
+
 	/* Free PCB state. */
-	killpcbstate(state->pPCBstat);
+	killpcbstate(ostate->pPCBstat);
 
 	/* Free date/time vars. */
-	free(state->in_datefmt);
-	free(state->time_datefmt);
-	free(state->out_datefmt);
+	free(ostate->in_datefmt);
+	free(ostate->time_datefmt);
+	free(ostate->out_datefmt);
 
 	/* Free state. */
-	free(state);
+	free(ostate);
 }

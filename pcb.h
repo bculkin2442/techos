@@ -120,4 +120,11 @@ enum pcberror insertpcb(struct pcbstate *, struct pcb *);
  * cause weirdness to happen.
  */
 void removepcb(struct pcbstate *, struct pcb *);
+/*
+ * Print a PCB.
+ *
+ * The void pointer should be a pointer to an OS state, but is a void* to comply
+ * with foreachpcb()
+ */
+void printpcb(struct pcb *, void *);
 #endif

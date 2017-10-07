@@ -83,4 +83,9 @@ struct pcbqueue *maketypedpcbqueue(enum queuetype);
  * NOTE: Killing a PCB queue kills all PCBs currently enqueued.
  */
 void killpcbqueue(struct pcbqueue *);
+
+/* Allocate/initialize a PCB state. */
+struct pcbstate *makepcbstate();
+/* Deinitialize/deallocate a PCB state. */
+void             killpcbstate(struct pcbstate *);
 #endif

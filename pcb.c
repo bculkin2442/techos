@@ -1,8 +1,11 @@
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "libs/intern.h"
-#include <stdio.h>
+
+#include "osstate.h"
+
 #include "pcb.h"
 #include "pcbinternals.h"
 
@@ -364,4 +367,77 @@ void removepcb(struct pcbstate *pState, struct pcb *pPCB) {
 			pqQueue->pHead = pNext;
 		}
 	}
+}
+
+/* Print a PCB. */
+void printpcb(struct pcb *pPCB, void *pvState) {
+	/* The OS state. */
+	struct osstate *ostate;
+
+	/* The name of the PCB. */
+	const char *pszPCBName;
+	/* The class of the PCB. */
+	const char *pszPCBClass;
+	/* The status of the PCB. */
+	const char *pszPCBStatus;
+	/* The suspension status of the PCB. */
+	const char *pszPCBSusp;
+
+	/* Cast arg. */
+	ostate = (struct osstate *)(pvState);
+
+	/* Get the PCB name. */
+	pszPCBName = lookupkey(ostate->pPCBstat->ptPCBNames, pPCB->kName);
+
+	/* Get the PCB class. */
+	switch(pPCB->clas) {
+	case PCB_SYSTEM:
+		pszPCBClass = "System";
+		break;
+	case PCB_APPLICATION:
+		pszPCBClass = "Application";
+		break;
+	default:
+		/* Shouldn't happen. */
+		assert(0);
+	}
+
+	/* Get the PCB status. */
+	switch(pPCB->status) {
+	case PCB_READY:
+		pszPCBStatus = "Ready";
+		break;
+	case PCB_RUNNING:
+		pszPCBStatus = "Running";
+		break;
+	case PCB_BLOCKED:
+		pszPCBStatus = "Blocked";
+		break;
+	default:
+		/* Shouldn't happen. */
+		assert(0);
+	}
+
+	/* Get the PCB suspension status. */
+	switch(pPCB->susp) {
+	case PCB_SUSPENDED:
+		pszPCBSusp = "Yes";
+		break;
+	case PCB_FREE:
+		pszPCBSusp = "No";
+		break;
+	default:
+		/* Shouldn't happen. */
+		assert(0);
+	}
+
+	/* Print basic PCB information. */
+	fprintf(ostate->output, "PCB ID:           %d\n", pPCB->id);
+	fprintf(ostate->output, "PCB Name:         %s\n", pszPCBName);
+	fprintf(ostate->output, "PCB Class:        %s\n", pszPCBClass);
+	fprintf(ostate->output, "PCB Priority:     %d\n", pPCB->priority);
+
+	/* Print PCB status information. */
+	fprintf(ostate->output, "PCB Status:       %s\n", pszPCBStatus);
+	fprintf(ostate->output, "Is PCB Suspended: %s\n\n", pszPCBSusp);
 }

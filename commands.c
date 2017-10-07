@@ -10,14 +10,17 @@
 #include <sys/stat.h>
 
 #include "osstate.h"
+
 #include "command.h"
 #include "comlist.h"
+#include "commandstate.h"
 #include "commands.h"
-#include "techos.h"
 
 #include "datecmds.h"
 #include "scriptcmds.h"
 #include "pcbcmds.h"
+
+#include "techos.h"
 
 /* Initialize commands. */
 void initcoms() {
@@ -112,7 +115,9 @@ HANDLECOM(version) {
 
 	/*
 	 * Print version info.
-	 *
+	 */
+
+	/*
 	 * @TODO add flags for printing only parts of this information.
 	 */
 	fprintf(ostate->output, "TechOS v%d.%d\n", major_ver, minor_ver);
@@ -130,7 +135,11 @@ HANDLECOM(help) {
 	if(argc == 1) {
 		fprintf(ostate->output, "Available commands\n");
 
-		printcommands(all_commands, ostate->output);
+		/* 
+		 * @TODO need to rewrite printcommands to take a commandstate
+		 * instead for when things like help-only commands get added.
+		 */
+		printcommands(ostate->pComstate->plCommands, ostate->output);
 	} else if(argc == 2){
 		/* The path to the man page. */
 		char *manpath;

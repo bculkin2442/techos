@@ -43,4 +43,10 @@ static struct command INVALID_COMMAND = {CT_NORMAL, "invalid", "", NULL};
 
 /* Check if a command that only takes the 'help' argument recieved it. */
 int checkhelpargs(int, char **, char *, struct osstate *);
+
+/* Allocate/initialize a normal (CT_NORMAL) command. */
+struct command *makecommand(char *, char *, comfun_t);
+/* Deinitialize/deallocate a command. */
+void            killcommand(struct command *);
+
 #endif

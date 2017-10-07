@@ -42,7 +42,6 @@ struct comlist *makecomlist() {
 }
 
 /* Deinitialize and deallocate a command list. */
-/* @TODO call this from somewhere. */
 void killcomlist(struct comlist *list) {
 	/* Free the intern table. */
 	killinterntab(list->interncoms);
@@ -51,13 +50,7 @@ void killcomlist(struct comlist *list) {
 	int i;
 	for(i = 0; i < list->comcount; i++) {
 		/* Get the command. */
-		struct command *com = list->commands[i];
-
-		/* @TODO move this to a seperate function. */
-		/* Free its components, then it. */
-		free(com->name);
-		free(com->brief);
-		free(com);
+		killcommand(list->commands[i]);
 	}
 	/* Free the command storage. */
 	free(list->commands);
@@ -76,35 +69,29 @@ void killcomlist(struct comlist *list) {
  *
  * and inserts it into the list.
  */
-void addcommand(struct comlist *list, char *comname, char *comdesc, comfun_t handler) {
+void addcommand(struct comlist *plList, char *pszName, char *pszDesc, comfun_t pfHandler) {
 	/* Intern the name. */
-	internkey comkey = internstring(list->interncoms, comname);
+	internkey comkey = internstring(plList->interncoms, pszName);
 	/* Fail if the request failed. */
 	assert(comkey > 0);
 
-	if(list->comspace == list->comcount) {
+	if(plList->comspace == plList->comcount) {
 		/* Allocate more space for the list. */
-		list->comspace *= 2;
-		list->commands = realloc(list->commands, sizeof(struct command *) * list->comspace);
+		plList->comspace *= 2;
+		plList->commands = realloc(plList->commands, sizeof(struct command *) * plList->comspace);
 		/* Fail if request fails. */
-		assert(list->commands != NULL);
+		assert(plList->commands != NULL);
 	}
 
-	/* @TODO move this command allocation/creation into a seperate function. */
-	/* Allocate a new command. */
-	struct command *com = malloc(sizeof(struct command));
-	/* Fail if request fails. */
-	assert(com != NULL);
-
-	/* Initialize the command. */
-	com->type   = CT_NORMAL;
-	com->name   = (char *)strdup(comname);
-	com->brief  = (char *)strdup(comdesc);
-	com->comfun = handler;
+	/* 
+	 * Allocate a new command. We duplicate strings, so that they belong to
+	 * the command. 
+	 */
+	struct command *pCommand = makecommand((char *)strdup(pszName), (char *)strdup(pszDesc), pfHandler);
 
 	/* Insert it into the list. */
-	list->commands[comkey - 1]  = com;
-	list->comcount             += 1;
+	plList->commands[comkey - 1]  = pCommand;
+	plList->comcount             += 1;
 }
 
 /* 
