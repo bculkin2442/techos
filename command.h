@@ -6,8 +6,22 @@
 /* Type of a command handler. */
 typedef int (*comfun_t)(int, char **, char *, struct osstate *);
 
+/* 
+ * The various types of commands that are possible.
+ */
+enum commandtype {
+	/* Represents a normal command, represented by a 'struct command'. */
+	CT_NORMAL,
+};
+
 /* Represents a command. */
 struct command {
+	/*
+	 * The type of the command. Should be CT_NORMAL if this is an actual
+	 * command.
+	 */
+	enum commandtype type;
+
 	/* The name of the command. */
 	char *name;
 
@@ -19,7 +33,7 @@ struct command {
 };
 
 /* An invalid command. */
-static struct command INVALID_COMMAND = {"invalid", "", NULL};
+static struct command INVALID_COMMAND = {CT_NORMAL, "invalid", "", NULL};
 
 /* Declare a command. */
 #define DECLCOM(name) int handle_##name(int, char **, char *, struct osstate *)

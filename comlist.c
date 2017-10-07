@@ -53,6 +53,7 @@ void killcomlist(struct comlist *list) {
 		/* Get the command. */
 		struct command *com = list->commands[i];
 
+		/* @TODO move this to a seperate function. */
 		/* Free its components, then it. */
 		free(com->name);
 		free(com->brief);
@@ -89,12 +90,14 @@ void addcommand(struct comlist *list, char *comname, char *comdesc, comfun_t han
 		assert(list->commands != NULL);
 	}
 
+	/* @TODO move this command allocation/creation into a seperate function. */
 	/* Allocate a new command. */
 	struct command *com = malloc(sizeof(struct command));
 	/* Fail if request fails. */
 	assert(com != NULL);
 
 	/* Initialize the command. */
+	com->type   = CT_NORMAL;
 	com->name   = (char *)strdup(comname);
 	com->brief  = (char *)strdup(comdesc);
 	com->comfun = handler;
@@ -132,6 +135,13 @@ void printcommands(struct comlist *list, FILE *fle) {
 	for(i = 0; i < list->comcount; i++) {
 		struct command *com = list->commands[i];
 
-		fprintf(fle, "\t%s\t%s\n", com->name, com->brief);
+		switch(com->type) {
+		case CT_NORMAL:
+			fprintf(fle, "\t%s\t%s\n", com->name, com->brief);
+			break;
+		default:
+			/* Shouldn't happen. */
+			assert(0);
+		}
 	}
 }

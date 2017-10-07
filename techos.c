@@ -145,7 +145,14 @@ int execcom(struct command *com, struct cliargs args, char *argline, struct osst
 	/* Return status of commands. */
 	int comret;
 	/* Execute the command. */
-	comret = com->comfun(args.argc, args.argv, argline, ostate);
+	switch(com->type) {
+	case CT_NORMAL:
+		comret = com->comfun(args.argc, args.argv, argline, ostate);
+		break;
+	default:
+		/* Shouldn't happen. */
+		assert(0);
+	}
 
 	return comret;
 }
