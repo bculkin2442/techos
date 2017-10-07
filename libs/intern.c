@@ -39,7 +39,6 @@ static unsigned long hashstring(const char *val) {
 
 /* Convert an integer to a hashcode. */
 static unsigned long hashkey(const int val) {
-	/* @TODO check if there is a better hash func. to use. */
 	return val;
 }
 
@@ -103,67 +102,44 @@ struct interntab *makeinterntab() {
 	return tab;
 }
 
-void killinterntab(struct interntab *table) {
-	int i;
-	/* Free strings table. */
-	for(i = 0; i < BUCKET_COUNT; i++) {
-		/* Get the initial bucket. */
-		struct bucket *buck;
-		buck = table->strings[i];
-
-		/* Terminate the chain. */
-		/*
-		 * NOTE:
-		 * 	buck->prev is only null in the case where nothing has
-		 * 	been inserted into this bucket before. 
-		 */
-		if(buck->prev != NULL) {
-			buck->prev->next = NULL;
-		}
-
-		while(buck != NULL && buck->next != NULL) {
-			/* Next bucket. */
-			struct bucket *tmp;
-
-			/* Advance the queue. */
-			tmp  = buck;
-			buck = buck->next;
-
-			/* Free the string we own. */
-			if(tmp->val != NULL) free(tmp->val);
-			/* Free the bucket. */
-			free(tmp);
-		}
+/* Destroy a bucket chain. */
+static void killbucket(struct bucket *buck, int freestrings) {
+	/* Terminate the chain. */
+	/*
+	 * NOTE:
+	 * 	buck->prev is only null in the case where nothing has
+	 * 	been inserted into this bucket before. 
+	 */
+	if(buck->prev != NULL) {
+		buck->prev->next = NULL;
 	}
 
-	/* Free keys table. */
-	/* @TODO deduplicate this code with the above loop. */
+	while(buck != NULL && buck->next != NULL) {
+		/* Next bucket. */
+		struct bucket *tmp;
+
+		/* Advance the queue. */
+		tmp  = buck;
+		buck = buck->next;
+
+		/* Free the string we own. */
+		if(tmp->val != NULL && freestrings == 1) free(tmp->val);
+		/* Free the bucket. */
+		free(tmp);
+	}
+}
+
+void killinterntab(struct interntab *table) {
+	/* Loop index. */
+	int i;
+
+	/* Free strings table. */
 	for(i = 0; i < BUCKET_COUNT; i++) {
-		/* Get the initial bucket. */
-		struct bucket *buck;
-		buck = table->strings[i];
-
-		/* Terminate the chain. */
-		/*
-		 * NOTE:
-		 * 	buck->prev is only null in the case where nothing has
-		 * 	been inserted into this bucket before. 
-		 */
-		if(buck->prev != NULL) {
-			buck->prev->next = NULL;
-		}
-
-		while(buck != NULL && buck->next != NULL) {
-			/* Free each bucket in the chain. */
-			struct bucket *tmp;
-
-			tmp  = buck;
-			buck = buck->next;
-
-			/* Free the bucket. */
-			/* @TODO this causes a double free bug on ubuntu. Why? */
-			free(tmp);
-		}
+		killbucket(table->strings[i], 0);
+	}
+	/* Free keys table. */
+	for(i = 0; i < BUCKET_COUNT; i++) {
+		killbucket(table->keys[i], 1);
 	}
 
 	free(table);
@@ -288,7 +264,7 @@ internkey lookupstring(struct interntab *table, const char *string) {
 
 		/* Move to next bucket. */
 		sbucket = sbucket->next;
-		
+
 		/* Bail out if we've looped or hit an empty bucket. */
 	} while(sbucket->key != fkey && sbucket->key != SIINVALID);
 
@@ -322,7 +298,7 @@ const char *lookupkey(struct interntab *table, const internkey key) {
 
 		/* Move to next bucket. */
 		kbucket = kbucket->next;
-		
+
 		/* Bail out if we've looped or hit an empty bucket. */
 	} while(kbucket->key != fkey && kbucket->key != SIINVALID);
 

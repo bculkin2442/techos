@@ -1,4 +1,3 @@
 //----------- Bugs ---------------//
 
-1) double free/corruption on exit after any pcb methods on ubuntu (maybe others,
-   not on gentoo)
+1) None currently :)

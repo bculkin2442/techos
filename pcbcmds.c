@@ -29,20 +29,17 @@ HANDLECOM(mkpcb) {
 	/* Process options. */
 	while(1) {
 		enum mopt {
-			MO_CSYS = 0,
-			MO_CAPP = 1,
-			MO_HELP = 2,
+			MO_CLASS = 0,
+			MO_HELP,
 		};
 
 		/* Usage message. */
-		char *usage = "Usage: mkpcb [-h] [--class_sys|--class_app] [--help] <name> <priority>\n";
+		char *usage = "Usage: mkpcb [-h] [--class app|application|system] [--help] <name> <priority>\n";
 
 		/* The long options we take. */
 		static struct option opts[] = {
 			/*class options*/
-			/* @TODO make this one option taking a string argument. */
-			{"class_sys",  no_argument, 0, 0},
-			{"class_app",  no_argument, 0, 0},
+			{"class", required_argument, 0, 0},
 
 			/* Misc. options. */
 			{"help", no_argument, 0, 0},
@@ -62,11 +59,16 @@ HANDLECOM(mkpcb) {
 		case 0:
 			/* Long options. */
 			switch(optidx) {
-			case MO_CSYS:
-				clas = PCB_SYSTEM;
-				break;
-			case MO_CAPP:
-				clas = PCB_APPLICATION;
+			case MO_CLASS:
+				if(strcmp(optarg, "application") == 0 ||
+						strcmp(optarg, "app") == 0) {
+					clas = PCB_APPLICATION;
+				} else if(strcmp(optarg, "system") == 0) {
+					clas = PCB_SYSTEM;
+				} else {
+					fprintf(ostate->output, "ERROR: Invalid PCB class '%s' (valid classes are 'app'/'application' and 'system')\n", optarg);
+					return 1;
+				}
 				break;
 			case MO_HELP:
 				fprintf(ostate->output, "%s\n", usage);

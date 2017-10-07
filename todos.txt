@@ -1,0 +1,20 @@
+@TODO - 10/7/17 Ben Culkin :UpdateManpages
+	update manpages to reflect new state of commands, as well as make sure
+	that they all display correctly in the pager.
+
+@TODO - 10/7/17 Ben Culkin :CLIHistory
+	Add history capability to TechOS.
+	Should include:
+		- Commands for listing/manipulating history
+		- (Maybe) bash-style history expansion
+
+@TODO - 10/7/17 Ben Culkin :CLIVars
+	Add bash-style shell vars to TechOS.
+	Should include:
+		- Commands for manipulating vars
+		- Expansion syntax
+
+@TODO - 10/7/17 Ben Culkin :CLIAliases
+	Add alias functionality to TechOS.
+	Should include:
+		- Commands for manipulating aliases

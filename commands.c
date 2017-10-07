@@ -108,21 +108,81 @@ HANDLECOM(exit) {
 
 /* Print out version/author information. */
 HANDLECOM(version) {
-	/* Handle CLI args. */
-	if(argc > 1) {
-		return checkhelpargs(argc, argv, "Usage: version [-h] [--help]\n", ostate);
+		return checkhelpargs(argc, argv, "Usage: version [-advh] [--author] [--date] [--version] [--help]\n", ostate);
+
+	/* Should version info be printed? */
+	int printVersion = 1;
+	/* Should author information be printed? */
+	int printAuthor  = 0;
+	/* Should date information be printed? */
+	int printDate    = 0;
+
+	/* Reinit getopt. */
+	optind = 1;
+
+	/* Process options. */
+	while(1) {
+		/*
+		 * @TODO 10/07/17 Ben Culkin :VersionOpts
+		 * 	Adjust these options to some better way of indicating
+		 * 	which information we do/do not want to show. If this was
+		 * 	java, I'd just go with a custom format string sorta
+		 * 	thing, but that'd have to be reimplemented for C, and'd
+		 * 	be kinda painful. Maybe we'd want to look into something
+		 * 	with getsubopt()?
+		 */
+
+		/* The current option/long option. */
+		int opt, optidx;
+		/* Usage message. */
+		static char *usage = "Usage: version [-advh] [--author] [--date] [--version] [--help]\n";
+
+		static struct option longopts[] = {
+			/* Info ctl. options. */
+			{"author",  no_argument, 0, 'a'},
+			{"date",    no_argument, 0, 'd'},
+			{"version", no_argument, 0, 'v'},
+
+			/* Misc. options. */
+			{"help", no_argument, 0, 'h'},
+
+			/* Terminating option. */
+			{0, 0, 0, 0}
+		};
+
+		/* Get an option. */
+		opt = getopt_long(argc, argv, "advh", longopts, &optidx);
+
+		/* Finish options. */
+		if(opt == -1) break;
+
+		switch(opt) {
+		case 'a':
+			printAuthor = 1;
+			break;
+		case 'd':
+			printDate = 1;
+			break;
+		case 'v':
+			printVersion = 1;
+			break;
+		case 'h':
+			fprintf(ostate->output, "%s", usage);
+			return 0;
+		default:
+			fprintf(ostate->output, "ERROR: Unknown short option '%c'\n", opt);
+			fprintf(ostate->output, "%s", usage);
+			return 1;
+		}
 	}
 
-	/*
-	 * Print version info.
-	 */
-
-	/*
-	 * @TODO add flags for printing only parts of this information.
-	 */
-	fprintf(ostate->output, "TechOS v%d.%d\n", major_ver, minor_ver);
-	fprintf(ostate->output, "\tAuthors: Benjamin Culkin, Lucas Darnell, Jared Miller\n");
-	fprintf(ostate->output, "\tCompletion Date: 9/13/17\n");
+	/* Print version info. */
+	if(printVersion)
+		fprintf(ostate->output, "TechOS v%d.%d\n", major_ver, minor_ver);
+	if(printAuthor)
+		fprintf(ostate->output, "\tAuthors: Benjamin Culkin, Lucas Darnell, Jared Miller\n");
+	if(printDate)
+		fprintf(ostate->output, "\tCompletion Date: 9/13/17\n");
 
 	return 0;
 }
