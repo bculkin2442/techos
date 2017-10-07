@@ -1,0 +1,8 @@
+.COMDECL "mkpcb" "pcbcmds.h"
+.COMDECL "rmpcb" "pcbcmds.h"
+.COMDECL "blpcb" "pcbcmds.h"
+.COMDECL "ubpcb" "pcbcmds.h"
+.COMDECL "sspcb" "pcbcmds.h"
+.COMDECL "rspcb" "pcbcmds.h"
+.COMDECL "sppcb" "pcbcmds.h"
+.COMDECL "shpcb" "pcbcmds.h"
