@@ -7,6 +7,7 @@
 
 /* An intern key is a reference to a string in an intern table. */
 typedef int internkey;
+
 /* The invalid intern key. */
 static internkey SIINVALID = -1;
 /* The code that indicates the intern table is full. */
