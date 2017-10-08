@@ -196,8 +196,11 @@ HANDLECOM(help) {
 		fprintf(ostate->output, "Available commands\n");
 
 		/* 
-		 * @TODO need to rewrite printcommands to take a commandstate
-		 * instead for when things like help-only commands get added.
+		 * @TODO 10/07/17 Ben Culkin :PrintCommandState
+		 * 	 printcommands needs to be rewritten to accept a
+		 * 	 commandstate, so that it can handle things like command
+		 * 	 categories and help-only commands/internal commands
+		 * 	 that don't show up in the default help list.
 		 */
 		printcommands(ostate->pComstate->plCommands, ostate->output);
 	} else if(argc == 2){

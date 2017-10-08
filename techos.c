@@ -105,9 +105,14 @@ int handleline(struct osstate *ostate, char *line) {
 		struct command *com;
 
 		/* Determine the command to execute from the name. */
-		/* 
-		 * @TODO may have to change this to a local function to better
-		 * support aliases, among other things.
+		/*
+		 * @TODO 10/0/7/17 Ben Culkin :GetCommand
+		 * 	May want to change this from using the general
+		 * 	'getcommand' function (and that should probably be named
+		 * 	something like getcommandfromlist to make what it takes
+		 * 	clear), to using a local version so that it can handle
+		 * 	things like aliases and other varying types of commands
+		 * 	that aren't normal ones stored in the single list.
 		 */
 		com = getcommand(ostate->pComstate->plCommands, args.argv[0]);
 

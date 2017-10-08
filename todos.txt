@@ -18,3 +18,9 @@
 	Add alias functionality to TechOS.
 	Should include:
 		- Commands for manipulating aliases
+
+@TODO - 10/7/17 Ben Culkin :OptHandling
+	Improve option handling. Each command should take each argument as
+	either long or short options, and long options should be using the
+	fourth argument to prevent having to duplicate code between long/short
+	options.

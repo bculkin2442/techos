@@ -921,8 +921,7 @@ HANDLECOM(shpcb) {
 
 		/* The long options we take. */
 		/* 
-		 * @TODO Use the 4th argument to indicate the corresponding
-		 * short option.
+		 * :OptHandling
 		 */
 		static struct option opts[] = {
 			/* Misc. options. */
@@ -943,7 +942,7 @@ HANDLECOM(shpcb) {
 		if(opt == -1) break;
 
 		/* Handle options. */
-		/* @TODO add short options. */
+		/* :OptHandling */
 		switch(opt) {
 		case 0:
 			/* Handle long options. */

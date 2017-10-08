@@ -16,10 +16,18 @@ extern char *defout_datefmt;
 struct commandstate;
 
 /* General structure for OS-level state. */
-/* @TODO Split the seperate system states into seperate structs */
+/* @TODO 10/07/17 Ben Culkin :OSStateRestructure
+ * 	Split the seperate system states into seperate structs. This is so that
+ * 	various systems can be made aware of only the state parts they need to,
+ * 	as well as allowing various instances to be swapped around using
+ * 	commands so as to handle 'user profiles' or something along those lines.
+ */
 struct osstate {
+	/* :OSStateRestructure
+	 * 	This will go into a 'struct datestate' or something along those
+	 * 	lines.
+	 */
 	/* Time/date variables. */
-	/* @TODO Split into 'struct datestate'.*/
 	/* Input/output/time date formats. */
 	char *in_datefmt;
 	char *out_datefmt;
@@ -27,10 +35,25 @@ struct osstate {
 	/* Current time/date. */
 	struct tm *datetime;
 	
+	/* :OSStateRestructure
+	 * 	This will go into a 'struct iostate' or something like that.
+	 */
 	/* Input/output streams. */
 	/*
-	 * @TODO rename strem; split command/user input; split error/normal output.
-	 *       split into 'struct iostate'.
+	 * @TODO 10/07/17 Ben Culkin :IORefactor
+	 * 	Do the following things to cleanup the way I/O is handled:
+	 * 		- Rename strem to something else
+	 * 		- Split command/user input in someway. Not sure of the
+	 * 			best way to go about this; having two seperate
+	 * 			file handles that may refer to the same thing
+	 * 			might be the best solution.
+	 * 		- Split error/normal output the same way command/user
+	 * 			input is split.
+	 * 		- Put I/O into functions. Create various functions to do
+	 * 			things like print 'ERROR' and 'INTERNAL ERROR'
+	 * 			messages with a consistent format. Also,
+	 * 			consider doing something similiar with input,
+	 * 			but none come to mind for it.
 	 */
 	/* The stream we read input from. */
 	FILE *strem;
