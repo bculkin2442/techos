@@ -109,7 +109,7 @@ static struct pcb *queuefindpcbname(struct pcbqueue *pqQueue, int kPCBName) {
 			pPCB    = pqQueue->pHead;
 
 			if(pPCB == NULL) {
-				printf("\nError: PCB HEAD ID IS NULL\n");
+				/* Empty queue. */
 				return 0;
 			} else {
 				initPCB = pPCB->id;
