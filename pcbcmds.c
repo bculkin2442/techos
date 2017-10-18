@@ -28,28 +28,23 @@ HANDLECOM(mkpcb) {
 
 	/* Process options. */
 	while(1) {
-		enum mopt {
-			MO_CLASS = 0,
-			MO_HELP,
-		};
-
 		/* Usage message. */
-		char *usage = "Usage: mkpcb [-h] [--class app|application|system] [--help] <name> <priority>\n";
+		char *usage = "Usage: mkpcb [-ch] [--class app|application|system] [--help] <name> <priority>\n";
 
 		/* The long options we take. */
 		static struct option opts[] = {
 			/*class options*/
-			{"class", required_argument, 0, 0},
+			{"class", required_argument, 0, 'c'},
 
 			/* Misc. options. */
-			{"help", no_argument, 0, 0},
+			{"help", no_argument, 0, 'h'},
 
 			/* Terminating option. */
 			{0, 0, 0, 0}
 		};
 
 		/* Get an option. */
-		opt = getopt_long(argc, argv, "h", opts, &optidx);
+		opt = getopt_long(argc, argv, "c:h", opts, &optidx);
 		
 		/* Break if we've processed every option. */
 		if(opt == -1) break;
@@ -57,25 +52,25 @@ HANDLECOM(mkpcb) {
 		/* Handle options. */
 		switch(opt) {
 		case 0:
-			/* Long options. */
+			/*
+			 * Long-options with corrsponding short-options are
+			 * handled by the corresponding short option. 
+			 */
 			switch(optidx) {
-			case MO_CLASS:
-				if(strcmp(optarg, "application") == 0 ||
-						strcmp(optarg, "app") == 0) {
-					clas = PCB_APPLICATION;
-				} else if(strcmp(optarg, "system") == 0) {
-					clas = PCB_SYSTEM;
-				} else {
-					fprintf(ostate->output, "ERROR: Invalid PCB class '%s' (valid classes are 'app'/'application' and 'system')\n", optarg);
-					return 1;
-				}
-				break;
-			case MO_HELP:
-				fprintf(ostate->output, "%s\n", usage);
-				return 0;
 			default:
 				fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
 				fprintf(ostate->output, "%s\n", usage);
+				return 1;
+			}
+			break;
+		case 'c':
+			if(strcmp(optarg, "application") == 0 ||
+			   strcmp(optarg, "app") == 0) {
+				clas = PCB_APPLICATION;
+			} else if(strcmp(optarg, "system") == 0) {
+				clas = PCB_SYSTEM;
+			} else {
+				fprintf(ostate->output, "ERROR: Invalid PCB class '%s' (valid classes are 'app'/'application' and 'system')\n", optarg);
 				return 1;
 			}
 			break;
@@ -126,27 +121,34 @@ HANDLECOM(mkpcb) {
 		/* Return from insertpcb. */
 		int pcbstat;
 		pcbstat = insertpcb(ostate->pPCBstat, madePCB);
-		if(pcbstat == PCBSUCCESS) return 0;
-		else switch(pcbstat) {
-		case PCBINVSUSP:
-			fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') has invalid suspension type %d\n", madePCB->id, pszPCBName, madePCB->susp);
-			break;
-		case PCBINVSTAT:
-			fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') has invalid run state %d\n", madePCB->id, pszPCBName, madePCB->status);
-			break;
-		case PCBRUNNING:
-			fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') is already running\n", madePCB->id, pszPCBName);
-			break;
-		case PCBINQUEUE:
-			fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') is already in a queue\n", madePCB->id, pszPCBName);
-			break;
-		default:
-			fprintf(ostate->output, "INTERNAL ERROR: Unknown return %d from attempting to insert new PCB %d (named '%s)\n", pcbstat, madePCB->id, pszPCBName);
+		if(pcbstat == PCBSUCCESS) {
+			return 0;
+		} else {
+			switch(pcbstat) {
+			case PCBINVSUSP:
+				fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') has invalid suspension type %d\n", madePCB->id, pszPCBName, madePCB->susp);
+				break;
+			case PCBINVSTAT:
+				fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') has invalid run state %d\n",
+						madePCB->id, pszPCBName, madePCB->status);
+				break;
+			case PCBRUNNING:
+				fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') is already running\n",
+						madePCB->id, pszPCBName);
+				break;
+			case PCBINQUEUE:
+				fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') is already in a queue\n",
+						madePCB->id, pszPCBName);
+				break;
+			default:
+				fprintf(ostate->output, "INTERNAL ERROR: Unknown return %d from attempting to insert new PCB %d (named '%s)\n", pcbstat, madePCB->id, pszPCBName);
+			}
+			return 1;
 		}
-		return 1;
 	}
 }
 
+/* Handle deleting a PCB. */
 HANDLECOM(rmpcb) {
 	/* Current option/long option. */
 	int opt, optidx;
@@ -163,46 +165,37 @@ HANDLECOM(rmpcb) {
 
 	/* Reinit getopt. */
 	optind = 1;
-	
+
 	/* The default PCB id type. */
 	enum pidopt idtype = PID_NAME;
 	while(1) {
 		/* Our usage method. */
-		char *usage = "Usage: rmpcb [name] [-h] [--help] [--proc name|num] <proc-name>|<proc-id>\n";
+		char *usage = "Usage: rmpcb [name] [-hp] [--help] [--proc name|num] <proc-name>|<proc-id>\n";
 		/* The long options we take. */
 		static struct option opts[] = {
-			/* Misc. options. */
-			{"help", no_argument, 0, 0},
-
 			/*Mode options*/ 
-			{"proc",  required_argument, 0, 0},
+			{"proc",  required_argument, 0, 'p'},
+
+			/* Misc. options. */
+			{"help", no_argument, 0, 'h'},
 
 			/* Terminating option. */
 			{0, 0, 0, 0}
 		};
 
 		/* Get an option. */
-		opt = getopt_long(argc, argv, "h", opts, &optidx);
+		opt = getopt_long(argc, argv, "hp:", opts, &optidx);
 		/* Break if we've processed every option. */
 		if(opt == -1) break;
 
 		/* Handle options. */
 		switch(opt) {
 		case 0:
-			/* Long options. */
+			/*
+			 * Long options with corresponding short options are
+			 * handled by their short options.
+			 */
 			switch(optidx) {
-			case 0:
-				fprintf(ostate->output, "%s\n", usage);
-				return 0;
-			case 1:
-				if(strcmp(optarg, "name") == 0) {
-					idtype = PID_NAME;
-				} else if(strcmp(optarg, "num") == 0) {
-					idtype = PID_NUM;
-				} else {
-					fprintf(ostate->output, "ERROR: Invalid process ID type '%s'. Valid ID types are 'name' and 'num'\n", optarg);
-					return 1;
-				}
 			default:
 				fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
 				fprintf(ostate->output, "%s\n", usage);
@@ -212,6 +205,16 @@ HANDLECOM(rmpcb) {
 		case 'h':
 			fprintf(ostate->output, "%s\n", usage);
 			return 0;
+		case 'p':
+			if(strcmp(optarg, "name") == 0) {
+				idtype = PID_NAME;
+			} else if(strcmp(optarg, "num") == 0) {
+				idtype = PID_NUM;
+			} else {
+				fprintf(ostate->output, "ERROR: Invalid process ID type '%s'. Valid ID types are 'name' and 'num'\n", optarg);
+				return 1;
+			}
+			break;
 		default:
 			fprintf(ostate->output, "\tERROR: Invalid command-line argument.\n");
 			fprintf(ostate->output, "%s\n", usage);
@@ -223,6 +226,7 @@ HANDLECOM(rmpcb) {
 	case PID_NAME:
 		if(optind < argc) {
 			char *pszPCBName = argv[optind];
+
 			pPCB = findpcbname(ostate->pPCBstat, pszPCBName);
 			if(pPCB == NULL) {
 				fprintf(ostate->output, "ERROR: No PCB with name '%s'\n", pszPCBName);
@@ -265,239 +269,9 @@ HANDLECOM(rmpcb) {
 		assert(0);
 	}
 
+	/* Remove and free the PCB. */
 	removepcb(ostate->pPCBstat, pPCB);
 	killpcb(pPCB);
-
-	return 0;
-}
-
-HANDLECOM(blpcb) {
-	//current option and long option
-	int opt, optidx;
-	optind = 1;
-
-	enum pidopt {
-		/* Locate a PCB by name. */
-		PID_NAME,
-		/* Locate a PCB by number. */
-		PID_NUM
-	};
-
-	enum pidopt idtype = PID_NAME;
-
-	while(1)
-	{
-		char *usage = "Usage: blpcb [name] [-h] [--help] [--proc name|num] <proc-name>|<proc-id>\n";
-		/* The long options we take. */
-		static struct option opts[] = {
-
-			/* Misc. options. */
-			{"help", no_argument, 0, 0},
-
-			/*Mode options*/
-			{"proc", required_argument, 0, 0},
-
-			/* Terminating option. */
-			{0, 0, 0, 0}
-		};
-
-		//get an option
-		opt = getopt_long(argc, argv, "h", opts, &optidx);
-
-		//break if we've processed every option
-		if(opt == -1) break;
-
-		//Handle options
-		switch(opt)
-		{
-		case 0:
-			//Long options
-			switch(optidx)
-			{
-			case 0://Help
-				fprintf(ostate->output, "%s\n", usage);
-				return 0;
-			case 1://SH_PROC
-				if(strcmp(optarg, "name") == 0) {
-					idtype = PID_NAME;
-				}
-				else if(strcmp(optarg, "num") == 0) {
-					idtype = PID_NUM;
-				}
-				else {
-					fprintf(ostate->output, "ERROR: Invalid process ID type '%s'. Valid ID types are 'name' and 'num'\n", optarg);
-					return 1;
-				}
-			default:
-				fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
-				fprintf(ostate->output, "%s\n", usage);
-				return 1;
-			}
-			break;
-			//Short options	
-		case 'h':
-			fprintf(ostate->output, "%s\n", usage);
-			return 0;
-		default:
-			fprintf(ostate->output, "\tERROR: Invalid command-line argument.\n");
-			fprintf(ostate->output, "%s\n", usage);
-			return 1;
-		}	
-
-	}
-
-	struct pcb *foundPCB;
-
-	switch(idtype) {
-	case PID_NAME:
-		if(optind < argc) {
-			char *pszPCBName = argv[optind];
-			foundPCB = findpcbname(ostate->pPCBstat, pszPCBName);
-			if(foundPCB == NULL) {
-				fprintf(ostate->output, "ERROR: No PCB with name '%s'\n", pszPCBName);
-				return 1;
-			}
-		} else {
-			fprintf(ostate->output, "ERROR: Must specify PCB name as argument.\n");
-			return 1;
-		}
-		break;
-	case PID_NUM:
-		if(optind < argc) {
-			int pcbid = atoi(argv[optind]);
-			foundPCB = findpcbnum(ostate->pPCBstat, pcbid);
-			if(foundPCB == NULL) {
-				fprintf(ostate->output, "ERROR: No PCB with ID '%d'\n", pcbid);
-				return 1;
-			}
-		} else {
-			fprintf(ostate->output, "ERROR: Must specify PCB name as argument.\n");
-			return 1;
-		}
-		break;
-	default:
-		/* Shouldn't happen. */
-		assert(0);
-	}
-	removepcb(ostate->pPCBstat, foundPCB);
-	foundPCB->status = PCB_BLOCKED;
-	insertpcb(ostate->pPCBstat, foundPCB);
-
-	return 0;
-}
-
-HANDLECOM(ubpcb) {
-	//current option and long option
-	int opt, optidx;
-	optind = 1;
-	
-	enum pidopt {
-		/* Locate a PCB by name. */
-		PID_NAME,
-		/* Locate a PCB by number. */
-		PID_NUM
-	};
-
-	enum pidopt idtype = PID_NAME;
-	
-	while(1)
-	{
-		char *usage = "Usage: ubpcb [name] [-h] [--help] [--proc name|num] <proc-name>|<proc-id>\n";
-		/* The long options we take. */
-		static struct option opts[] = {
-
-			/* Misc. options. */
-			{"help", no_argument, 0, 0},
-			
-			/*Mode options*/
-			{"proc", required_argument, 0 , 0},
-			
-			/* Terminating option. */
-			{0, 0, 0, 0},
-		};
-
-		//get an option
-		opt = getopt_long(argc, argv, "h", opts, &optidx);
-
-		//break if we've processed every option
-		if(opt == -1) break;
-
-		//Handle options
-		switch(opt)
-		{
-		case 0:
-			//Long options
-			switch(optidx)
-			{
-			case 0://Help
-				fprintf(ostate->output, "%s\n", usage);
-				return 0;
-			case 1://SH_PROC
-				if(strcmp(optarg, "name") == 0) {
-					idtype = PID_NAME;
-				}
-				else if(strcmp(optarg, "num") == 0) {
-					idtype = PID_NUM;
-				}
-				else {
-					fprintf(ostate->output, "ERROR: Invalid process ID type '%s'. Valid ID types are 'name' and 'num'\n", optarg);
-					return 1;
-				}
-			default:
-				fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
-				fprintf(ostate->output, "%s\n", usage);
-				return 1;
-			}
-			break;
-			//Short options	
-		case 'h':
-			fprintf(ostate->output, "%s\n", usage);
-			return 0;
-		default:
-			fprintf(ostate->output, "\tERROR: Invalid command-line argument.\n");
-			fprintf(ostate->output, "%s\n", usage);
-			return 1;
-		}	
-
-	}
-
-	struct pcb *foundPCB;
-		
-	switch(idtype) {
-	case PID_NAME:
-		if(optind < argc) {
-			char *pszPCBName = argv[optind];
-			foundPCB = findpcbname(ostate->pPCBstat, pszPCBName);
-			if(foundPCB == NULL) {
-				fprintf(ostate->output, "ERROR: No PCB with name '%s'\n", pszPCBName);
-				return 1;
-			}
-		} else {
-			fprintf(ostate->output, "ERROR: Must specify PCB name as argument.\n");
-			return 1;
-		}
-		break;
-	case PID_NUM:
-		if(optind < argc) {
-			int pcbid = atoi(argv[optind]);
-			foundPCB = findpcbnum(ostate->pPCBstat, pcbid);
-			if(foundPCB == NULL) {
-				fprintf(ostate->output, "ERROR: No PCB with ID '%d'\n", pcbid);
-				return 1;
-			}
-		} else {
-			fprintf(ostate->output, "ERROR: Must specify PCB name as argument.\n");
-			return 1;
-		}
-		break;
-	default:
-		/* Shouldn't happen. */
-		assert(0);
-	}	
-
-	removepcb(ostate->pPCBstat, foundPCB);
-	foundPCB->status = PCB_READY;
-	insertpcb(ostate->pPCBstat, foundPCB);
 
 	return 0;
 }
@@ -506,7 +280,7 @@ HANDLECOM(sspcb) {
 	//current option and long option
 	int opt, optidx;
 	optind = 1;
-	
+
 	enum pidopt {
 		/* Locate a PCB by name. */
 		PID_NAME,
@@ -515,7 +289,7 @@ HANDLECOM(sspcb) {
 	};
 
 	enum pidopt idtype = PID_NAME;
-	
+
 	while(1)
 	{
 		char *usage = "Usage: sspcb [name] [-h] [--help] [--proc name|num] <proc-name>|<proc-id>\n";
@@ -524,10 +298,10 @@ HANDLECOM(sspcb) {
 
 			/* Misc. options. */
 			{"help", no_argument, 0, 0},
-			
+
 			/*Mode options*/
 			{"proc", required_argument, 0 , 0},
-			
+
 			/* Terminating option. */
 			{0, 0, 0, 0},
 		};
@@ -577,7 +351,7 @@ HANDLECOM(sspcb) {
 
 	}
 	struct pcb *foundPCB;
-	
+
 	switch(idtype) {
 	case PID_NAME:
 		if(optind < argc) {
@@ -609,7 +383,7 @@ HANDLECOM(sspcb) {
 		/* Shouldn't happen. */
 		assert(0);
 	}
-	
+
 	removepcb(ostate->pPCBstat, foundPCB);
 	foundPCB->susp = PCB_SUSPENDED;
 	insertpcb(ostate->pPCBstat, foundPCB);
@@ -621,7 +395,7 @@ HANDLECOM(rspcb) {
 	//current option and long option
 	int opt, optidx;
 	optind = 1;
-	
+
 	enum pidopt {
 		/* Locate a PCB by name. */
 		PID_NAME,
@@ -630,7 +404,7 @@ HANDLECOM(rspcb) {
 	};
 
 	enum pidopt idtype = PID_NAME;
-	
+
 	while(1)
 	{
 		char *usage = "Usage: rspcb [name] [-h] [--help] [--proc name|num] <proc-name>|<proc-id>\n";
@@ -639,10 +413,10 @@ HANDLECOM(rspcb) {
 
 			/* Misc. options. */
 			{"help", no_argument, 0, 0},
-			
+
 			/*Mode options*/
 			{"proc", required_argument, 0 , 0},
-			
+
 			/* Terminating option. */
 			{0, 0, 0, 0},
 		};
@@ -693,7 +467,7 @@ HANDLECOM(rspcb) {
 	}
 
 	struct pcb *foundPCB;
-	
+
 	switch(idtype) {
 	case PID_NAME:
 		if(optind < argc) {
@@ -725,7 +499,7 @@ HANDLECOM(rspcb) {
 		/* Shouldn't happen. */
 		assert(0);
 	}
-	
+
 	removepcb(ostate->pPCBstat, foundPCB);
 	foundPCB->susp = PCB_FREE;
 	insertpcb(ostate->pPCBstat, foundPCB);
@@ -734,11 +508,11 @@ HANDLECOM(rspcb) {
 }
 
 HANDLECOM(sppcb) {
-	
+
 	//current option and long option
 	int opt, optidx;
 	optind = 1;
-	
+
 	enum pidopt {
 		/* Locate a PCB by name. */
 		PID_NAME,
@@ -747,9 +521,9 @@ HANDLECOM(sppcb) {
 	};
 
 	enum pidopt idtype = PID_NAME;
-	
+
 	int priorityN;
-	
+
 	while(1)
 	{
 		char *usage = "Usage: rspcb [name] [priority] [-h] [--help] [--proc name|num] <proc-name>|<proc-id>\n";
@@ -758,10 +532,10 @@ HANDLECOM(sppcb) {
 
 			/* Misc. options. */
 			{"help", no_argument, 0, 0},
-			
+
 			/*Mode options*/
 			{"proc", required_argument, 0 , 0},
-			
+
 			/* Terminating option. */
 			{0, 0, 0, 0},
 		};
@@ -812,7 +586,7 @@ HANDLECOM(sppcb) {
 	}
 
 	struct pcb *foundPCB;
-	
+
 	switch(idtype) {
 	case PID_NAME:
 		if(optind < argc) {
@@ -844,7 +618,7 @@ HANDLECOM(sppcb) {
 		/* Shouldn't happen. */
 		assert(0);
 	}
-	
+
 	if(argc >= (optind + 2)){
 		priorityN = atoi(argv[optind + 1]);
 	} else {
@@ -857,9 +631,9 @@ HANDLECOM(sppcb) {
 		fprintf(ostate->output, "Priority entered is out of bounds.\n");
 		return 1;
 	}
-	
+
 	foundPCB->priority = priorityN;
-	
+
 	return 0;
 }
 

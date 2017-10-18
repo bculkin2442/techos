@@ -7,8 +7,6 @@
 /* Header for pcb related commands. */
 DECLCOM(mkpcb);
 DECLCOM(rmpcb);
-DECLCOM(blpcb);
-DECLCOM(ubpcb);
 DECLCOM(sspcb);
 DECLCOM(rspcb);
 DECLCOM(sppcb);
