@@ -53,6 +53,7 @@ HANDLECOM(script) {
 				fprintf(ostate->output, "%s\n", usage);
 				return 1;
 			}
+			break;
 		case 'h':
 			fprintf(ostate->output, "%s\n", usage);
 			return 1;

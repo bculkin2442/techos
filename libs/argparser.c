@@ -7,15 +7,15 @@
 /* Parse a string from a set of arguments. */
 static char *parsestr(char *pszLead, char delim, char **pSaved) {
 	/* The rest of the string from the arguments. */
-	char *rest;
+	char *pszRest;
 	/* The string we're returning. */
 	char *pszStrang;
 
 	/* The rest of the strings contents. */
-	rest = (char *)strtok_r(NULL, &delim, pSaved);
+	pszRest = (char *)strtok_r(NULL, &delim, pSaved);
 
 	/* Print the string, and bail if that fails. */
-	if(asprintf(&pszStrang, "%s %s", pszLead, rest) == -1) assert(0);
+	if(asprintf(&pszStrang, "%s %s", pszLead, pszRest) == -1) assert(0);
 
 	return pszStrang;
 }
@@ -30,7 +30,7 @@ struct cliargs parseargs(char *pszStrang) {
 	/* The currently parsed token. */
 	char *pszToken;
 	/* Length of current token. */
-	int tokenlen;
+	int lToken;
 
 	/* Initialize argument count. */
 	args.argc = 0;
@@ -43,7 +43,7 @@ struct cliargs parseargs(char *pszStrang) {
 	pszToken = (char *)strtok_r(pszStrang, " ", &pSave);
 
 	while(pszToken != NULL && args.argc < MAX_CLI_ARGS) {
-		tokenlen = strlen(pszToken);
+		lToken = strlen(pszToken);
 
 		/* The possible quote. */
 		char posQuote;
@@ -54,7 +54,7 @@ struct cliargs parseargs(char *pszStrang) {
 		ppszArg  = &(args.argv[args.argc]);
 
 		if(posQuote == '\'' || posQuote == '\"') {
-			if(pszToken[tokenlen - 1] == posQuote) {
+			if(pszToken[lToken - 1] == posQuote) {
 				/* Length of single-string. */
 				int stranglen;
 
