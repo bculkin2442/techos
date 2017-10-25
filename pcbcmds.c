@@ -192,6 +192,12 @@ HANDLECOM(mkpcb) {
 }
 
 /* Handle deleting a PCB. */
+/*
+ * @NOTE
+ *	This command has been removed from the list of commands, but the
+ *	function is sticking around in case something we want to do is remove
+ *	processes that are currently executing.
+ */
 HANDLECOM(rmpcb) {
 	/* Current option/long option. */
 	int opt, optidx;

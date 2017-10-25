@@ -42,11 +42,9 @@ void addcommands(struct comlist *list) {
 
 	/* Script commands. */
 	addcommand(list, "script",    "Execute a script file",        &handle_script);
-	/* addcommand(list, "scriptctl", "Do other things with scripts", &handle_scriptctl); */
 
 	/* PCB commands. */
 	addcommand(list, "mkpcb",     "Create PCB and insert into queue",          &handle_mkpcb);
-	addcommand(list, "rmpcb",     "Remove PCB from queue and free memory",     &handle_rmpcb);
 	addcommand(list, "sspcb",     "Suspend PCB and reinsert into queue",       &handle_sspcb);
 	addcommand(list, "rspcb",     "Set PCB state to unsuspended and reinsert", &handle_rspcb);
 	addcommand(list, "sppcb",     "Set PCB priority and reinserts",            &handle_sppcb);
