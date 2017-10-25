@@ -16,6 +16,7 @@
 #include "commandstate.h"
 #include "commands.h"
 
+#include "dispatchcmds.h"
 #include "datecmds.h"
 #include "scriptcmds.h"
 #include "pcbcmds.h"
@@ -49,6 +50,9 @@ void addcommands(struct comlist *list) {
 	addcommand(list, "rspcb",     "Set PCB state to unsuspended and reinsert", &handle_rspcb);
 	addcommand(list, "sppcb",     "Set PCB priority and reinserts",            &handle_sppcb);
 	addcommand(list, "shpcb",     "Display PCB/queue information",             &handle_shpcb);
+
+	/* Dispatching commands. */
+	addcommand(list, "dispatch", "Dispatch all processes currently available", &handle_dispatch);
 
 	/* Misc. Commands. */
 	addcommand(list, "exit",    "Exit TechOS",                                    &handle_exit);

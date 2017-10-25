@@ -24,3 +24,7 @@
 	either long or short options, and long options should be using the
 	fourth argument to prevent having to duplicate code between long/short
 	options.
+
+@TODO - 10/25/17 Ben Culkin :Dispatching
+	Improve the dispatch command to work in a threaded fashion instead of
+	blocking the commands while processes are dispatched.
