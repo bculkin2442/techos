@@ -18,6 +18,11 @@
 #include "pcbinternals.h"
 #include "pcbcmds.h"
 
+/*
+ * @TODO 10/25/17 Ben Culkin :InsertPCBCheck
+ * 	Make sure the return value of insertpcb is checked every time it is
+ * 	called.
+ */
 /* Handle creating a PCB. */
 HANDLECOM(mkpcb) { 
 	/* Class of the PCB. */
@@ -40,7 +45,7 @@ HANDLECOM(mkpcb) {
 	/* Process options. */
 	while(1) {
 		/* Usage message. */
-		char *usage = "Usage: mkpcb [-h] [-c|--class app|application|system] [--help] [-n|--name <proc-name>] <image-name> <priority>\n";
+		char *usage = "Usage: mkpcb [-cnh] [-c|--class (app|application)|(system|sys)] [--help] [-n|--name <proc-name>] <image-name> <priority>\n";
 
 		/* The long options we take. */
 		static struct option opts[] = {
@@ -48,7 +53,7 @@ HANDLECOM(mkpcb) {
 			{"class", required_argument, 0, 'c'},
 
 			/* Misc. options. */
-			{"help", no_argument, 0, 'h'},
+			{"help", no_argument,       0, 'h'},
 			{"name", required_argument, 0, 'n'},
 
 			/* Terminating option. */
@@ -77,12 +82,14 @@ HANDLECOM(mkpcb) {
 			break;
 		case 'c':
 			if(strcmp(optarg, "application") == 0 ||
-			   strcmp(optarg, "app") == 0) {
+			   strcmp(optarg, "app")         == 0) {
 				clas = PCB_APPLICATION;
-			} else if(strcmp(optarg, "system") == 0) {
+			} else if(strcmp(optarg, "system") == 0 ||
+				  strcmp(optarg, "sys")    == 0) {
 				clas = PCB_SYSTEM;
 			} else {
-				fprintf(ostate->output, "ERROR: Invalid PCB class '%s' (valid classes are 'app'/'application' and 'system')\n", optarg);
+				fprintf(ostate->output, "ERROR: Invalid PCB class '%s' (valid classes are 'app'/'application' and 'sys/system')\n", optarg);
+
 				return 1;
 			}
 			break;
@@ -162,32 +169,33 @@ HANDLECOM(mkpcb) {
 
 	{
 		/* Return from insertpcb. */
-		int pcbstat;
+		enum pcberror pcbstat;
+
 		pcbstat = insertpcb(ostate->pPCBstat, madePCB);
-		if(pcbstat == PCBSUCCESS) {
+
+		switch(pcbstat) {
+		case PCBSUCCESS:
 			return 0;
-		} else {
-			switch(pcbstat) {
-			case PCBINVSUSP:
-				fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') has invalid suspension type %d\n", madePCB->id, pszPCBImage, madePCB->susp);
-				break;
-			case PCBINVSTAT:
-				fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') has invalid run state %d\n",
-						madePCB->id, pszPCBImage, madePCB->status);
-				break;
-			case PCBRUNNING:
-				fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') is already running\n",
-						madePCB->id, pszPCBImage);
-				break;
-			case PCBINQUEUE:
-				fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') is already in a queue\n",
-						madePCB->id, pszPCBImage);
-				break;
-			default:
-				fprintf(ostate->output, "INTERNAL ERROR: Unknown return %d from attempting to insert new PCB %d (named '%s)\n", pcbstat, madePCB->id, pszPCBImage);
-			}
-			return 1;
+		case PCBINVSUSP:
+			fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') has invalid suspension type %d\n", madePCB->id, pszPCBImage, madePCB->susp);
+			break;
+		case PCBINVSTAT:
+			fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') has invalid run state %d\n",
+					madePCB->id, pszPCBImage, madePCB->status);
+			break;
+		case PCBRUNNING:
+			fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') is already running\n",
+					madePCB->id, pszPCBImage);
+			break;
+		case PCBINQUEUE:
+			fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') is already in a queue\n",
+					madePCB->id, pszPCBImage);
+			break;
+		default:
+			fprintf(ostate->output, "INTERNAL ERROR: Unknown return %d from attempting to insert new PCB %d (named '%s)\n", pcbstat, madePCB->id, pszPCBImage);
 		}
+
+		return 1;
 	}
 }
 
@@ -271,6 +279,7 @@ HANDLECOM(rmpcb) {
 		}	
 	}
 
+	/* Grab the PCB. */
 	switch(idtype) {
 	case PID_NAME:
 		if(optind < argc) {
@@ -326,10 +335,17 @@ HANDLECOM(rmpcb) {
 }
 
 HANDLECOM(sspcb) {
-	//current option and long option
+	/* Current option & long option. */
 	int opt, optidx;
+
+	/* Reinit getopt. */
 	optind = 1;
 
+	/* Types of locating PCBs. */
+	/*
+	 * @NOTE
+	 * 	Should this enum get put somewhere global?
+	 */
 	enum pidopt {
 		/* Locate a PCB by name. */
 		PID_NAME,
@@ -337,62 +353,59 @@ HANDLECOM(sspcb) {
 		PID_NUM
 	};
 
+	/* Set sensible default options. */
 	enum pidopt idtype = PID_NAME;
 
-	while(1)
-	{
+	while(1) {
+		/* Our usage message. */
 		char *usage = "Usage: sspcb [name] [-h] [--help] [--proc name|num] <proc-name>|<proc-id>\n";
+
 		/* The long options we take. */
 		static struct option opts[] = {
-
 			/* Misc. options. */
-			{"help", no_argument, 0, 0},
+			{"help", no_argument, 0, 'h'},
 
 			/*Mode options*/
-			{"proc", required_argument, 0 , 0},
+			{"proc", required_argument, 0 , 'p'},
 
 			/* Terminating option. */
 			{0, 0, 0, 0},
 		};
 
-		//get an option
-		opt = getopt_long(argc, argv, "h", opts, &optidx);
+		/* Get an option. */
+		opt = getopt_long(argc, argv, "hp:", opts, &optidx);
 
-		//break if we've processed every option
+		/* Break if we've processed every option. */
 		if(opt == -1) break;
 
-		//Handle options
-		switch(opt)
-		{
+		/* Handle options. */
+		switch(opt) {
 		case 0:
-			//Long options
-			switch(optidx)
-			{
-			case 0://Help
-				fprintf(ostate->output, "%s\n", usage);
-				return 0;
-			case 1://SH_PROC
-				if(strcmp(optarg, "name") == 0) {
-					idtype = PID_NAME;
-				}
-				else if(strcmp(optarg, "num") == 0) {
-					idtype = PID_NUM;
-				}
-				else {
-					fprintf(ostate->output, "ERROR: Invalid process ID type '%s'. Valid ID types are 'name' and 'num'\n", optarg);
-					return 1;
-				}
-				break;
+			/* Handle long options. */
+			switch(optidx) {
+				/* 
+				 * Long options are handled by their
+				 * corresponding short option.
+				 */
 			default:
 				fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
 				fprintf(ostate->output, "%s\n", usage);
 				return 1;
 			}
 			break;
-			//Short options	
 		case 'h':
 			fprintf(ostate->output, "%s\n", usage);
 			return 0;
+		case 'p':
+			if(strcmp(optarg, "name") == 0) {
+				idtype = PID_NAME;
+			} else if(strcmp(optarg, "num") == 0) {
+				idtype = PID_NUM;
+			} else {
+				fprintf(ostate->output, "ERROR: Invalid process ID type '%s'. Valid ID types are 'name' and 'num'\n", optarg);
+				return 1;
+			}
+			break;
 		default:
 			fprintf(ostate->output, "\tERROR: Invalid command-line argument.\n");
 			fprintf(ostate->output, "%s\n", usage);
@@ -400,43 +413,48 @@ HANDLECOM(sspcb) {
 		}
 
 	}
-	struct pcb *foundPCB;
 
-	switch(idtype) {
-	case PID_NAME:
-		if(optind < argc) {
-			char *pszPCBName = argv[optind];
-			foundPCB = findpcbname(ostate->pPCBstat, pszPCBName);
-			if(foundPCB == NULL) {
-				fprintf(ostate->output, "ERROR: No PCB with name '%s'\n", pszPCBName);
+	{
+		/* The PCB we're looking for. */
+		struct pcb *foundPCB;
+
+		/* Grab the PCB. */
+		switch(idtype) {
+		case PID_NAME:
+			if(optind < argc) {
+				char *pszPCBName = argv[optind];
+				foundPCB = findpcbname(ostate->pPCBstat, pszPCBName);
+				if(foundPCB == NULL) {
+					fprintf(ostate->output, "ERROR: No PCB with name '%s'\n", pszPCBName);
+					return 1;
+				}
+			} else {
+				fprintf(ostate->output, "ERROR: Must specify PCB name as argument.\n");
 				return 1;
 			}
-		} else {
-			fprintf(ostate->output, "ERROR: Must specify PCB name as argument.\n");
-			return 1;
-		}
-		break;
-	case PID_NUM:
-		if(optind < argc) {
-			int pcbid = atoi(argv[optind]);
-			foundPCB = findpcbnum(ostate->pPCBstat, pcbid);
-			if(foundPCB == NULL) {
-				fprintf(ostate->output, "ERROR: No PCB with ID '%d'\n", pcbid);
+			break;
+		case PID_NUM:
+			if(optind < argc) {
+				int pcbid = atoi(argv[optind]);
+				foundPCB = findpcbnum(ostate->pPCBstat, pcbid);
+				if(foundPCB == NULL) {
+					fprintf(ostate->output, "ERROR: No PCB with ID '%d'\n", pcbid);
+					return 1;
+				}
+			} else {
+				fprintf(ostate->output, "ERROR: Must specify PCB name as argument.\n");
 				return 1;
 			}
-		} else {
-			fprintf(ostate->output, "ERROR: Must specify PCB name as argument.\n");
-			return 1;
+			break;
+		default:
+			/* Shouldn't happen. */
+			assert(0);
 		}
-		break;
-	default:
-		/* Shouldn't happen. */
-		assert(0);
+
+		removepcb(ostate->pPCBstat, foundPCB);
+		foundPCB->susp = PCB_SUSPENDED;
+		insertpcb(ostate->pPCBstat, foundPCB);
 	}
-
-	removepcb(ostate->pPCBstat, foundPCB);
-	foundPCB->susp = PCB_SUSPENDED;
-	insertpcb(ostate->pPCBstat, foundPCB);
 
 	return 0;
 }

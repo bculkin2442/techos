@@ -33,7 +33,7 @@ HANDLECOM(date) {
 	timesize  = strftime(outtime, 255, ostate->out_datefmt, ostate->datetime);
 	/* Error if the format was too long. */
 	if(timesize == 0) {
-		fprintf(ostate->output, "Output for format '%s' is too long. It must be shorter than 255 characters when filled out\n", ostate->out_datefmt);
+		fprintf(ostate->output, "ERROR: Output for format '%s' is too long. It must be shorter than 255 characters when filled out\n", ostate->out_datefmt);
 		return 1;
 	}
 
@@ -62,6 +62,7 @@ HANDLECOM(time) {
 	/* Update the time in our time struct. */
 	clocktime = time(NULL);
 	datetime  = localtime(&clocktime);
+
 	ostate->datetime->tm_sec = datetime->tm_sec;
 	ostate->datetime->tm_min = datetime->tm_min;
 	ostate->datetime->tm_hour = datetime->tm_hour;
@@ -70,7 +71,7 @@ HANDLECOM(time) {
 	timesize  = strftime(outtime, 255, ostate->time_datefmt, ostate->datetime);
 	/* Error if the format was too long. */
 	if(timesize == 0) {
-		fprintf(ostate->output, "Output for format '%s' is too long. It must be shorter than 255 characters when filled out\n", ostate->out_datefmt);
+		fprintf(ostate->output, "ERROR: Output for format '%s' is too long. It must be shorter than 255 characters when filled out\n", ostate->out_datefmt);
 		return 1;
 	}
 
@@ -88,13 +89,15 @@ HANDLECOM(datefmt) {
 
 	/* Whether to set or display the format. */
 	enum setmode set;
-
 	/* The format to display/modify. */
 	enum fmtmode fmt;
+	/* The format provided by the user. */
+	char *pszFormat;
 
-	/* Set modes to sensible defaults. */
-	set = SM_DISPLAY;
-	fmt = FM_IN;
+	/* Set options to sensible defaults. */
+	set       = SM_DISPLAY;
+	fmt       = FM_IN;
+	pszFormat = NULL;
 
 	/* Reinit getopt. */
 	optind = 1;
@@ -104,44 +107,30 @@ HANDLECOM(datefmt) {
 		/* The current option, and the current long option */
 		int opt, optidx;
 
-		/* Enum declaration for long options. */
-		enum dfmtopt {
-			/* Help option. */
-			DO_HELP = 0,
-
-			/* Mode options. */
-			DO_SET,
-			DO_DISPLAY,
-
-			/* Format choice options. */
-			DO_TIME,
-			DO_IN,
-			DO_OUT,
-		};
-
 		/* Our usage message. */
-		static const char *usage = "Usage: datefmt [-stdioh] [--help] [--set|--display] [--time|--in|--out]\n";
+		static const char *usage = "Usage: datefmt [-stdioh] [--help] [--set|--display] [--time|--in|--out] [-f|--format <format>]\n";
 
 		/* The long options we take. */
 		static struct option opts[] = {
 			/* Misc. options. */
-			{"help", no_argument, 0, 0},
+			{"help", no_argument, 0, 'h'},
+			{"format", no_argument, 0, 'f'},
 
 			/* Mode options. */
-			{"set",     no_argument, 0, 0},
-			{"display", no_argument, 0, 0},
+			{"set",     no_argument, 0, 's'},
+			{"display", no_argument, 0, 'd'},
 
-			/* Format options. */
-			{"time", no_argument, 0, 0},
-			{"in",   no_argument, 0, 0},
-			{"out",  no_argument, 0, 0},
+			/* Format picking options. */
+			{"time", no_argument, 0, 't'},
+			{"in",   no_argument, 0, 'i'},
+			{"out",  no_argument, 0, 'o'},
 
 			/* Terminating option. */
 			{0, 0, 0, 0}
 		};
 
 		/* Get an option. */
-		opt = getopt_long(argc, argv, "stdioh", opts, &optidx);
+		opt = getopt_long(argc, argv, "f:stdioh", opts, &optidx);
 		/* Break if we've processed every option. */
 		if(opt == -1) break;
 
@@ -150,32 +139,32 @@ HANDLECOM(datefmt) {
 		case 0:
 			/* We picked a long option. */
 			switch(optidx) {
-			case DO_HELP:
-				fprintf(ostate->output, "%s\n", usage);
-				return 0;
-			case DO_SET:
-				set = SM_SET;
-				break;
-			case DO_DISPLAY:
-				set = SM_DISPLAY;
-				break;
-			case DO_TIME:
-				fmt = FM_TIME;
-				break;
-			case DO_IN:
-				fmt = FM_IN;
-				break;
-			case DO_OUT:
-				fmt = FM_OUT;
-				break;
+				/* 
+				 * Long options are handled by corresponding
+				 * short options.
+				 */
 			default:
 				fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
 				fprintf(ostate->output, "%s\n", usage);
 				return 1;
 			}
 			break;
+		case 'f':
+			/* Free previous format. */
+			if(pszFormat != NULL) {
+				free(pszFormat);
+			}
+			/*
+			 * @NOTE
+			 * 	Is this duplication necessary?
+			 */
+			pszFormat = (char *)strdup(optarg);
+			break;
 		case 's':
 			set = SM_SET;
+			break;
+		case 't':
+			fmt = FM_TIME;
 			break;
 		case 'd':
 			set = SM_DISPLAY;
@@ -185,9 +174,6 @@ HANDLECOM(datefmt) {
 			break;
 		case 'o':
 			fmt = FM_OUT;
-			break;
-		case 't':
-			fmt = FM_TIME;
 			break;
 		case 'h':
 			fprintf(ostate->output, "%s\n", usage);
@@ -200,9 +186,7 @@ HANDLECOM(datefmt) {
 	}
 
 	if(set == SM_DISPLAY) {
-		/*
-		 * Display the format.
-		 */
+		/* Display the format. */
 		switch(fmt) {
 		case FM_IN:
 			fprintf(ostate->output, "%s\n", ostate->in_datefmt);
@@ -214,58 +198,51 @@ HANDLECOM(datefmt) {
 			fprintf(ostate->output, "%s\n", ostate->time_datefmt);
 			break;
 		default:
-			fprintf(ostate->output, "INTERNAL ERROR: Invalid format setting.\n");
+			/* Shouldn't happen. */
+			assert(0);
 		}
 	} else {
-		/*
-		 * Variables for format input.
-		 */
-		char *line;
-		size_t lsize, lread, llen;
+		/* Read a format only if we need to. */
+		if(pszFormat == NULL) {
+			/* Variables for format input. */
+			size_t lsize, lread, llen;
 
-		/*
-		 * Prompt/read the new format.
-		 */
-		fprintf(ostate->output, "Enter the new format: ");
-		lread = getline(&line, &lsize, ostate->strem);
+			/* Prompt/read the new format. */
+			fprintf(ostate->output, "Enter the new format: ");
+			lread = getline(&pszFormat, &lsize, ostate->strem);
 
-		if(lread < 1) {
-			fprintf(ostate->output, "\tERROR: No input available\n");
-			return 1;
+			if(lread < 1) {
+				fprintf(ostate->output, "\tERROR: No input available\n");
+				return 1;
+			}
+
+			/* Trim trailing newline. */
+			llen = strlen(pszFormat);
+			if(pszFormat[llen-1] == '\n')
+				pszFormat[llen-1] = '\0';
+
+			/* Warn if truncation is going to occur. */
+			if(llen >= 256) fprintf(ostate->output, "WARNING: Truncating format '%1$s' to '%1$.256s'\n", pszFormat);
 		}
 
-		/*
-		 * Trim trailing newline.
-		 */
-		llen = strlen(line);
-		if(line[llen-1] == '\n')
-			line[llen-1] = '\0';
-
-		if(llen >= 256) fprintf(ostate->output, "WARNING: Truncating format '%s' to '%.256s'\n", line, line);
-
-		/*
-		 * Set the format.
-		 */
+		/* Set the format. */
 		switch(fmt) {
 		case FM_IN:
-			sprintf(ostate->in_datefmt,  "%.256s", line);
+			sprintf(ostate->in_datefmt,  "%.256s", pszFormat);
 			break;
 		case FM_OUT:
-			sprintf(ostate->out_datefmt, "%.256s", line);
+			sprintf(ostate->out_datefmt, "%.256s", pszFormat);
 			break;
 		case FM_TIME:
-			sprintf(ostate->time_datefmt, "%.256s", line);
+			sprintf(ostate->time_datefmt, "%.256s", pszFormat);
 			break;
 		default:
-			fprintf(ostate->output, "INTERNAL ERROR: Invalid format setting.\n");
-			free(line);
-			return 1;
+			/* Shouldn't happen. */
+			assert(0);
 		}
 
-		/*
-		 * Cleanup.
-		 */
-		free(line);
+		/* Cleanup after ourselves. */
+		free(pszFormat);
 
 		fprintf(ostate->output, "Format set\n");
 	}
@@ -274,6 +251,13 @@ HANDLECOM(datefmt) {
 }
 
 HANDLECOM(setdate) {
+	/*
+	 * @TODO 10/25/17 Ben Culkin :SetdateCLI
+	 *	Convert this to use getopt for arg-handling and add the
+	 *	following options:
+	 * 	- Specify the date as a CLI param
+	 * 	- Specify a custom format to use
+	 */
 	/* Variables for date input. */
 	char *line;
 	size_t lsize, lread, llen;

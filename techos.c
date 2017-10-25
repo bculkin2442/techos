@@ -15,7 +15,7 @@
 #include "techos.h"
 
 /* The major/minor version of TechOS. */
-const int major_ver = 2;
+const int major_ver = 3;
 const int minor_ver = 0;
 
 /*

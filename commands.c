@@ -67,12 +67,15 @@ void addcommands(struct comlist *list) {
  */
 HANDLECOM(exit) {
 	/* Variables for line input. */
-	char *line = NULL;
-	size_t lread;
-	size_t lsize;
+	char  *pszLine = NULL;
+	size_t lread, lsize;
 
 	/* Command return status. */
-	int ret = 0;
+	int ret;
+
+	/* Init vars. */
+	ret     = 0;
+	pszLine = NULL;
 
 	/* Handle CLI args. */
 	if(argc > 1) {
@@ -80,11 +83,12 @@ HANDLECOM(exit) {
 	}
 
 	fprintf(ostate->output, "Are you sure you want to exit? (y/n) ");
-	lread = getline(&line, &lsize, stdin);
+	lread = getline(&pszLine, &lsize, stdin);
 
 	/* Use rpmatch() to pick an action. */
 	if(lread > 1) {
-		int result = rpmatch(line);
+		int result = rpmatch(pszLine);
+
 		switch(result) {
 		case 1:
 			ret = -1;
@@ -94,14 +98,14 @@ HANDLECOM(exit) {
 			break;
 		case -1:
 		default:
-			fprintf(ostate->output, "Unknown response '%s'\n", line);
+			fprintf(ostate->output, "ERROR: Unknown response '%s'\n", pszLine);
 		}
 	}
 
 	/*
 	 * Cleanup after ourselves.
 	 */
-	if(line != NULL) free(line);
+	if(pszLine != NULL) free(pszLine);
 
 	return ret;
 }
@@ -157,14 +161,15 @@ HANDLECOM(version) {
 		if(opt == -1) break;
 
 		switch(opt) {
+			/* a, d and v are toggle options. */
 		case 'a':
-			printAuthor = 1;
+			printAuthor = 1 - printAuthor;
 			break;
 		case 'd':
-			printDate = 1;
+			printDate = 1 - printDate;
 			break;
 		case 'v':
-			printVersion = 1;
+			printVersion = 1 - printDate;
 			break;
 		case 'h':
 			fprintf(ostate->output, "%s", usage);
@@ -177,12 +182,9 @@ HANDLECOM(version) {
 	}
 
 	/* Print version info. */
-	if(printVersion)
-		fprintf(ostate->output, "TechOS v%d.%d\n", major_ver, minor_ver);
-	if(printAuthor)
-		fprintf(ostate->output, "\tAuthors: Benjamin Culkin, Lucas Darnell, Jared Miller\n");
-	if(printDate)
-		fprintf(ostate->output, "\tCompletion Date: 9/13/17\n");
+	if(printVersion) fprintf(ostate->output, "\tTechOS v%d.%d\n", major_ver, minor_ver);
+	if(printAuthor)  fprintf(ostate->output, "\tAuthors: Benjamin Culkin, Lucas Darnell, Jared Miller\n");
+	if(printDate)    fprintf(ostate->output, "\tCompletion Date: 9/13/17\n");
 
 	return 0;
 }
@@ -193,7 +195,7 @@ HANDLECOM(help) {
 
 	/* Handle CLI args. */
 	if(argc == 1) {
-		fprintf(ostate->output, "Available commands\n");
+		fprintf(ostate->output, "Available commands:\n");
 
 		/* 
 		 * @TODO 10/07/17 Ben Culkin :PrintCommandState
@@ -223,8 +225,9 @@ HANDLECOM(help) {
 
 		/* Check if the file exists. */
 		if(stat(manpath, &scratch) == -1) {
-			/* Something went wrong. */
-			fprintf(ostate->output, "\tINTERNAL ERROR: Something went wrong checking for the manpage");
+			/* File wasn't found. */
+			fprintf(ostate->output, "\tINTERNAL ERROR: Manpage for command '%s' ('%s') couldn't be found.\n", argv[1], manpath);
+
 			free(manpath);
 			return 1;
 		}
@@ -235,12 +238,12 @@ HANDLECOM(help) {
 			/* Create our command, then run it. */
 			assert(asprintf(&compath, "man %s", manpath) != -1);
 			if(system(compath) != 0) {
-				fprintf(ostate->output, "\tINTERNAL ERROR: Something went wrong displaying the manpage.\n");
+				fprintf(ostate->output, "\tINTERNAL ERROR: Could not display the manpage for '%s'\n", argv[1]);
 			}
 
 			free(compath);	
 		} else {
-			fprintf(ostate->output, "\tERROR: No help available for command '%s'\n", argv[1]);
+			fprintf(ostate->output, "\tINTERNAL ERROR: Manpage for command '%s' ('%s') is not valid.\n", argv[1], manpath);
 
 			free(manpath);
 			return 1;
