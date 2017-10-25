@@ -47,6 +47,8 @@ LINKLIBS := -largparser -lintern
 .PHONY: all clean run libs docs
 
 all: bin/techos libs
+	-@ctags -R .
+	-@cscope -b -q -R
 
 
 # TechOS depends on an .o file for each source file
