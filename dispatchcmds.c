@@ -14,7 +14,18 @@
 
 /* Do the actual work of dispatching processes. */
 static int dodispatch(struct osstate *ostate) {
+	/* Counter variables. */
+	int ndisp, niter, ninter;
+
+	/* Initialize counters. */
+	ndisp = 0;
+	niter = 0;
+	ninter = 0;
+
 	while(candispatch(ostate->pPCBstat) > 0) {
+		/* Increment iteration counter. */
+		niter += 1;
+
 		/* The PCB being dispatched. */
 		struct pcb *pPCB;
 
@@ -56,6 +67,9 @@ static int dodispatch(struct osstate *ostate) {
 
 		/* The process finished. */
 		if(pPCB->offset == 0) {
+			/* Increment dispatchable counter. */
+			ndisp += 1;
+
 			/* The process finished. */
 			fprintf(ostate->output, "Process '%s' (id no. %d) finished execution\n", pszName, pPCB->id);
 			killpcb(pPCB);
@@ -72,6 +86,8 @@ static int dodispatch(struct osstate *ostate) {
 
 			switch(ret) {
 			case PCBSUCCESS:
+				/* Increment interrupt counter. */
+				ninter += 1;
 				break;
 			case PCBINVSUSP:
 				fprintf(ostate->output, "WARNING: Process '%s' (id no. %d) was dropped on the floor because of an invalid suspension status (%d)\n", pszName, pPCB->id, pPCB->susp);
@@ -94,6 +110,8 @@ static int dodispatch(struct osstate *ostate) {
 		/* Close the file. */
 		fclose(pfImage);
 	}
+
+	fprintf("Dispatched %d processes in %d iterations with %d interrupts\n", ndisp, niter, ninter);
 
 	return 0;
 }

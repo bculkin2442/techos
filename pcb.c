@@ -380,6 +380,8 @@ void printpcb(struct pcb *pPCB, void *pvState) {
 
 	/* The name of the PCB. */
 	const char *pszPCBName;
+	/* The process image for the PCB. */
+	const char *pszPCBImage;
 	/* The class of the PCB. */
 	const char *pszPCBClass;
 	/* The status of the PCB. */
@@ -391,7 +393,9 @@ void printpcb(struct pcb *pPCB, void *pvState) {
 	ostate = (struct osstate *)(pvState);
 
 	/* Get the PCB name. */
-	pszPCBName = lookupkey(ostate->pPCBstat->ptPCBNames, pPCB->kName);
+	pszPCBName  = lookupkey(ostate->pPCBstat->ptPCBNames, pPCB->kName);
+	/* Get the image name. */
+	pszPCBImage = lookupkey(ostate->pPCBstat->ptPCBImages, pPCB->kImage);
 
 	/* Get the PCB class. */
 	switch(pPCB->clas) {
@@ -443,7 +447,11 @@ void printpcb(struct pcb *pPCB, void *pvState) {
 
 	/* Print PCB status information. */
 	fprintf(ostate->output, "PCB Status:       %s\n", pszPCBStatus);
-	fprintf(ostate->output, "Is PCB Suspended: %s\n\n", pszPCBSusp);
+	fprintf(ostate->output, "Is PCB Suspended: %s\n", pszPCBSusp);
+
+	/* Print PCB process information. */
+	fprintf(ostate->output, "PCB Image:         %s\n", pszPCBImage);
+	fprintf(ostate->output, "PCB Image Offset:  %d\n\n", pPCB->offset);
 }
 
 /* Check if there are any processes to dispatch. */
