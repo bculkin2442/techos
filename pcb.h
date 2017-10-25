@@ -46,6 +46,7 @@ struct pcb {
 	 * Stored as a interned string, for fast comparisons.
 	 */
 	internkey     kName;
+
 	/* Process class. */
 	enum pcbclass clas;
 	/* Process priority. */
@@ -56,6 +57,12 @@ struct pcb {
 	enum pcbstatus status;
 	/* Whether the PCB is suspended or not. */
 	enum pcbsusp   susp;
+
+	/* Process state indicators. */
+	/* The image for this process. */
+	internkey kImage;
+	/* The current offset into the process. */
+	int offset;
 
 	/* The next process in whatever queue this PCB is in. */
 	struct pcb *pNext;
@@ -70,7 +77,7 @@ struct pcbqueue;
 struct pcbstate;
 
 /* Allocate a new PCB. */
-struct pcb *makepcb(struct pcbstate *, char *, enum pcbclass, int);
+struct pcb *makepcb(struct pcbstate *, char *, char *, enum pcbclass, int);
 /* Deallocate a PCB. */
 void        killpcb(struct pcb *);
 

@@ -157,6 +157,8 @@ struct pcbstate *makepcbstate() {
 
 	/* Setup name table. */
 	pState->ptPCBNames = makeinterntab();
+	/* Setup image table. */
+	pState->ptPCBImages = makeinterntab();
 	/* Initialize proc. ids. */
 	pState->nProcid    = 1;
 

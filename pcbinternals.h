@@ -55,6 +55,9 @@ struct pcbqueueprior {
 struct pcbstate {
 	/* PCB name table. */
 	struct interntab *ptPCBNames;
+	/* PCB image table. */
+	struct interntab *ptPCBImages;
+
 	/* Next process ID. */
 	int nProcid;
 

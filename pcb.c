@@ -10,7 +10,7 @@
 #include "pcbinternals.h"
 
 /* Allocate and initialize a PCB. */
-struct pcb *makepcb(struct pcbstate *pState, char *pszPCBName, enum pcbclass clas, int prior) {
+struct pcb *makepcb(struct pcbstate *pState, char *pszPCBName, char *pszPCBImage, enum pcbclass clas, int prior) {
 	/* The PCB to return. */
 	struct pcb *pPCB;
 
@@ -37,6 +37,10 @@ struct pcb *makepcb(struct pcbstate *pState, char *pszPCBName, enum pcbclass cla
 	/* Initialize PCB queue. */
 	pPCB->pNext = pPCB;
 	pPCB->pPrev = pPCB;
+
+	/* Setup process data. */
+	pPCB->kImage = internstring(pState->ptPCBImages, pszPCBImage);
+	pPCB->offset = 0;
 
 	return pPCB;
 }
