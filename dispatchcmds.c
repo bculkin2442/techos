@@ -74,11 +74,13 @@ static int dodispatch(struct osstate *ostate) {
 			fprintf(ostate->output, "Process '%s' (id no. %d) finished execution\n", pszName, pPCB->id);
 			killpcb(pPCB);
 		} else {
+			pPCB->offset += 1;
+
 			/* The return from inserting the PCB. */
 			enum pcberror ret;
 
 			/* The process stopped. */
-			fprintf(ostate->output, "Process '%s' (id no. %d) blocked at offset %d\n", pszName, pPCB->id, pPCB->offset);
+			fprintf(ostate->output, "Process '%s' (id no. %d) blocked at offset %d\n", pszName, pPCB->id, pPCB->offset - 1);
 
 			pPCB->status = PCB_BLOCKED;
 
@@ -111,7 +113,7 @@ static int dodispatch(struct osstate *ostate) {
 		fclose(pfImage);
 	}
 
-	fprintf("Dispatched %d processes in %d iterations with %d interrupts\n", ndisp, niter, ninter);
+	fprintf(ostate->output, "Dispatched %d processes in %d iterations with %d interrupts\n", ndisp, niter, ninter);
 
 	return 0;
 }
