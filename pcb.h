@@ -93,11 +93,7 @@ struct pcb *findpcbnum(struct pcbstate *, int);
  * Returns NULL if the PCB wasn't found.
  *
  * WARNING: Will only return the first PCB by a given name, searching the
- * queues in the following order:
- *	1. Ready
- * 	2. Blocked
- *	3. Suspended Ready
- *	4. Suspended Blocked.
+ * queues in a defined but unspecified way.
  */
 struct pcb *findpcbname(struct pcbstate *, char *);
 
