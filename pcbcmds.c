@@ -5,6 +5,9 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include "libs/intern.h"
 
 #include "osstate.h"
@@ -18,18 +21,26 @@
 /* Handle creating a PCB. */
 HANDLECOM(mkpcb) { 
 	/* Class of the PCB. */
-	enum pcbclass clas = PCB_APPLICATION;
+	enum pcbclass clas;
 	/* Priority of the PCB. */
 	int priority;
+	/* Name of the PCB. */
+	char *pszPCBName;
+
 	/* Current option/long option. */
 	int opt, optidx;
+
+	/* Set default options. */
+	clas       = PCB_APPLICATION;
+	pszPCBName = NULL;
+
 	/* Reinit getopt. */
 	optind = 1;
 
 	/* Process options. */
 	while(1) {
 		/* Usage message. */
-		char *usage = "Usage: mkpcb [-ch] [--class app|application|system] [--help] <name> <priority>\n";
+		char *usage = "Usage: mkpcb [-h] [-c|--class app|application|system] [--help] [-n|--name <proc-name>] <image-name> <priority>\n";
 
 		/* The long options we take. */
 		static struct option opts[] = {
@@ -38,13 +49,14 @@ HANDLECOM(mkpcb) {
 
 			/* Misc. options. */
 			{"help", no_argument, 0, 'h'},
+			{"name", required_argument, 0, 'n'},
 
 			/* Terminating option. */
 			{0, 0, 0, 0}
 		};
 
 		/* Get an option. */
-		opt = getopt_long(argc, argv, "c:h", opts, &optidx);
+		opt = getopt_long(argc, argv, "c:n:h", opts, &optidx);
 		
 		/* Break if we've processed every option. */
 		if(opt == -1) break;
@@ -77,6 +89,18 @@ HANDLECOM(mkpcb) {
 		case 'h':
 			fprintf(ostate->output, "%s\n", usage);
 			return 0;
+		case 'n':
+			/* Free an already set name. */
+			if(pszPCBName != NULL) {
+				free(pszPCBName);
+			}
+			/* 
+			 * @NOTE
+			 *	Do we need to duplicate this?
+			 */
+			pszPCBName = (char *)strdup(optarg);
+			assert(pszPCBName != NULL);
+			break;
 		default:
 			fprintf(ostate->output, "\tERROR: Invalid command-line argument.\n");
 			fprintf(ostate->output, "%s\n", usage);
@@ -107,13 +131,32 @@ HANDLECOM(mkpcb) {
 		return 1;
 	}
 
-	/* Bind the PCB name. */
-	char *pszPCBName = argv[optind];
+	/* Bind the PCB image. */
+	char *pszPCBImage = argv[optind];
+
+	/* Validate that the image referenced exists. */
+	{
+		struct stat scratch;
+
+		/* Error if there isn't a normal file for the image. */
+		if(stat(pszPCBImage, &scratch) == -1) {
+			fprintf(ostate->output, "ERROR: No image found for process '%s'\n", pszPCBImage);
+			return 1;
+		} else if(!S_ISREG(scratch.st_mode)) {
+			fprintf(ostate->output, "ERROR: Invalid image for process '%s'\n", pszPCBImage);
+			return 1;
+		}
+	}
+
+	/* Set the PCB name correctly. */
+	if(pszPCBName == NULL) {
+		pszPCBName = pszPCBImage;
+	}
 
 	/* Create the PCB. */
-	struct pcb *madePCB = makepcb(ostate->pPCBstat, pszPCBName, clas, priority);
+	struct pcb *madePCB = makepcb(ostate->pPCBstat, pszPCBName, pszPCBImage, clas, priority);
 	if(madePCB == NULL) {
-		fprintf(ostate->output, "INTERNAL ERROR: PCB named '%s' created as null.\n", pszPCBName);
+		fprintf(ostate->output, "INTERNAL ERROR: PCB named '%s' created as null.\n", pszPCBImage);
 		return 1;
 	}
 
@@ -126,22 +169,22 @@ HANDLECOM(mkpcb) {
 		} else {
 			switch(pcbstat) {
 			case PCBINVSUSP:
-				fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') has invalid suspension type %d\n", madePCB->id, pszPCBName, madePCB->susp);
+				fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') has invalid suspension type %d\n", madePCB->id, pszPCBImage, madePCB->susp);
 				break;
 			case PCBINVSTAT:
 				fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') has invalid run state %d\n",
-						madePCB->id, pszPCBName, madePCB->status);
+						madePCB->id, pszPCBImage, madePCB->status);
 				break;
 			case PCBRUNNING:
 				fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') is already running\n",
-						madePCB->id, pszPCBName);
+						madePCB->id, pszPCBImage);
 				break;
 			case PCBINQUEUE:
 				fprintf(ostate->output, "INTERNAL ERROR: New PCB %d (named '%s') is already in a queue\n",
-						madePCB->id, pszPCBName);
+						madePCB->id, pszPCBImage);
 				break;
 			default:
-				fprintf(ostate->output, "INTERNAL ERROR: Unknown return %d from attempting to insert new PCB %d (named '%s)\n", pcbstat, madePCB->id, pszPCBName);
+				fprintf(ostate->output, "INTERNAL ERROR: Unknown return %d from attempting to insert new PCB %d (named '%s)\n", pcbstat, madePCB->id, pszPCBImage);
 			}
 			return 1;
 		}
