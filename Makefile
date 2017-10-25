@@ -35,7 +35,7 @@ SRCS := $(wildcard *.c)
 DOCS := $(wildcard help/*.1)
 
 # The flags we want to pass to the C compiler
-CFLAGS := -std=c11 -O0 -g -Wall -Wextra -Wpedantic -Wno-unused-variable -Wno-unused-parameter -Wno-implicit-function-declaration -Wno-unused-but-set-variable
+CFLAGS := -std=c11 -O0 -g -Wall -Wextra -Wpedantic -Wno-unused-variable -Wno-unused-parameter -Wno-implicit-function-declaration -Wno-unused-but-set-variable -fdiagnostics-color=auto
 
 # The flags we want to pass to the linker
 LDFLAGS := -Llibs
