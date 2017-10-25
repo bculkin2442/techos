@@ -445,3 +445,26 @@ void printpcb(struct pcb *pPCB, void *pvState) {
 	fprintf(ostate->output, "PCB Status:       %s\n", pszPCBStatus);
 	fprintf(ostate->output, "Is PCB Suspended: %s\n\n", pszPCBSusp);
 }
+
+/* Check if there are any processes to dispatch. */
+int candispatch(struct pcbstate *pState) {
+	if(pState->pqReady->nprocs > 0 || pState->pqBlocked->nprocs > 0) {
+		return pState->pqReady->nprocs + pState->pqBlocked->nprocs;
+	}
+
+	return 0;
+}
+
+/* Get a dispatchable process. */
+struct pcb *getdisppcb(struct pcbstate *pState) {
+	if(pState->pqReady->nprocs > 0 && pState->pqBlocked->nprocs > 0) {
+		if(random() > .5) return poppcb(pState, pState->pqReady);
+		else              return poppcb(pState, pState->pqBlocked);
+	} else if(pState->pqReady->nprocs > 0) {
+		return poppcb(pState, pState->pqReady);
+	} else if(pState->pqBlocked->nprocs > 0) {
+		return poppcb(pState, pState->pqBlocked);
+	} else {
+		return NULL;
+	}
+}

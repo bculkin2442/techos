@@ -25,6 +25,8 @@ enum queuetype {
 struct pcbqueue {
 	/*
 	 * Represents the type of queue this is.
+	 *
+	 * For this struct, it should be QT_NORMAL.
 	 */
 	enum queuetype type;
 
@@ -86,6 +88,13 @@ struct pcbqueue *maketypedpcbqueue(enum queuetype);
  * NOTE: Killing a PCB queue kills all PCBs currently enqueued.
  */
 void killpcbqueue(struct pcbqueue *);
+
+/* 
+ * Remove the first PCB from a queue.
+ *
+ * Returns the PCB removed, or null if the queue was empty.
+ */
+struct pcb *poppcb(struct pcbstate *, struct pcbqueue *);
 
 /* Allocate/initialize a PCB state. */
 struct pcbstate *makepcbstate();

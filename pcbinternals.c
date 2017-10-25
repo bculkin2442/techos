@@ -149,6 +149,58 @@ void foreachpcb(struct pcbqueue *pqQueue, void(*pcbitr)(struct pcb *, void *), v
 	}
 }
 
+/* Remove the first PCB in a queue. */
+struct pcb *poppcb(struct pcbstate *pState, struct pcbqueue *pqQueue) {
+	switch(pqQueue->type) {
+	case QT_NORMAL:
+		{
+			/* The removed PCB. */
+			struct pcb *pPCB;
+
+			/* Don't remove NULL PCBs. */
+			if(pqQueue->pHead == NULL) {
+				return NULL;
+			}
+
+			/* Remove the head PCB. */
+			pPCB = pqQueue->pHead;
+			removepcb(pState, pPCB);
+
+			return pPCB;
+		}
+		break;
+	case QT_PRIORITY:
+		{
+			/* The cast queue. */
+			struct pcbqueueprior *pqrQueue;
+			/* The loop index. */
+			int i;
+
+			/* Cast the queue. */
+			pqrQueue = (struct pcbqueueprior *)pqQueue;
+			/*
+			 * @NOTE
+			 * 	Which way did PCB priorities go again?
+			 */
+			for(i = PCB_MAXPRIOR; i >= 0; i--) {
+				/* The PCB to hand back. */
+				struct pcb *pPCB;
+
+				pPCB = poppcb(pState, pqrQueue->apqQueues[i]);
+
+				if(pPCB != NULL) return pPCB;
+			}
+
+			/* We didn't find a PCB. */
+			return NULL;
+		}
+		break;
+	default:
+		/* Shouldn't happen. */
+		assert(0);
+	}
+}
+
 /* Allocate/initialize PCB state. */
 struct pcbstate *makepcbstate() {
 	/* Allocate the state, and fail if allocation fails. */

@@ -130,4 +130,23 @@ void removepcb(struct pcbstate *, struct pcb *);
  * with foreachpcb()
  */
 void printpcb(struct pcb *, void *);
+
+/*
+ * Dispatching related commands.
+ */
+
+/*
+ * Check if there are any processes to dispatch.
+ *
+ * Returns the number of dispatchable processes.
+ */
+int candispatch(struct pcbstate *);
+/* 
+ * Get a process to dispatch. 
+ *
+ * A dispatchable process is one that is not suspended.
+ *
+ * Returns the dispatchable process, or NULL if none were available.
+ */
+struct pcb *getdispppcb(struct pcbstate *);
 #endif
