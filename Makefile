@@ -7,7 +7,7 @@ DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.Td
 COMPILE.c   = $(CC) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS)
 POSTCOMPILE = @mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d && touch $@
 
-OBJDIR := bin/
+OBJDIR := bin
 $(shell mkdir -p $(OBJDIR) >/dev/null)
 
 %.o : %.c
@@ -77,10 +77,10 @@ libs/argparser.o: libs/argparser.c libs/argparser.h
 
 # Delete the binary and any object/library files, as well as the printed documentation
 clean: 
-	rm -rf bin/
-	rm $(wildcard libs/*.o)
-	rm $(wildcard libs/*.a)
-	@rm $(wildcard help/*.pdf)
+	-@rm -rf bin/
+	-@rm $(wildcard libs/*.o)
+	-@rm $(wildcard libs/*.a)
+	-@rm $(wildcard help/*.pdf)
 
 docs: $(patsubst %.1,%.pdf,$(DOCS))
 
