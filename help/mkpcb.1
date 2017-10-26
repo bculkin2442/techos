@@ -4,22 +4,32 @@ mkpcb \- create PCB
 .SH SYNOPSIS
 .B mkpcb
 [
-.I \-h
+.I \-cnh
 ]
 [
-.I \-\-help
+.I "-c|--class \f(BI(app|application)|(system|sys)\fP"
 ]
-.I "<process-name> <priority>"
+[
+.I "\-\-help"
+]
+[
+.I "-n|--name \f(BI<proc-name>\fP"
+]
+.I "<image-name> <priority>"
 .SH "DESCRIPTION"
-Executes commands read from a script line by line
+Create a process that can be executed.
 .SH OPTIONS
 .TP
 .B "\-h, \-\-help"
 Show a short usage message.
 .TP
-.B "--class"
-Set the process type. Valid ones are 'app'/'application' and 'system'
+.B "\-c, \-\-class"
+Set the process type. Valid ones are 'app'/'application' and 'sys/system'
+.TP
+.B "\-n, \-\-name"
+Set the process name.
 .SH NOTES
-Process type is set to application by default
+Process type is set to application by default, are given the same name as their
+image.
 .SH AUTHOR
 Lucas Darnell, Benjamin Culkin, and Jared Miller
