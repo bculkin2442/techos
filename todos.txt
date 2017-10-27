@@ -28,3 +28,6 @@
 @TODO - 10/25/17 Ben Culkin :Dispatching
 	Improve the dispatch command to work in a threaded fashion instead of
 	blocking the commands while processes are dispatched.
+
+@TODO - 10/27/17 Ben Culkin :CommandGrouping
+	Group commands in the help into the categories

@@ -13,16 +13,27 @@
 #include "dispatchcmds.h"
 
 /* Do the actual work of dispatching processes. */
-static int dodispatch(struct osstate *ostate) {
+static int dodispatch(struct osstate *ostate, int verbosity) {
+	/* Original number of dispatchables. */
+	int ondisp;
+
 	/* Counter variables. */
-	int ndisp, niter, ninter;
+	int ndisp, niter, ninter, cndisp;
 
 	/* Initialize counters. */
 	ndisp = 0;
 	niter = 0;
 	ninter = 0;
 
-	while(candispatch(ostate->pPCBstat) > 0) {
+	ondisp = candispatch(ostate->pPCBstat);
+	cndisp = candispatch(ostate->pPCBstat);
+
+	while(cndisp > 0) {
+		if(verbosity > 1) {
+			fprintf("%d dispatchables remaining at iteration %d (%d originally)\n",
+					cndisp, niter, ondisp);
+		}
+
 		/* Increment iteration counter. */
 		niter += 1;
 
@@ -60,7 +71,9 @@ static int dodispatch(struct osstate *ostate) {
 		/* The process is now running. */
 		pPCB->status = PCB_RUNNING;
 
-		fprintf(ostate->output, "Executing process '%s' (id no. %d), starting at offset %d\n", pszName, pPCB->id, pPCB->offset);
+		if(verbosity > 0) {
+			fprintf(ostate->output, "Executing process '%s' (id no. %d), starting at offset %d\n", pszName, pPCB->id, pPCB->offset);
+		}
 
 		/* Dispatch the process. */
 		pPCB->offset = executeimage(pfImage, pPCB->offset);
@@ -80,7 +93,9 @@ static int dodispatch(struct osstate *ostate) {
 			enum pcberror ret;
 
 			/* The process stopped. */
-			fprintf(ostate->output, "Process '%s' (id no. %d) blocked at offset %d\n", pszName, pPCB->id, pPCB->offset - 1);
+			if(verbosity > 0) {
+				fprintf(ostate->output, "Process '%s' (id no. %d) blocked at offset %d\n", pszName, pPCB->id, pPCB->offset - 1);
+			}
 
 			pPCB->status = PCB_BLOCKED;
 
@@ -93,15 +108,19 @@ static int dodispatch(struct osstate *ostate) {
 				break;
 			case PCBINVSUSP:
 				fprintf(ostate->output, "WARNING: Process '%s' (id no. %d) was dropped on the floor because of an invalid suspension status (%d)\n", pszName, pPCB->id, pPCB->susp);
+				killpcb(pPCB);
 				break;
 			case PCBINVSTAT:
 				fprintf(ostate->output, "WARNING: Process '%s' (id no. %d) was dropped on the floor because of an invalid run status (%d)\n", pszName, pPCB->id, pPCB->status);
+				killpcb(pPCB);
 				break;
 			case PCBRUNNING:
 				fprintf(ostate->output, "WARNING: Process '%s' (id no. %d) was dropped on the floor because it was improperly marked as running\n", pszName, pPCB->id);
+				killpcb(pPCB);
 				break;
 			case PCBINQUEUE:
 				fprintf(ostate->output, "WARNING: Process '%s' (id no. %d) was dropped on the floor because it was improperly inserted into a queue\n", pszName, pPCB->id);
+				killpcb(pPCB);
 				break;
 			default:
 				/* Shouldn't happen. */
@@ -111,17 +130,26 @@ static int dodispatch(struct osstate *ostate) {
 
 		/* Close the file. */
 		fclose(pfImage);
+
+		cndisp = candispatch(ostate->pPCBstat);
 	}
 
-	fprintf(ostate->output, "Dispatched %d processes in %d iterations with %d interrupts\n", ndisp, niter, ninter);
+	if(verbosity > 0) {
+		fprintf(ostate->output, "Dispatched %d processes in %d iterations with %d interrupts\n", ndisp, niter, ninter);
+	}
 
 	return 0;
 }
 
 /* Handle dispatching PCBs. */
 HANDLECOM(dispatch) {
+	/* The amount of text to print. */
+	int verbosity;
+
 	/* The number of dispatchable PCBs available. */
 	int ndisp;
+
+	verbosity = 0;
 
 	ndisp = candispatch(ostate->pPCBstat);
 
@@ -130,7 +158,9 @@ HANDLECOM(dispatch) {
 		return 0;
 	}
 
-	fprintf(ostate->output, "Dispatching %d processes\n", ndisp);
+	if(verbosity > 0) {
+		fprintf(ostate->output, "Dispatching %d processes\n", ndisp);
+	}
 
 	return dodispatch(ostate);
 }
