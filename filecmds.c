@@ -81,6 +81,56 @@ HANDLECOM(mkdir) {
 
 	dname = argv[optind];
 
+	/*make sure enough arguments are provided*/
+	if(argc <= (optind + 1)) {
+                fprintf(ostate->output, "\tERROR: Must provide the directory name as an argument\n");
+                return 1;
+        }
+
+        struct stat st;
+
+        /* check the status */
+        if(mkdirat(ostate->fWorkingDir, dname, 0777) != 0)
+	{
+
+		switch(errno)
+		{
+			case EACCES:
+			fprintf(ostate->output, "\tERROR: Cannot write to given path\n");
+			break;
+			case EEXIST:
+			fprintf(ostate->output, "\tERROR: Pathname already exists\n");
+			break;
+			case EDQUOT:
+			case EFAULT:
+			case ELOOP:
+			case EMLINK:
+			fprintf(ostate->output, "\tERROR: Unknown error\n");
+			break;
+			case ENAMETOOLONG:
+			fprintf(ostate->output, "\tERROR: Pathname too long\n");
+			break;
+			case ENOENT:
+			fprintf(ostate->output, "\tERROR: A directory component in pathname does not exist\n");
+			break;
+			case ENOMEM:
+			fprintf(ostate->output, "\tERROR: Insufficient kernel memory\n");
+			break;
+			case ENOSPC:
+			fprintf(ostate->output, "\tERROR: No room for new directory\n");
+			break;
+			case ENOTDIR:
+			fprintf(ostate->output, "\tERROR: A  component used as a directory in pathname is not, in fact, a directory\n");
+			break;
+			case EPERM:
+			fprintf(ostate->output, "\tERROR: Filesystem does not support creating directories\n");
+			break;
+			default:
+			break;
+		}
+	}
+
+
 	return 1;
 }
 
@@ -135,7 +185,7 @@ HANDLECOM(rmdir) {
 		}
 	}
 
-	if(argc >= (optind + 1)) {
+	if(argc <= (optind + 1)) {
 		fprintf(ostate->output, "\tERROR: Must provide the directory to remove as an argument\n");
 		return 1;
 	}
