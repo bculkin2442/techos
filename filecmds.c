@@ -9,7 +9,14 @@
 #include "command.h"
 #include "filecmds.h"
 
-HANDLECOM(script) {
+
+HANDLECOM(ls) {
+        return 1;
+}
+HANDLECOM(cd) {
+        return 1;
+}
+HANDLECOM(mkdir) {
 	/* Reinit getopt. */
 	optind = 1;
 
@@ -66,42 +73,14 @@ HANDLECOM(script) {
 	}
 
 	/* The name of the file. */
-	char *fname;
-	/* The file descriptor of the file. */
-	FILE *script;
+	char *dname;
 
-	fname = argv[optind];
-	
-	script = fopen(fname, "r");
-	if(script == NULL) {
-		/* Some error with opening the file. */
-		char *errmsg = strerror(errno);
+	dname = argv[optind];
 
-		fprintf(ostate->output, "\tERROR: Couldn't open file '%s' because '%s'\n", fname, errmsg);
-	} else {
-		/* Enclose I/O variables in their own scope. */
-		/* Variables for line input. */
-		size_t  lread = 0;
-		size_t  lsize = 0;
-		char   *line  = NULL;
-		/* Loop until we don't read anything. */
-		while((lread = getline(&line, &lsize, script)) > 0) {
-			/* Exit the command loop if we've read EOF. */
-			if(feof(script) != 0) break;
-			/* Handle the line, and exit if a command failed */
-			if(handleline(ostate, line) < 0) break;
-		}
-		/* Cleanup ourselves. */
-		if(line != NULL) free(line);
-	}
 
-	return 1;
-}
 
-HANDLECOM(cd) {
-	return 1;
-}
-HANDLECOM(mkdir) {
+
+
 	return 1;
 }
 HANDLECOM(rmdir) {
