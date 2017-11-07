@@ -62,6 +62,9 @@ struct osstate *makeosstate() {
 
 /* Free/destroy OS state. */
 void killosstate(struct osstate *ostate) {
+	/* Close working directory. */
+	close(ostate->fWorkingDir);
+
 	/* Free command state. */
 	killcommandstate(ostate->pComstate);
 

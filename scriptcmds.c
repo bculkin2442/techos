@@ -24,12 +24,12 @@ HANDLECOM(script) {
 		int opt, optidx;
 
 		/* Our usage message. */
-		char *usage = "Usage script [-h] [--help] <file-name>";
+		char *usage = "Usage: script [-h] [--help] <file-name>";
 
 		/* The long options we take. */
 		static struct option opts[] = {
 			/* Misc. options. */
-			{"help", no_argument, 0, 0},
+			{"help", no_argument, 0, 'h'},
 			
 			/* Terminating option. */
 			{0, 0, 0, 0}
@@ -43,11 +43,11 @@ HANDLECOM(script) {
 		/* Handle options. */
 		switch(opt) {
 		case 0:
-			/* We picked a long option. */
+			/* 
+			 * We picked a long option, but they are handled by
+			 * their short options.
+			 */
 			switch(optidx) {
-			case SO_HELP:
-				fprintf(ostate->output, "%s\n", usage);
-				return 1;
 			default:
 				fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
 				fprintf(ostate->output, "%s\n", usage);

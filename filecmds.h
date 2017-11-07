@@ -4,7 +4,8 @@
 #include "osstate.h"
 #include "command.h"
 
-/* Header for pcb related commands. */
+/* Header for file related commands. */
+
 DECLCOM(ls);
 DECLCOM(cd);
 DECLCOM(mkdir);
