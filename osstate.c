@@ -1,7 +1,11 @@
 #include <assert.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include "osstate.h"
 
@@ -49,6 +53,9 @@ struct osstate *makeosstate() {
 
 	/* Setup command state. */
 	ostate->pComstate = makecommandstate();
+
+	/* Setup working directory. */
+	ostate->fWorkingDir = open(".", O_PATH);
 
 	return ostate;
 }

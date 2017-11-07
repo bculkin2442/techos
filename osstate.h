@@ -65,6 +65,9 @@ struct osstate {
 	
 	/* Command state. */
 	struct commandstate *pComstate;
+
+	/* Base working directory for the OS. */
+	int fWorkingDir;
 };
 
 /* Create/delete an osstate. */

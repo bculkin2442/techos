@@ -22,12 +22,15 @@
 @TODO - 10/7/17 Ben Culkin :OptHandling
 	Improve option handling. Each command should take each argument as
 	either long or short options, and long options should be using the
-	fourth argument to prevent having to duplicate code between long/short
-	options.
+	fourth value in 'struct option' to prevent having to duplicate code
+	between long/short options.
 
 @TODO - 10/25/17 Ben Culkin :Dispatching
 	Improve the dispatch command to work in a threaded fashion instead of
 	blocking the commands while processes are dispatched.
+
+	ADDENDA:
+		Do this later
 
 @TODO - 10/27/17 Ben Culkin :CommandGrouping
 	Group commands in the help into the categories
