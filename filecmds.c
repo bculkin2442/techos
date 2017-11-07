@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #include <assert.h>
 #include <dirent.h>
 #include <errno.h>
@@ -11,6 +12,77 @@
 #include "command.h"
 
 #include "filecmds.h"
+
+HANDLECOM(ls) {
+        return 1;
+}
+
+HANDLECOM(cd) {
+        return 1;
+}
+
+HANDLECOM(mkdir) {
+	/* Reinit getopt. */
+	optind = 1;
+
+	while(1) {
+		/* Enum declaration for long options. */
+		enum scriptopt {
+			/* Help option. */
+			SO_HELP = 0,
+		};
+
+		/* The current option, and the current long option. */
+		int opt, optidx;
+
+		/* Our usage message. */
+		char *usage = "Usage script [-h] [--help] <file-name>";
+
+		static struct option opts[] = {
+			/* Misc. options. */
+			{"help", no_argument, 0, 'h'},
+
+			/* Terminating option. */
+			{0, 0, 0, 0}
+		}
+
+		/* Get an option. */
+		opt = getopt_long(argc, argv, "h", opts, &optidx);
+		/* Break if we've processed everything. */
+		if(opt == -1) break;
+
+		/* Handle options. */
+		switch(opt) {
+		case 0:
+			/* 
+			 * We picked a long option, but they are handled by
+			 * their short options.
+			 */
+			switch(optidx) {
+			default:
+				fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
+				fprintf(ostate->output, "%s\n", usage);
+				return 1;
+			}
+			break;
+		case 'h':
+			fprintf(ostate->output, "%s\n", usage);
+			return 1;
+		default:
+			fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
+			fprintf(ostate->output, "%s\n", usage);
+			return 1;
+
+		}
+	}
+
+	/* The name of the file. */
+	char *dname;
+
+	dname = argv[optind];
+
+	return 1;
+}
 
 /* Handle removing a directory. */
 HANDLECOM(rmdir) {
@@ -144,4 +216,19 @@ HANDLECOM(rmdir) {
 			return 1;
 		}
 	}
+
+	fprintf(ostate->output, "Successfully removed directory '%s'\n", pszDirname);
+	return 0;
+}
+
+HANDLECOM(rmdir) {
+	return 1;
+}
+
+HANDLECOM(touch) {
+        return 1;
+}
+
+HANDLECOM(rm) {
+        return 1;
 }

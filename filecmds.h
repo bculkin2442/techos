@@ -5,7 +5,6 @@
 #include "command.h"
 
 /* Header for file related commands. */
-
 DECLCOM(ls);
 DECLCOM(cd);
 DECLCOM(mkdir);
