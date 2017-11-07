@@ -1,3 +1,5 @@
+#define _POSIX_C_SOURCE 200810
+
 #include <assert.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -55,7 +57,7 @@ struct osstate *makeosstate() {
 	ostate->pComstate = makecommandstate();
 
 	/* Setup working directory. */
-	ostate->fWorkingDir = open(".", O_PATH);
+	ostate->fWorkingDir = open(".", 0);
 
 	return ostate;
 }

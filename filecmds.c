@@ -1,4 +1,5 @@
-<<<<<<< HEAD
+#define _ATFILE_SOURCE
+
 #include <assert.h>
 #include <dirent.h>
 #include <errno.h>
@@ -7,6 +8,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include "osstate.h"
 #include "command.h"
@@ -44,7 +49,7 @@ HANDLECOM(mkdir) {
 
 			/* Terminating option. */
 			{0, 0, 0, 0}
-		}
+		};
 
 		/* Get an option. */
 		opt = getopt_long(argc, argv, "h", opts, &optidx);
@@ -87,7 +92,7 @@ HANDLECOM(mkdir) {
 /* Handle removing a directory. */
 HANDLECOM(rmdir) {
 	/* Handle options. */
-	{
+	while (1) {
 		/* Reinit getopt. */
 		optind = 1;
 
@@ -103,7 +108,7 @@ HANDLECOM(rmdir) {
 
 			/* Terminating option. */
 			{0, 0, 0, 0}
-		}
+		};
 
 		/* Get an option. */
 		opt = getopt_long(argc, argv, "h", opts, &optidx);
@@ -120,22 +125,22 @@ HANDLECOM(rmdir) {
 			switch(optidx) {
 			default:
 				fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
-				fprintf(ostate->output, "%s\n", usage);
+				fprintf(ostate->output, "%s\n", pszUsage);
 				return 1;
 			}
 			break;
 		case 'h':
-			fprintf(ostate->output, "%s\n", usage);
+			fprintf(ostate->output, "%s\n", pszUsage);
 			return 1;
 		default:
 			fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
-			fprintf(ostate->output, "%s\n", usage);
+			fprintf(ostate->output, "%s\n", pszUsage);
 			return 1;
 
 		}
 	}
 
-	if(argc >= (optind + 1)) {
+	if(argc <= (optind + 1)) {
 		fprintf(ostate->output, "\tERROR: Must provide the directory to remove as an argument\n");
 		return 1;
 	}
@@ -151,13 +156,13 @@ HANDLECOM(rmdir) {
 		struct stat buf;
 
 		/* Stat the thing. */
-		if(fstatat(ostate->fWorkingDir, pszDirname, &buf) != 0) {
+		if(fstatat(ostate->fWorkingDir, pszDirname, &buf, 0) != 0) {
 			fprintf(ostate->output, "\tERROR: Could not access '%s'\n", pszDirname);
 			return 1;
 		}
 
 		/* Check that it is a directory. */
-		if(!S_ISDIR(buf)) {
+		if(!S_ISDIR(buf.st_mode)) {
 			fprintf(ostate->output, "\tERROR: '%s' is not a directory\n", pszDirname);
 			return 1;
 		}
@@ -176,13 +181,13 @@ HANDLECOM(rmdir) {
 			/* Init count. */
 			count = 0;
 
-			fDir = openat(ostate->fWorkingDir, pszDirname);
+			fDir = openat(ostate->fWorkingDir, pszDirname, 0);
 			if(fDir == -1) {
 				fprintf(ostate->output, "\tERROR: Could not check if '%s' was empty\n", pszDirname);
 				return 1;
 			}
 
-			sDir = fdopendir(fDir);
+			sDir = (DIR *)fdopendir(fDir);
 			if(sDir == NULL) {
 				fprintf(ostate->output, "\tERROR: Could not check if '%s' was empty\n", pszDirname);
 				return 1;
@@ -194,7 +199,7 @@ HANDLECOM(rmdir) {
 			}
 
 			if(count > 2) {
-				fprintf(ostate->output, "\tERROR: Directory '%d' is not empty\n", pszDirname);
+				fprintf(ostate->output, "\tERROR: Directory '%s' is not empty\n", pszDirname);
 
 				closedir(sDir);
 				/* fDir is closed by the closedir. */
@@ -219,10 +224,6 @@ HANDLECOM(rmdir) {
 
 	fprintf(ostate->output, "Successfully removed directory '%s'\n", pszDirname);
 	return 0;
-}
-
-HANDLECOM(rmdir) {
-	return 1;
 }
 
 HANDLECOM(touch) {
