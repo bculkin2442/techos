@@ -86,7 +86,7 @@ HANDLECOM(mkdir) {
 
 /* Handle removing a directory. */
 HANDLECOM(rmdir) {
-	/* Handle options. */
+	/* Handle options. *////////////////////////////////////////////////////////////////////////////////////////////////
 	{
 		/* Reinit getopt. */
 		optind = 1;
@@ -139,7 +139,8 @@ HANDLECOM(rmdir) {
 		fprintf(ostate->output, "\tERROR: Must provide the directory to remove as an argument\n");
 		return 1;
 	}
-
+	/*END HANDLE OPTIONS*////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	/* The specified directory. */
 	char *pszDirname;
 	
@@ -221,11 +222,67 @@ HANDLECOM(rmdir) {
 	return 0;
 }
 
-HANDLECOM(rmdir) {
-	return 1;
-}
-
 HANDLECOM(touch) {
+	/* Handle options. *////////////////////////////////////////////////////////////////////////////////////////////////
+	{
+		/* Reinit getopt. */
+		optind = 1;
+
+		/* The current option & long option. */
+		int opt, optidx;
+
+		/* Our usage message. */
+		char *pszUsage = "Usage: rmdir [-h] [--help] <directory-name>";
+
+		static struct option opts[] = {
+			/* Misc. options. */
+			{"help", no_argument, 0, 'h'},
+
+			/* Terminating option. */
+			{0, 0, 0, 0}
+		}
+
+		/* Get an option. */
+		opt = getopt_long(argc, argv, "h", opts, &optidx);
+		/* Break if we've processed everything. */
+		if(opt == -1) break;
+
+		/* Handle options. */
+		switch(opt) {
+		case 0:
+			/* 
+			 * We picked a long option, but they are handled by
+			 * their short options.
+			 */
+			switch(optidx) {
+			default:
+				fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
+				fprintf(ostate->output, "%s\n", usage);
+				return 1;
+			}
+			break;
+		case 'h':
+			fprintf(ostate->output, "%s\n", usage);
+			return 1;
+		default:
+			fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
+			fprintf(ostate->output, "%s\n", usage);
+			return 1;
+
+		}
+	}
+
+	if(argc >= (optind + 1)) {
+		fprintf(ostate->output, "\tERROR: Must provide the directory to remove as an argument\n");
+		return 1;
+	}
+	/*END HANDLE OPTIONS*////////////////////////////////////////////////////////////////////////////////////////////////
+	//get the path
+	char *path;
+	path = argv[optind];
+	
+	openat(ostate->fWorkingDir, path, O_CREAT);
+	
         return 1;
 }
 
