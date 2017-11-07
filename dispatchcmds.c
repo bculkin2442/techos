@@ -30,7 +30,7 @@ static int dodispatch(struct osstate *ostate, int verbosity) {
 
 	while(cndisp > 0) {
 		if(verbosity > 1) {
-			fprintf("%d dispatchables remaining at iteration %d (%d originally)\n",
+			fprintf(ostate->output, "%d dispatchables remaining at iteration %d (%d originally)\n",
 					cndisp, niter, ondisp);
 		}
 
@@ -162,5 +162,5 @@ HANDLECOM(dispatch) {
 		fprintf(ostate->output, "Dispatching %d processes\n", ndisp);
 	}
 
-	return dodispatch(ostate);
+	return dodispatch(ostate, verbosity);
 }
