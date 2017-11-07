@@ -232,7 +232,7 @@ HANDLECOM(touch) {
 		int opt, optidx;
 
 		/* Our usage message. */
-		char *pszUsage = "Usage: rmdir [-h] [--help] <directory-name>";
+		char *pszUsage = "Usage: touch [-h] [--help] <directory-name>";
 
 		static struct option opts[] = {
 			/* Misc. options. */
@@ -281,7 +281,58 @@ HANDLECOM(touch) {
 	char *path;
 	path = argv[optind];
 	
-	openat(ostate->fWorkingDir, path, O_CREAT);
+	if(openat(ostate->fWorkingDir, path, O_CREAT) != 0)
+	{
+		switch(errno)
+		{
+			case EACCES:
+				printf("The requested access to the file is not allowed, or search permission is denied for one of the directories in the path prefix of pathname, or the file did not exist yet and write access to the parent directory is not allowed.");
+			case EDQUOT:
+				printf("Where O_CREAT is specified, the file does not exist, and the user's quota of disk blocks or inodes on the file system has been exhausted.");
+			case EEXIST:
+				printf("pathname already exists and O_CREAT and O_EXCL were used.");
+			case EFAULT:
+				printf("pathname points outside your accessible address space.");
+			case EFBIG:
+				printf("See EOVERFLOW.");
+			case EINTR:
+				printf("While blocked waiting to complete an open of a slow device");
+			case EISDIR:
+				printf("pathname refers to a directory and the access requested involved writing");
+			case ELOOP:
+				printf("Too many symbolic links were encountered in resolving pathname, or O_NOFOLLOW was specified but pathname was a symbolic link.");
+			case EMFILE:
+				printf("The process already has the maximum number of files open.");
+			case ENAMETOOLONG:
+				printf("pathname was too long.");
+			case ENFILE:
+				printf("The system limit on the total number of open files has been reached.");
+			case ENODEV:
+				printf("pathname refers to a device special file and no corresponding device exists.");
+			case ENOENT:
+				printf("O_CREAT is not set and the named file does not exist. Or, a directory component in pathname does not exist or is a dangling symbolic link.");
+			case ENONEM:
+				printf("Insufficient kernel memory was available.");
+			case ENOSPC:
+				printf("pathname was to be created but the device containing pathname has no room for the new file.");
+			case ENOTDIR:
+				printf("A component used as a directory in pathname is not, in fact, a directory, or O_DIRECTORY was specified and pathname was not a directory.");
+			case ENXIO:
+				printf("O_NONBLOCK | O_WRONLY is set, the named file is a FIFO and no process has the file open for reading. Or, the file is a device special file and no corresponding device exists.");
+			case EOVERFLOW:
+				printf("pathname refers to a regular file that is too large to be opened. The usual scenario here is that an application compiled on a 32-bit platform without -D_FILE_OFFSET_BITS=64 tried to open a file whose size exceeds (2<<31)-1 bits; see also O_LARGEFILE above. This is the error specified by POSIX.1-2001; in kernels before 2.6.24, Linux gave the error EFBIG for this case.");
+			case EPERM:
+				printf("The O_NOATIME flag was specified, but the effective user ID of the caller did not match the owner of the file and the caller was not privileged (CAP_FOWNER).");
+			case EROFS:
+				printf("pathname refers to a file on a read-only file system and write access was requested.");
+			case ETXTBSY:
+				printf("pathname refers to an executable image which is currently being executed and write access was requested.");
+			case EWOULDBLOCK:
+				printf("The O_NONBLOCK flag was specified, and an incompatible lease was held on the file");
+			
+		}
+		
+	}
 	
         return 1;
 }
