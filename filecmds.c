@@ -1,7 +1,5 @@
 #define _ATFILE_SOURCE
 
-=======
->>>>>>> Stashed changes
 #include <assert.h>
 #include <dirent.h>
 #include <errno.h>
@@ -112,7 +110,11 @@ HANDLECOM(mkdir) {
 				fprintf(ostate->output, "\tERROR: No diskspace remaining\n");
 				break;
 			default:
-				fprintf(ostate->output, "\tERROR: Unknown error creating directory '%s'\n", pszDirname);
+				{
+					char *pszError = strerror(errno);
+					fprintf(ostate->output, "\tERROR: Unknown error creating directory '%s'\n", pszDirname);
+					fprintf(ostate->output, "\tCause: %s\n", pszError);
+				}
 				break;
 			}
 
@@ -256,7 +258,11 @@ HANDLECOM(rmdir) {
 			fprintf(ostate->output, "\tERROR: Filesystem is read-only. Can't delete directory '%s'\n", pszDirname);
 			break;
 		default:
-			fprintf(ostate->output, "\tERROR: Unknown error removing directory '%s'\n", pszDirname);
+			{
+				char *pszError = strerror(errno);
+				fprintf(ostate->output, "\tERROR: Unknown error removing directory '%s'\n", pszDirname);
+				fprintf(ostate->output, "\tCause: %s\n", pszError);
+			}
 			break;
 		}
 
@@ -359,7 +365,11 @@ HANDLECOM(touch) {
 				fprintf(ostate->output, "\tERROR: File '%s' already exists\n", pszFilename);
 				break;	
 			default:
-				fprintf(ostate->output, "\tERROR: Unknown error creating file '%s'\n", pszFilename);
+				{
+					char *pszError = strerror(errno);
+					fprintf(ostate->output, "\tERROR: Unknown error creating file '%s'\n", pszFilename);
+					fprintf(ostate->output, "\tCause: %s\n", pszError);
+				}
 				break;
 			}
 
@@ -476,7 +486,11 @@ HANDLECOM(rm) {
 				fprintf(ostate->output, "\tERROR: Filesystem is read-only, can't delete file '%s'\n", pszFilename);
 				break;
 			default:
-				fprintf(ostate->output, "\tERROR: Unknown error attempting to delete file '%s'\n", pszFilename);
+				{
+					char *pszError = strerror(errno);
+					fprintf(ostate->output, "\tERROR: Unknown error attempting to delete file '%s'\n", pszFilename);
+					fprintf(ostate->output, "\tCause: %s\n", pszError);
+				}
 				break;
 			}
 
