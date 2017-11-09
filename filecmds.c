@@ -152,7 +152,7 @@ HANDLECOM(cd) {
 		int opt, optidx;
 
 		/* Our usage message. */
-		char *usage = "Usage script [-h] [--help] <file-name>";
+		char *usage = "Usage cd [-h] [--help] <directory-name>";
 
 		static struct option opts[] = {
 			/* Misc. options. */
@@ -253,7 +253,7 @@ HANDLECOM(mkdir) {
 		int opt, optidx;
 
 		/* Our usage message. */
-		char *usage = "Usage script [-h] [--help] <file-name>";
+		char *usage = "Usage mkdir [-h] [--help] <directory-name>";
 
 		static struct option opts[] = {
 			/* Misc. options. */
