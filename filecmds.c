@@ -103,13 +103,13 @@ HANDLECOM(ls) {
 
 	fDir = openat(ostate->fWorkingDir, pszDirname, 0);
 	if(fDir == -1) {
-			fprintf(ostate->output, "\tERROR: Could not check if '%s' was empty\n", pszDirname);
+			fprintf(ostate->output, "\tERROR: Could not open '%s'\n", pszDirname);
 			return 1;
 	}
 
 	sDir = (DIR *)fdopendir(fDir);
 	if(sDir == NULL) {
-			fprintf(ostate->output, "\tERROR: Could not check if '%s' was empty\n", pszDirname);
+			fprintf(ostate->output, "\tERROR: Could not open if '%s' \n", pszDirname);
 			return 1;
 	}
 
