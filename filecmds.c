@@ -116,7 +116,8 @@ HANDLECOM(ls) {
 	pdEnt = readdir(sDir);
 	char *fName = pdEnt->d_name;
 	while(pdEnt != NULL){
-		printf("%s",&(fName));
+		printf("%s", fName);
+
 		if(showSize) {
 			/* Scratch struct. */
 			struct stat buf;
@@ -125,6 +126,7 @@ HANDLECOM(ls) {
 				fprintf(ostate->output, "\tERROR: Could not check if file '%s' exists\n", fName);
 				return 1;
 			}
+
 			printf("%s\t\t%d", pdEnt->d_name, buf.st_size);
 		}
 
