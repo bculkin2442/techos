@@ -57,7 +57,11 @@ struct osstate *makeosstate() {
 	ostate->pComstate = makecommandstate();
 
 	/* Setup working directory. */
-	ostate->fWorkingDir = open("tree", 0);
+	ostate->fWorkingDir = open("tree", O_RDONLY);
+	if(ostate->fWorkingDir == -1) {
+		fprintf(ostate->output, "FATAL ERROR: Could not set working directory\n");
+		exit(1);
+	}
 
 	return ostate;
 }
