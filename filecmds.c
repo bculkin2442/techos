@@ -131,10 +131,10 @@ HANDLECOM(mkdir) {
 
 /* Handle removing a directory. */
 HANDLECOM(rmdir) {
-	/* Handle options. */
-	while (1) {
 		/* Reinit getopt. */
 		optind = 1;
+	/* Handle options. */
+	while (1) {
 
 		/* The current option & long option. */
 		int opt, optidx;
@@ -282,10 +282,10 @@ HANDLECOM(rmdir) {
 }
 
 HANDLECOM(touch) {
+	/* Reinit getopt. */
+	optind = 1;
 	/* Handle options. */
 	while (1) {
-		/* Reinit getopt. */
-		optind = 1;
 
 		/* The current option & long option. */
 		int opt, optidx;
@@ -393,10 +393,10 @@ HANDLECOM(touch) {
 }
 
 HANDLECOM(rm) {
+	/* Reinit getopt. */
+	optind = 1;
 	/* Handle options. */
 	while (1) {
-		/* Reinit getopt. */
-		optind = 1;
 
 		/* The current option & long option. */
 		int opt, optidx;
@@ -473,6 +473,8 @@ HANDLECOM(rm) {
 			char *pszLine;
 
 			size_t llen, lread;
+
+			fprintf(ostate->output, "Are you sure you want to delete this file? (y/n) ");
 
 			llen = getline(&pszLine, &llen, ostate->strem);
 
