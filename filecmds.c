@@ -469,18 +469,26 @@ HANDLECOM(rm) {
 			}
 		}
 
-		switch(rpmatch("Are you sure you want to delete the file? ")) {
-		case 0:
-			/* Don't delete the file. */
-			return 0;
-		case 1:
-			/* Delete the file. */
-			break;
-		case -1:
-		default:
-			/* Incorrect response. */
-			fprintf(ostate->output, "\tERROR: Unrecognized response\n");
-			return 1;
+		{
+			char *pszLine;
+
+			size_t llen, lread;
+
+			llen = getline(&pszLine, &llen, ostate->strem);
+
+			switch(rpmatch(pszLine)) {
+			case 0:
+				/* Don't delete the file. */
+				return 0;
+			case 1:
+				/* Delete the file. */
+				break;
+			case -1:
+			default:
+				/* Incorrect response. */
+				fprintf(ostate->output, "\tERROR: Unrecognized response\n");
+				return 1;
+			}
 		}
 
 		if(unlinkat(ostate->fWorkingDir, pszFilename, 0) == -1) {
