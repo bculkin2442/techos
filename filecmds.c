@@ -1,7 +1,5 @@
 #define _ATFILE_SOURCE
 
-=======
->>>>>>> Stashed changes
 #include <assert.h>
 #include <dirent.h>
 #include <errno.h>
@@ -84,7 +82,7 @@ HANDLECOM(mkdir) {
 	}
 
 	/* Make sure enough arguments are provided. */
-	if(argc <= (optind + 1)) {
+	if(argc <= (optind)) {
 		fprintf(ostate->output, "\tERROR: Must provide the directory name as an argument\n");
 		return 1;
 	}
