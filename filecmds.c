@@ -228,10 +228,10 @@ HANDLECOM(mkdir) {
 
 /* Handle removing a directory. */
 HANDLECOM(rmdir) {
-	/* Handle options. */
-	while (1) {
 		/* Reinit getopt. */
 		optind = 1;
+	/* Handle options. */
+	while (1) {
 
 		/* The current option & long option. */
 		int opt, optidx;
@@ -379,10 +379,10 @@ HANDLECOM(rmdir) {
 }
 
 HANDLECOM(touch) {
+	/* Reinit getopt. */
+	optind = 1;
 	/* Handle options. */
 	while (1) {
-		/* Reinit getopt. */
-		optind = 1;
 
 		/* The current option & long option. */
 		int opt, optidx;
@@ -431,7 +431,7 @@ HANDLECOM(touch) {
 		/* The file being opened. */
 		int dFile;
 
-		if(argc <= (optind + 1)) {
+		if(argc <= (optind)) {
 			fprintf(ostate->output, "\tERROR: Must provide the file to create as an argument\n");
 			return 1;
 		}
@@ -490,10 +490,10 @@ HANDLECOM(touch) {
 }
 
 HANDLECOM(rm) {
+	/* Reinit getopt. */
+	optind = 1;
 	/* Handle options. */
 	while (1) {
-		/* Reinit getopt. */
-		optind = 1;
 
 		/* The current option & long option. */
 		int opt, optidx;
@@ -543,7 +543,7 @@ HANDLECOM(rm) {
 		/* The specified filename. */
 		char *pszFilename;
 
-		if(argc <= (optind + 1)) {
+		if(argc <= (optind)) {
 			fprintf(ostate->output, "\tERROR: Must provide the file to delete as an argument\n");
 			return 1;
 		}
@@ -570,6 +570,8 @@ HANDLECOM(rm) {
 			char *pszLine;
 
 			size_t llen, lread;
+
+			fprintf(ostate->output, "Are you sure you want to delete this file? (y/n) ");
 
 			llen = getline(&pszLine, &llen, ostate->strem);
 
