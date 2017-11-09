@@ -230,7 +230,7 @@ HANDLECOM(rmdir) {
 			}
 
 			pdEnt = readdir(sDir);
-			while(pdEnt != NULL && count <= 2) {
+			while(pdEnt != NULL) {
 				count += 1;
 			}
 
