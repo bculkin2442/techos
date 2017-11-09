@@ -120,6 +120,10 @@ HANDLECOM(mkdir) {
 
 			return 1;
 		}
+
+		fprintf(ostate->output, "Successfully created directory '%s'\n", pszDirname);
+
+
 	}
 
 	return 0;
