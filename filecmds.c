@@ -227,9 +227,202 @@ HANDLECOM(rmdir) {
 }
 
 HANDLECOM(touch) {
-        return 1;
+	/* Handle options. */
+	while (1) {
+		/* Reinit getopt. */
+		optind = 1;
+
+		/* The current option & long option. */
+		int opt, optidx;
+
+		/* Our usage message. */
+		char *pszUsage = "Usage: touch [-h] [--help] <file-name>";
+
+		static struct option opts[] = {
+			/* Misc. options. */
+			{"help", no_argument, 0, 'h'},
+
+			/* Terminating option. */
+			{0, 0, 0, 0}
+		};
+
+		/* Get an option. */
+		opt = getopt_long(argc, argv, "h", opts, &optidx);
+		/* Break if we've processed everything. */
+		if(opt == -1) break;
+
+		/* Handle options. */
+		switch(opt) {
+		case 0:
+			/* 
+			 * We picked a long option, but they are handled by
+			 * their short options.
+			 */
+			switch(optidx) {
+			default:
+				fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
+				fprintf(ostate->output, "%s\n", pszUsage);
+				return 1;
+			}
+			break;
+		case 'h':
+			fprintf(ostate->output, "%s\n", pszUsage);
+			return 1;
+		default:
+			fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
+			fprintf(ostate->output, "%s\n", pszUsage);
+			return 1;
+
+		}
+	}
+
+	{
+		/* The specified filename. */
+		char *pszFilename;
+		/* The file being opened. */
+		int dFile;
+
+
+		if(argc <= (optind + 1)) {
+			fprintf(ostate->output, "\tERROR: Must provide the file to create as an argument\n");
+			return 1;
+		}
+
+		pszFilename = argv[optind];
+
+		/* Open the file, give an error if opening fails. */
+		dFile = openat(ostate->fWorkingDir, pszFilename, O_CREAT | O_EXCL, 0777);
+		if(dFile == -1) {
+			switch(errno) {
+			case EEXIST:
+				fprintf(ostate->output, "\tERROR: File '%s' already exists\n", pszFilename);
+				break;	
+			default:
+				fprintf(ostate->output, "\tERROR: Unknown error creating file '%s'\n", pszFilename);
+				break;
+			}
+
+			return 1;
+		}
+
+		/* Don't leak the file handle. */
+		close(dFile);
+
+		fprintf(ostate->output, "Successfully created file '%s'\n", pszFilename);
+		return 0;
+	}
 }
 
 HANDLECOM(rm) {
-        return 1;
+	/* Handle options. */
+	while (1) {
+		/* Reinit getopt. */
+		optind = 1;
+
+		/* The current option & long option. */
+		int opt, optidx;
+
+		/* Our usage message. */
+		char *pszUsage = "Usage: rm [-h] [--help] <file-name>";
+
+		static struct option opts[] = {
+			/* Misc. options. */
+			{"help", no_argument, 0, 'h'},
+
+			/* Terminating option. */
+			{0, 0, 0, 0}
+		};
+
+		/* Get an option. */
+		opt = getopt_long(argc, argv, "h", opts, &optidx);
+		/* Break if we've processed everything. */
+		if(opt == -1) break;
+
+		/* Handle options. */
+		switch(opt) {
+		case 0:
+			/* 
+			 * We picked a long option, but they are handled by
+			 * their short options.
+			 */
+			switch(optidx) {
+			default:
+				fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
+				fprintf(ostate->output, "%s\n", pszUsage);
+				return 1;
+			}
+			break;
+		case 'h':
+			fprintf(ostate->output, "%s\n", pszUsage);
+			return 1;
+		default:
+			fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
+			fprintf(ostate->output, "%s\n", pszUsage);
+			return 1;
+
+		}
+	}
+
+	{
+		/* The specified filename. */
+		char *pszFilename;
+
+		if(argc <= (optind + 1)) {
+			fprintf(ostate->output, "\tERROR: Must provide the file to delete as an argument\n");
+			return 1;
+		}
+
+		pszFilename = argv[optind];
+
+		/* Ensure the file exists. */
+		{
+			/* Scratch struct. */
+			struct stat buf;
+
+			if(fstatat(ostate->fWorkingDir, pszFilename, &buf, 0) != 0) {
+				fprintf(ostate->output, "\tERROR: Could not check if file '%s' exists\n", pszFilename);
+				return 1;
+			}
+
+			if(!S_ISREG(buf.st_mode)) {
+				fprintf(ostate->output, "\tERROR: '%s' is not a regular file\n", pszFilename);
+				return 1;
+			}
+		}
+
+		switch(rpmatch("Are you sure you want to delete the file? ")) {
+		case 0:
+			/* Don't delete the file. */
+			return 0;
+		case 1:
+			/* Delete the file. */
+			break;
+		case -1:
+		default:
+			/* Incorrect response. */
+			fprintf(ostate->output, "\tERROR: Unrecognized response\n");
+			return 1;
+		}
+
+		if(unlinkat(ostate->fWorkingDir, pszFilename, 0) == -1) {
+			switch(errno) {
+			case EACCES:
+			case EFAULT:
+			case EPERM:
+				fprintf(ostate->output, "\tERROR: You do not have permission to delete '%s'\n", pszFilename);
+				break;
+			case EROFS:
+				fprintf(ostate->output, "\tERROR: Filesystem is read-only, can't delete file '%s'\n", pszFilename);
+				break;
+			default:
+				fprintf(ostate->output, "\tERROR: Unknown error attempting to delete file '%s'\n", pszFilename);
+				break;
+			}
+			
+			return 1;
+		}
+
+		fprintf(ostate->output, "Successfully deleted file '%s'\n", pszFilename);
+		return 0;
+	}
 }
