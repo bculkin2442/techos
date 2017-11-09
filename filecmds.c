@@ -135,7 +135,104 @@ HANDLECOM(ls) {
 }
 
 HANDLECOM(cd) {
-	return 1;
+	/* Reinit getopt. */
+	optind = 1;
+
+	while(1) {
+		/* Enum declaration for long options. */
+		enum scriptopt {
+			/* Help option. */
+			SO_HELP = 0,
+		};
+
+		/* The current option, and the current long option. */
+		int opt, optidx;
+
+		/* Our usage message. */
+		char *usage = "Usage script [-h] [--help] <file-name>";
+
+		static struct option opts[] = {
+			/* Misc. options. */
+			{"help", no_argument, 0, 'h'},
+
+			/* Terminating option. */
+			{0, 0, 0, 0}
+		};
+
+		/* Get an option. */
+		opt = getopt_long(argc, argv, "h", opts, &optidx);
+		/* Break if we've processed everything. */
+		if(opt == -1) break;
+
+		/* Handle options. */
+		switch(opt) {
+		case 0:
+			/* 
+			 * We picked a long option, but they are handled by
+			 * their short options.
+			 */
+			switch(optidx) {
+			default:
+				fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
+				fprintf(ostate->output, "%s\n", usage);
+				return 1;
+			}
+			break;
+		case 'h':
+			fprintf(ostate->output, "%s\n", usage);
+			return 0;
+		default:
+			fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
+			fprintf(ostate->output, "%s\n", usage);
+			return 1;
+
+		}
+	}
+
+	/* Make sure enough arguments are provided. */
+	if(argc <= (optind)) {
+		fprintf(ostate->output, "\tERROR: Must provide the directory name as an argument\n");
+		return 1;
+	}
+
+	{
+		/* The name of the file. */
+		char *pszDirname;
+		/* The old working directory. */
+		int fOld;
+
+		pszDirname = argv[optind];
+
+		/* Make sure that it is a directory. */
+		{
+			struct stat buf;
+
+			if(fstatat(ostate->fWorkingDir, pszDirname, &buf, 0) != 0) {
+				fprintf(ostate->output, "\tERROR: Couldn't check the status of '%s' (Are you sure it exists?)\n", pszDirname);
+				return 1;
+			}
+
+			if(!S_ISDIR(buf.st_mode)) {
+				fprintf(ostate->output, "\tERROR: '%s' is not a directory\n", pszDirname);
+				return 1;
+			}
+		}
+
+		fOld = ostate->fWorkingDir;
+
+		ostate->fWorkingDir = openat(fOld, pszDirname, O_RDONLY);
+		if(ostate->fWorkingDir == -1) {
+			fprintf(ostate->output, "\tERROR: Couldn't switch to directory '%s'\n", pszDirname);
+			ostate->fWorkingDir = fOld;
+
+			return 1;
+		}
+
+		fprintf(ostate->output, "Succesfully changed to directory '%s'\n", pszDirname);
+		close(fOld);
+	}
+
+	return 0;
 }
 
 HANDLECOM(mkdir) {
@@ -194,7 +291,7 @@ HANDLECOM(mkdir) {
 	}
 
 	/* Make sure enough arguments are provided. */
-	if(argc <= (optind + 1)) {
+	if(argc <= (optind)) {
 		fprintf(ostate->output, "\tERROR: Must provide the directory name as an argument\n");
 		return 1;
 	}
@@ -232,6 +329,10 @@ HANDLECOM(mkdir) {
 
 			return 1;
 		}
+
+		fprintf(ostate->output, "Successfully created directory '%s'\n", pszDirname);
+
+
 	}
 
 	return 0;
@@ -239,10 +340,10 @@ HANDLECOM(mkdir) {
 
 /* Handle removing a directory. */
 HANDLECOM(rmdir) {
-	/* Handle options. */
-	while (1) {
 		/* Reinit getopt. */
 		optind = 1;
+	/* Handle options. */
+	while (1) {
 
 		/* The current option & long option. */
 		int opt, optidx;
@@ -288,7 +389,7 @@ HANDLECOM(rmdir) {
 		}
 	}
 
-	if(argc <= (optind + 1)) {
+	if(argc <= (optind)) {
 		fprintf(ostate->output, "\tERROR: Must provide the directory to remove as an argument\n");
 		return 1;
 	}
@@ -342,19 +443,23 @@ HANDLECOM(rmdir) {
 			}
 
 			pdEnt = readdir(sDir);
-			while(pdEnt != NULL && count <= 2) {
+			while(pdEnt != NULL) {
 				count += 1;
+
+				pdEnt = readdir(sDir);
 			}
 
 			if(count > 2) {
 				fprintf(ostate->output, "\tERROR: Directory '%s' is not empty\n", pszDirname);
 
 				closedir(sDir);
+
+				return 1;
+				/* fDir is closed by the closedir. */
+			} else {
+				closedir(sDir);
 				/* fDir is closed by the closedir. */
 			}
-
-			closedir(sDir);
-			/* fDir is closed by the closedir. */
 		}
 	}
 
@@ -386,10 +491,10 @@ HANDLECOM(rmdir) {
 }
 
 HANDLECOM(touch) {
+	/* Reinit getopt. */
+	optind = 1;
 	/* Handle options. */
 	while (1) {
-		/* Reinit getopt. */
-		optind = 1;
 
 		/* The current option & long option. */
 		int opt, optidx;
@@ -438,7 +543,7 @@ HANDLECOM(touch) {
 		/* The file being opened. */
 		int dFile;
 
-		if(argc <= (optind + 1)) {
+		if(argc <= (optind)) {
 			fprintf(ostate->output, "\tERROR: Must provide the file to create as an argument\n");
 			return 1;
 		}
@@ -497,10 +602,10 @@ HANDLECOM(touch) {
 }
 
 HANDLECOM(rm) {
+	/* Reinit getopt. */
+	optind = 1;
 	/* Handle options. */
 	while (1) {
-		/* Reinit getopt. */
-		optind = 1;
 
 		/* The current option & long option. */
 		int opt, optidx;
@@ -550,7 +655,7 @@ HANDLECOM(rm) {
 		/* The specified filename. */
 		char *pszFilename;
 
-		if(argc <= (optind + 1)) {
+		if(argc <= (optind)) {
 			fprintf(ostate->output, "\tERROR: Must provide the file to delete as an argument\n");
 			return 1;
 		}
@@ -573,18 +678,28 @@ HANDLECOM(rm) {
 			}
 		}
 
-		switch(rpmatch("Are you sure you want to delete the file? ")) {
-		case 0:
-			/* Don't delete the file. */
-			return 0;
-		case 1:
-			/* Delete the file. */
-			break;
-		case -1:
-		default:
-			/* Incorrect response. */
-			fprintf(ostate->output, "\tERROR: Unrecognized response\n");
-			return 1;
+		{
+			char *pszLine;
+
+			size_t llen, lread;
+
+			fprintf(ostate->output, "Are you sure you want to delete this file? (y/n) ");
+
+			llen = getline(&pszLine, &llen, ostate->strem);
+
+			switch(rpmatch(pszLine)) {
+			case 0:
+				/* Don't delete the file. */
+				return 0;
+			case 1:
+				/* Delete the file. */
+				break;
+			case -1:
+			default:
+				/* Incorrect response. */
+				fprintf(ostate->output, "\tERROR: Unrecognized response\n");
+				return 1;
+			}
 		}
 
 		if(unlinkat(ostate->fWorkingDir, pszFilename, 0) == -1) {
