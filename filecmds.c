@@ -114,9 +114,8 @@ HANDLECOM(ls) {
 	}
 
 	pdEnt = readdir(sDir);
-	char *fName = pdEnt->d_name;
 	while(pdEnt != NULL){
-		printf("%s", fName);
+		char *fName = pdEnt->d_name;
 
 		if(showSize) {
 			/* Scratch struct. */
@@ -127,7 +126,9 @@ HANDLECOM(ls) {
 				return 1;
 			}
 
-			printf("%s\t\t%d", pdEnt->d_name, buf.st_size);
+			printf("%s\t\t%d\n", fName, buf.st_size);
+		} else {
+			fprintf(ostate->output, "%s\n", fName);
 		}
 
 		pdEnt = readdir(sDir);
