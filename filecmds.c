@@ -176,7 +176,7 @@ HANDLECOM(rmdir) {
 		}
 	}
 
-	if(argc <= (optind + 1)) {
+	if(argc <= (optind)) {
 		fprintf(ostate->output, "\tERROR: Must provide the directory to remove as an argument\n");
 		return 1;
 	}
