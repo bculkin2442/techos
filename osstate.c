@@ -57,7 +57,7 @@ struct osstate *makeosstate() {
 	ostate->pComstate = makecommandstate();
 
 	/* Setup working directory. */
-	ostate->fWorkingDir = open(".", 0);
+	ostate->fWorkingDir = open("tree", 0);
 
 	return ostate;
 }
