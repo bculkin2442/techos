@@ -22,7 +22,7 @@ HANDLECOM(ls) {
 	///HANDLE OPTIONS//////////////////////////////////////////////////
 	/* Reinit getopt. */
 	optind = 1;
-	bool showSize = 0;
+	int showSize = 0;
 	while(1) {
 		/* Enum declaration for long options. */
 		enum scriptopt {
@@ -77,17 +77,17 @@ HANDLECOM(ls) {
 		}
 	}
 	///HANDLE OPTIONS END/////////////////////////////////////////////////
-	
-	if(argc <= (optind + 1)) {
+
+	if(argc <= (optind)) {
 		fprintf(ostate->output, "\tERROR: Must provide the directory to remove as an argument\n");
 		return 1;
 	}
-	
+
 	/* The specified directory. */
 	char *pszDirname;
 
 	pszDirname = argv[optind];
-	
+
 	/* FD to directory. */
 	int fDir;
 	/* Directory stream. */
@@ -96,14 +96,14 @@ HANDLECOM(ls) {
 	struct dirent *pdEnt;
 	/* The number of directory entries read so far. */
 	int count;
-	
+
 	/* Init count. */
 	count = 0;
-	
+
 	fDir = openat(ostate->fWorkingDir, pszDirname, 0);
 	if(fDir == -1) {
 			fprintf(ostate->output, "\tERROR: Could not check if '%s' was empty\n", pszDirname);
-			return 1;			
+			return 1;
 	}
 
 	sDir = (DIR *)fdopendir(fDir);
@@ -112,7 +112,7 @@ HANDLECOM(ls) {
 			return 1;
 	}
 	pdEnt = readdir(sDir);
-	char *fName = pdEnt.d_name;
+	char *fName = pdEnt->d_name;
 	while(pdEnt != NULL){
 		printf("%s",&(fName));
 		if(showSize)
@@ -124,10 +124,10 @@ HANDLECOM(ls) {
 				fprintf(ostate->output, "\tERROR: Could not check if file '%s' exists\n", fName);
 				return 1;
 			}
-			
-			printf("%s          %d", &(*pdEnt.d_name), buf.st_size);
+
+			printf("%s          %d", &(*pdEnt->d_name), buf.st_size);
 		}
-			
+
 	}
 	pdEnt = readdir(sDir);
 	
