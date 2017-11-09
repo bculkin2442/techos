@@ -232,6 +232,8 @@ HANDLECOM(rmdir) {
 			pdEnt = readdir(sDir);
 			while(pdEnt != NULL) {
 				count += 1;
+
+				pdEnt = readdir(sDir);
 			}
 
 			if(count > 2) {
