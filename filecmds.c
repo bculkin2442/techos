@@ -19,11 +19,11 @@
 #include "filecmds.h"
 
 HANDLECOM(ls) {
-        return 1;
+	return 1;
 }
 
 HANDLECOM(cd) {
-        return 1;
+	return 1;
 }
 
 HANDLECOM(mkdir) {
@@ -72,7 +72,7 @@ HANDLECOM(mkdir) {
 			break;
 		case 'h':
 			fprintf(ostate->output, "%s\n", usage);
-			return 1;
+			return 0;
 		default:
 			fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
 			fprintf(ostate->output, "%s\n", usage);
@@ -81,12 +81,44 @@ HANDLECOM(mkdir) {
 		}
 	}
 
-	/* The name of the file. */
-	char *dname;
+	/* Make sure enough arguments are provided. */
+	if(argc <= (optind + 1)) {
+		fprintf(ostate->output, "\tERROR: Must provide the directory name as an argument\n");
+		return 1;
+	}
 
-	dname = argv[optind];
+	{
+		/* The name of the file. */
+		char *pszDirname;
 
-	return 1;
+		pszDirname = argv[optind];
+
+		/* check the status */
+		if(mkdirat(ostate->fWorkingDir, pszDirname, 0777) != 0) {
+			switch(errno) {
+			case EACCES:
+			case EPERM:
+				fprintf(ostate->output, "\tERROR: You don't have permission to do that\n");
+				break;
+			case EEXIST:
+				fprintf(ostate->output, "\tERROR: A directory or file with that name already exists\n");
+				break;
+			case ENAMETOOLONG:
+				fprintf(ostate->output, "\tERROR: '%s' is too long for a directory name\n", pszDirname);
+				break;
+			case ENOSPC:
+				fprintf(ostate->output, "\tERROR: No diskspace remaining\n");
+				break;
+			default:
+				fprintf(ostate->output, "\tERROR: Unknown error creating directory '%s'\n", pszDirname);
+				break;
+			}
+
+			return 1;
+		}
+	}
+
+	return 0;
 }
 
 /* Handle removing a directory. */
@@ -131,7 +163,7 @@ HANDLECOM(rmdir) {
 			break;
 		case 'h':
 			fprintf(ostate->output, "%s\n", pszUsage);
-			return 1;
+			return 0;
 		default:
 			fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
 			fprintf(ostate->output, "%s\n", pszUsage);
@@ -147,7 +179,7 @@ HANDLECOM(rmdir) {
 
 	/* The specified directory. */
 	char *pszDirname;
-	
+
 	pszDirname = argv[optind];
 
 	/* Verify that we're trying to delete a directory. */
@@ -213,13 +245,20 @@ HANDLECOM(rmdir) {
 	if(unlinkat(ostate->fWorkingDir, pszDirname, AT_REMOVEDIR) != 0) {
 		/* Error removing directory. */
 		switch(errno) {
-		/* @TODO 11/07/17 Ben Culkin :RmdirErrors
-		 * 	Give some more specific errors.
-		 */
+		case EACCES:
+		case EPERM:
+		case EFAULT:
+			fprintf(ostate->output, "\tERROR: You don't have permission to delete '%s'\n", pszDirname);
+			break;
+		case EROFS:
+			fprintf(ostate->output, "\tERROR: Filesystem is read-only. Can't delete directory '%s'\n", pszDirname);
+			break;
 		default:
-			fprintf(ostate->output, "\tERROR: Unknown error %d removing directory '%s'\n", errno, pszDirname);
-			return 1;
+			fprintf(ostate->output, "\tERROR: Unknown error removing directory '%s'\n", pszDirname);
+			break;
 		}
+
+		return 1;
 	}
 
 	fprintf(ostate->output, "Successfully removed directory '%s'\n", pszDirname);
@@ -235,9 +274,7 @@ HANDLECOM(touch) {
 		/* The current option & long option. */
 		int opt, optidx;
 
-		/* Our usage message. */
 		char *pszUsage = "Usage: touch [-h] [--help] <file-name>";
-
 		static struct option opts[] = {
 			/* Misc. options. */
 			{"help", no_argument, 0, 'h'},
@@ -267,12 +304,11 @@ HANDLECOM(touch) {
 			break;
 		case 'h':
 			fprintf(ostate->output, "%s\n", pszUsage);
-			return 1;
+			return 0;
 		default:
 			fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
 			fprintf(ostate->output, "%s\n", pszUsage);
 			return 1;
-
 		}
 	}
 
@@ -282,7 +318,6 @@ HANDLECOM(touch) {
 		/* The file being opened. */
 		int dFile;
 
-
 		if(argc <= (optind + 1)) {
 			fprintf(ostate->output, "\tERROR: Must provide the file to create as an argument\n");
 			return 1;
@@ -291,9 +326,33 @@ HANDLECOM(touch) {
 		pszFilename = argv[optind];
 
 		/* Open the file, give an error if opening fails. */
-		dFile = openat(ostate->fWorkingDir, pszFilename, O_CREAT | O_EXCL, 0777);
+		dFile = openat(ostate->fWorkingDir, pszFilename, O_RDONLY | O_CREAT | O_EXCL, 0777);
 		if(dFile == -1) {
 			switch(errno) {
+			case EACCES:
+			case EPERM:
+			case EFAULT:
+				fprintf(ostate->output, "\tERROR: You don't have permission to do that\n");
+				break;
+			case EDQUOT:
+				fprintf(ostate->output, "\tERROR: You have exhausted your diskspace quota\n");
+				break;
+			case EINTR:
+				fprintf(ostate->output, "\tERROR: Attempt to create file '%s' was interrupted\n", pszFilename);
+				break;
+			case EMFILE:
+			case ENFILE:
+				fprintf(ostate->output, "\tERROR: Too many files open to attempt to create file '%s'\n", pszFilename);
+				break;
+			case ENAMETOOLONG:
+				fprintf(ostate->output, "\tERROR: '%s' is too long for a file name\n", pszFilename);
+				break;
+			case ENOSPC:
+				fprintf(ostate->output, "\tERROR: The disk is full\n");
+				break;
+			case EROFS:
+				fprintf(ostate->output, "\tERROR: Filesystem is read-only. Can't create file '%s'\n", pszFilename);
+				break;
 			case EEXIST:
 				fprintf(ostate->output, "\tERROR: File '%s' already exists\n", pszFilename);
 				break;	
@@ -418,7 +477,7 @@ HANDLECOM(rm) {
 				fprintf(ostate->output, "\tERROR: Unknown error attempting to delete file '%s'\n", pszFilename);
 				break;
 			}
-			
+
 			return 1;
 		}
 
