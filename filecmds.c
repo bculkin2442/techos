@@ -238,11 +238,13 @@ HANDLECOM(rmdir) {
 				fprintf(ostate->output, "\tERROR: Directory '%s' is not empty\n", pszDirname);
 
 				closedir(sDir);
+
+				return 1;
+				/* fDir is closed by the closedir. */
+			} else {
+				closedir(sDir);
 				/* fDir is closed by the closedir. */
 			}
-
-			closedir(sDir);
-			/* fDir is closed by the closedir. */
 		}
 	}
 
