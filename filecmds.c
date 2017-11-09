@@ -23,7 +23,104 @@ HANDLECOM(ls) {
 }
 
 HANDLECOM(cd) {
-	return 1;
+	/* Reinit getopt. */
+	optind = 1;
+
+	while(1) {
+		/* Enum declaration for long options. */
+		enum scriptopt {
+			/* Help option. */
+			SO_HELP = 0,
+		};
+
+		/* The current option, and the current long option. */
+		int opt, optidx;
+
+		/* Our usage message. */
+		char *usage = "Usage script [-h] [--help] <file-name>";
+
+		static struct option opts[] = {
+			/* Misc. options. */
+			{"help", no_argument, 0, 'h'},
+
+			/* Terminating option. */
+			{0, 0, 0, 0}
+		};
+
+		/* Get an option. */
+		opt = getopt_long(argc, argv, "h", opts, &optidx);
+		/* Break if we've processed everything. */
+		if(opt == -1) break;
+
+		/* Handle options. */
+		switch(opt) {
+		case 0:
+			/* 
+			 * We picked a long option, but they are handled by
+			 * their short options.
+			 */
+			switch(optidx) {
+			default:
+				fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
+				fprintf(ostate->output, "%s\n", usage);
+				return 1;
+			}
+			break;
+		case 'h':
+			fprintf(ostate->output, "%s\n", usage);
+			return 0;
+		default:
+			fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
+			fprintf(ostate->output, "%s\n", usage);
+			return 1;
+
+		}
+	}
+
+	/* Make sure enough arguments are provided. */
+	if(argc <= (optind)) {
+		fprintf(ostate->output, "\tERROR: Must provide the directory name as an argument\n");
+		return 1;
+	}
+
+	{
+		/* The name of the file. */
+		char *pszDirname;
+		/* The old working directory. */
+		int fOld;
+
+		pszDirname = argv[optind];
+
+		/* Make sure that it is a directory. */
+		{
+			struct stat buf;
+
+			if(fstatat(ostate->fWorkingDir, pszDirname, &buf, 0) != 0) {
+				fprintf(ostate->output, "\tERROR: Couldn't check the status of '%s' (Are you sure it exists?)\n", pszDirname);
+				return 1;
+			}
+
+			if(!S_ISDIR(buf.st_mode)) {
+				fprintf(ostate->output, "\tERROR: '%s' is not a directory\n", pszDirname);
+				return 1;
+			}
+		}
+
+		fOld = ostate->fWorkingDir;
+
+		ostate->fWorkingDir = openat(fOld, pszDirname, O_RDONLY);
+		if(ostate->fWorkingDir == -1) {
+			fprintf(ostate->output, "\tERROR: Couldn't switch to directory '%s'\n", pszDirname);
+			ostate->fWorkingDir = fOld;
+
+			return 1;
+		}
+
+		fprintf(ostate->output, "Succesfully changed to directory '%s'\n", pszDirname);
+		close(fOld);
+	}
+
+	return 0;
 }
 
 HANDLECOM(mkdir) {
