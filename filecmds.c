@@ -19,10 +19,10 @@
 #include "filecmds.h"
 
 HANDLECOM(ls) {
-	///HANDLE OPTIONS//////////////////////////////////////////////////
 	/* Reinit getopt. */
 	optind = 1;
 	int showSize = 0;
+
 	while(1) {
 		/* Enum declaration for long options. */
 		enum scriptopt {
@@ -37,6 +37,9 @@ HANDLECOM(ls) {
 		char *usage = "Usage ls [-h] [--help] [-l] <directory-name or path>";
 
 		static struct option opts[] = {
+			/* Show everything. */
+			{"long", no_argument, 0, 'l'},
+
 			/* Misc. options. */
 			{"help", no_argument, 0, 'h'},
 			
@@ -45,7 +48,7 @@ HANDLECOM(ls) {
 		};
 
 		/* Get an option. */
-		opt = getopt_long(argc, argv, "h", opts, &optidx);
+		opt = getopt_long(argc, argv, "hl", opts, &optidx);
 		/* Break if we've processed everything. */
 		if(opt == -1) break;
 
@@ -66,7 +69,7 @@ HANDLECOM(ls) {
 		case 'h':
 			fprintf(ostate->output, "%s\n", usage);
 			return 0;
-		case '-l':
+		case 'l':
 			showSize = 1;
 			break;
 		default:
@@ -76,18 +79,16 @@ HANDLECOM(ls) {
 
 		}
 	}
-	///HANDLE OPTIONS END/////////////////////////////////////////////////
-
-	if(argc <= (optind)) {
-		fprintf(ostate->output, "\tERROR: Must provide the directory to remove as an argument\n");
-		return 1;
-	}
-
+	
 	/* The specified directory. */
 	char *pszDirname;
 
-	pszDirname = argv[optind];
-
+	if(argc <= (optind)) {
+		pszDirname = ".";
+	} else {
+		pszDirname = argv[optind];
+	}
+	
 	/* FD to directory. */
 	int fDir;
 	/* Directory stream. */
@@ -111,12 +112,12 @@ HANDLECOM(ls) {
 			fprintf(ostate->output, "\tERROR: Could not check if '%s' was empty\n", pszDirname);
 			return 1;
 	}
+
 	pdEnt = readdir(sDir);
 	char *fName = pdEnt->d_name;
 	while(pdEnt != NULL){
 		printf("%s",&(fName));
-		if(showSize)
-		{
+		if(showSize) {
 			/* Scratch struct. */
 			struct stat buf;
 
@@ -124,12 +125,11 @@ HANDLECOM(ls) {
 				fprintf(ostate->output, "\tERROR: Could not check if file '%s' exists\n", fName);
 				return 1;
 			}
-
-			printf("%s          %d", &(*pdEnt->d_name), buf.st_size);
+			printf("%s\t\t%d", pdEnt->d_name, buf.st_size);
 		}
 
+		pdEnt = readdir(sDir);
 	}
-	pdEnt = readdir(sDir);
 	
 	return 1;
 }
