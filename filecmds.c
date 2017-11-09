@@ -334,7 +334,7 @@ HANDLECOM(touch) {
 		/* The file being opened. */
 		int dFile;
 
-		if(argc <= (optind + 1)) {
+		if(argc <= (optind)) {
 			fprintf(ostate->output, "\tERROR: Must provide the file to create as an argument\n");
 			return 1;
 		}
@@ -446,7 +446,7 @@ HANDLECOM(rm) {
 		/* The specified filename. */
 		char *pszFilename;
 
-		if(argc <= (optind + 1)) {
+		if(argc <= (optind)) {
 			fprintf(ostate->output, "\tERROR: Must provide the file to delete as an argument\n");
 			return 1;
 		}
