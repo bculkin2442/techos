@@ -19,6 +19,118 @@
 #include "filecmds.h"
 
 HANDLECOM(ls) {
+	///HANDLE OPTIONS//////////////////////////////////////////////////
+	/* Reinit getopt. */
+	optind = 1;
+	bool showSize = 0;
+	while(1) {
+		/* Enum declaration for long options. */
+		enum scriptopt {
+			/* Help option. */
+			SO_HELP = 0,
+		};
+
+		/* The current option, and the current long option. */
+		int opt, optidx;
+
+		/* Our usage message. */
+		char *usage = "Usage ls [-h] [--help] [-l] <directory-name or path>";
+
+		static struct option opts[] = {
+			/* Misc. options. */
+			{"help", no_argument, 0, 'h'},
+			
+			/* Terminating option. */
+			{0, 0, 0, 0}
+		};
+
+		/* Get an option. */
+		opt = getopt_long(argc, argv, "h", opts, &optidx);
+		/* Break if we've processed everything. */
+		if(opt == -1) break;
+
+		/* Handle options. */
+		switch(opt) {
+		case 0:
+			/* 
+			 * We picked a long option, but they are handled by
+			 * their short options.
+			 */
+			switch(optidx) {
+			default:
+				fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
+				fprintf(ostate->output, "%s\n", usage);
+				return 1;
+			}
+			break;
+		case 'h':
+			fprintf(ostate->output, "%s\n", usage);
+			return 0;
+		case '-l':
+			showSize = 1;
+			break;
+		default:
+			fprintf(ostate->output, "\tERROR: Invalid command-line argument\n");
+			fprintf(ostate->output, "%s\n", usage);
+			return 1;
+
+		}
+	}
+	///HANDLE OPTIONS END/////////////////////////////////////////////////
+	
+	if(argc <= (optind + 1)) {
+		fprintf(ostate->output, "\tERROR: Must provide the directory to remove as an argument\n");
+		return 1;
+	}
+	
+	/* The specified directory. */
+	char *pszDirname;
+
+	pszDirname = argv[optind];
+	
+	/* FD to directory. */
+	int fDir;
+	/* Directory stream. */
+	DIR *sDir;
+	/* Current entry into the stream. */
+	struct dirent *pdEnt;
+	/* The number of directory entries read so far. */
+	int count;
+	
+	/* Init count. */
+	count = 0;
+	
+	fDir = openat(ostate->fWorkingDir, pszDirname, 0);
+	if(fDir == -1) {
+			fprintf(ostate->output, "\tERROR: Could not check if '%s' was empty\n", pszDirname);
+			return 1;			
+	}
+
+	sDir = (DIR *)fdopendir(fDir);
+	if(sDir == NULL) {
+			fprintf(ostate->output, "\tERROR: Could not check if '%s' was empty\n", pszDirname);
+			return 1;
+	}
+	pdEnt = readdir(sDir);
+	char *fName = pdEnt.d_name;
+	while(pdEnt != NULL){
+		printf("%s",&(fName));
+		if(showSize)
+		{
+			/* Scratch struct. */
+			struct stat buf;
+
+			if(fstatat(ostate->fWorkingDir, fName, &buf, 0) != 0) {
+				fprintf(ostate->output, "\tERROR: Could not check if file '%s' exists\n", fName);
+				return 1;
+			}
+			
+			printf("%s          %d", &(*pdEnt.d_name), buf.st_size);
+		}
+			
+	}
+	pdEnt = readdir(sDir);
+	
 	return 1;
 }
 
