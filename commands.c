@@ -57,12 +57,12 @@ void addcommands(struct comlist *list) {
 	addcommand(list, "dispatch", "Dispatch all processes currently available", &handle_dispatch);
 
 	/* File commands. */
-	addcommand(list, "ls", "Show all files in the directory"  ,&handle_ls);
-	addcommand(list, "cd", "Change the current directory"     ,&handle_cd);
-	addcommand(list, "mkdir", "Create a new file directory"   ,&handle_mkdir);
-	addcommand(list, "rmdir", "Delete a  directory"           ,&handle_rmdir);
-	addcommand(list, "touch", "Create a file"                 ,&handle_touch);
-	addcommand(list, "rm", "Delete a file"                    ,&handle_rm);
+	addcommand(list, "ls", "Show all files in the directory",  &handle_ls);
+	addcommand(list, "cd", "Change the current directory",     &handle_cd);
+	addcommand(list, "mkdir", "Create a new file directory",   &handle_mkdir);
+	addcommand(list, "rmdir", "Delete a  directory",           &handle_rmdir);
+	addcommand(list, "touch", "Create a file",                 &handle_touch);
+	addcommand(list, "rm", "Delete a file",                    &handle_rm);
 
 	/* Misc. Commands. */
 	addcommand(list, "exit",    "Exit TechOS",                                    &handle_exit);

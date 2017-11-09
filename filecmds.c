@@ -1,5 +1,7 @@
 #define _ATFILE_SOURCE
 
+=======
+>>>>>>> Stashed changes
 #include <assert.h>
 #include <dirent.h>
 #include <errno.h>
