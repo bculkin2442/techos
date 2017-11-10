@@ -126,7 +126,7 @@ HANDLECOM(ls) {
 				return 1;
 			}
 
-			printf("%s\t\t%d\n", fName, buf.st_size);
+			fprintf(ostate->output, "%dB\t\t%s\n",  buf.st_size, fName);
 		} else {
 			fprintf(ostate->output, "%s\n", fName);
 		}
