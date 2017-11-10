@@ -126,7 +126,13 @@ HANDLECOM(ls) {
 				return 1;
 			}
 
-			fprintf(ostate->output, "%dB\t\t%s\n",  buf.st_size, fName);
+			if(buf.st_size > 4096)
+			{
+				int temp = buf.st_size / 1024;
+				fprintf(ostate->output, "%d\e[32mKB\e[0m\t\t%s\n",  temp, fName);
+			}
+			else
+				fprintf(ostate->output, "%d\e[37mB\e[0m\t\t%s\n",  buf.st_size, fName);
 		} else {
 			fprintf(ostate->output, "%s\n", fName);
 		}
