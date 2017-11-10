@@ -68,6 +68,7 @@ void addcommands(struct comlist *list) {
 	addcommand(list, "exit",    "Exit TechOS",                                    &handle_exit);
 	addcommand(list, "help",    "Get help for commands, or list available ones.", &handle_help);
 	addcommand(list, "version", "Display version/author information",             &handle_version);
+	addcommand(list, "moo", " ",             &handle_moo);
 }
 
 /*
@@ -265,5 +266,16 @@ HANDLECOM(help) {
 		fprintf(ostate->output, "\t%s", usage);
 	}
 
+	return 0;
+}
+HANDLECOM(moo) {
+
+	fprintf(ostate->output, "        (__)\n");
+	fprintf(ostate->output, "        (oo)\n");
+	fprintf(ostate->output, "  /------\\/\n");
+	fprintf(ostate->output, " / |    ||\n");
+	fprintf(ostate->output, "*  /\\---/\\\n");
+	fprintf(ostate->output, "   ~~   ~~\n");
+	fprintf(ostate->output, "....\"Have you mooed today?\"...\n");
 	return 0;
 }

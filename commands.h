@@ -20,5 +20,6 @@ void disposecoms();
 DECLCOM(exit);
 DECLCOM(version);
 DECLCOM(help);
+DECLCOM(moo);
 
 #endif
