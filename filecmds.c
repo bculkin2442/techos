@@ -121,12 +121,17 @@ HANDLECOM(ls) {
 			/* Scratch struct. */
 			struct stat buf;
 
-			if(fstatat(ostate->fWorkingDir, fName, &buf, 0) != 0) {
+			if(fstatat(fDir, fName, &buf, 0) != 0) {
 				fprintf(ostate->output, "\tERROR: Could not check if file '%s' exists\n", fName);
 				return 1;
 			}
 
-			if(buf.st_size > 4096)
+			if(buf.st_size > (1024 * 1024))
+			{
+				int temp = buf.st_size / (1024*1024);
+				fprintf(ostate->output, "%d\e[34mMB\e[0m\t\t%s\n",  temp, fName);
+			}
+			else if(buf.st_size > 4096)
 			{
 				int temp = buf.st_size / 1024;
 				fprintf(ostate->output, "%d\e[32mKB\e[0m\t\t%s\n",  temp, fName);
