@@ -124,7 +124,7 @@ void printcommands(struct comlist *list, FILE *fle) {
 
 		switch(com->type) {
 		case CT_NORMAL:
-			fprintf(fle, "\t%s\t%s\n", com->name, com->brief);
+			fprintf(fle, "\t%s\t\t\t%s\n", com->name, com->brief);
 			break;
 		default:
 			/* Shouldn't happen. */
