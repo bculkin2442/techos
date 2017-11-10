@@ -68,7 +68,7 @@ void addcommands(struct comlist *list) {
 	addcommand(list, "exit",    "Exit TechOS",                                    &handle_exit);
 	addcommand(list, "help",    "Get help for commands, or list available ones.", &handle_help);
 	addcommand(list, "version", "Display version/author information",             &handle_version);
-	addcommand(list, "moo", " ",             &handle_moo);
+	addcommand(list, "moo", " ~~moo~~",             &handle_moo);
 }
 
 /*
