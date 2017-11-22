@@ -218,11 +218,14 @@ HANDLECOM(datefmt) {
 
 			/* Trim trailing newline. */
 			llen = strlen(pszFormat);
-			if(pszFormat[llen-1] == '\n')
+			if(pszFormat[llen-1] == '\n') {
 				pszFormat[llen-1] = '\0';
+			}
 
 			/* Warn if truncation is going to occur. */
-			if(llen >= 256) fprintf(ostate->output, "WARNING: Truncating format '%1$s' to '%1$.256s'\n", pszFormat);
+			if(llen >= 256) {
+				fprintf(ostate->output, "WARNING: Truncating format '%1$s' to '%1$.256s'\n", pszFormat);
+			}
 		}
 
 		/* Set the format. */

@@ -42,7 +42,7 @@ HANDLECOM(ls) {
 
 			/* Misc. options. */
 			{"help", no_argument, 0, 'h'},
-			
+
 			/* Terminating option. */
 			{0, 0, 0, 0}
 		};
@@ -79,7 +79,7 @@ HANDLECOM(ls) {
 
 		}
 	}
-	
+
 	/* The specified directory. */
 	char *pszDirname;
 
@@ -88,7 +88,7 @@ HANDLECOM(ls) {
 	} else {
 		pszDirname = argv[optind];
 	}
-	
+
 	/* FD to directory. */
 	int fDir;
 	/* Directory stream. */
@@ -103,14 +103,14 @@ HANDLECOM(ls) {
 
 	fDir = openat(ostate->fWorkingDir, pszDirname, 0);
 	if(fDir == -1) {
-			fprintf(ostate->output, "\tERROR: Could not open directory '%s'\n", pszDirname);
-			return 1;
+		fprintf(ostate->output, "\tERROR: Could not open directory '%s'\n", pszDirname);
+		return 1;
 	}
 
 	sDir = (DIR *)fdopendir(fDir);
 	if(sDir == NULL) {
-			fprintf(ostate->output, "\tERROR: Could not open directory '%s' \n", pszDirname);
-			return 1;
+		fprintf(ostate->output, "\tERROR: Could not open directory '%s' \n", pszDirname);
+		return 1;
 	}
 
 	pdEnt = readdir(sDir);
@@ -126,25 +126,22 @@ HANDLECOM(ls) {
 				return 1;
 			}
 
-			if(buf.st_size > (1024 * 1024))
-			{
+			if(buf.st_size > (1024 * 1024)) {
 				int temp = buf.st_size / (1024*1024);
 				fprintf(ostate->output, "%d\e[34mMB\e[0m\t\t%s\n",  temp, fName);
-			}
-			else if(buf.st_size > 4096)
-			{
+			} else if(buf.st_size > 4096) {
 				int temp = buf.st_size / 1024;
 				fprintf(ostate->output, "%d\e[32mKB\e[0m\t\t%s\n",  temp, fName);
-			}
-			else
+			} else {
 				fprintf(ostate->output, "%d\e[37mB\e[0m\t\t%s\n",  buf.st_size, fName);
+			}
 		} else {
 			fprintf(ostate->output, "%s\n", fName);
 		}
 
 		pdEnt = readdir(sDir);
 	}
-	
+
 	return 1;
 }
 
@@ -354,8 +351,8 @@ HANDLECOM(mkdir) {
 
 /* Handle removing a directory. */
 HANDLECOM(rmdir) {
-		/* Reinit getopt. */
-		optind = 1;
+	/* Reinit getopt. */
+	optind = 1;
 	/* Handle options. */
 	while (1) {
 
