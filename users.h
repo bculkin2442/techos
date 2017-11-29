@@ -43,10 +43,13 @@ struct userdb *makeudb();
 /* Destroy a user DB. */
 void           killudb(struct userdb *);
 /* Insert a user into the database. */
+void          udbinsert(struct userdb *, enum utype, char *, char *);
 /* 
  * Lookup a user in the user database.
  *
  * Returns NULL if there  is no user by that name.
  */
 struct user *udblookup(struct userdb *, char *);
+/* Remove a user by name from the user database. */
+void         udbremove(struct userdb *, char *);
 #endif
