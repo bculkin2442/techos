@@ -34,3 +34,7 @@
 
 @TODO - 10/27/17 Ben Culkin :CommandGrouping
 	Group commands in the help into the categories
+
+@TODO - 11/26/17 Ben Culkin :InternList
+	Add a general key-indexed list to the interning library, and use that
+	in comlist.c and users.c
