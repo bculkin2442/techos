@@ -50,4 +50,48 @@ internkey lookupstring(struct interntab *, const char *);
  * Returns the string if the key was found, or NULL if the given key is invalid.
  */
 const char *lookupkey(struct interntab *, internkey);
+
+/* Type of an iterator over an intern table. */
+typedef void (*tableitr)(const char *, internkey, void *);
+
+/* Execute an action for every key in a table. */
+void foreachintern(struct interntab *, tableitr, void *);
+/*
+ * Handle easy, if space-inefficent storage of things keyed by interned strings.
+ */
+
+/* An intern list is a mapping from strings to data. */
+struct internlist;
+
+/*
+ * Create an intern list.
+ *
+ * Takes the initial capacity for the intern list, and the function to use to
+ * destroy items in the intern list.
+ */
+struct internlist *makeinternlist(int, void (*pfDestroy)(void *));
+/* Destroy an intern list. */
+void               killinternlist(struct internlist *);
+
+/* Insert an item into the list. */
+void  putinternlist(struct internlist *, char *, void *);
+/* 
+ * Get an item from an intern list. 
+ *
+ * Returns NULL if there is no item for that key. 
+ */
+void *getinternlist(struct internlist *, char *);
+/* Delete an item from an intern list. */
+void  deleteinternlist(struct internlist *, char *);
+/* 
+ * Check if an item is in an intern list. 
+ *
+ * Returns 0 if the item is not cotinained, 1 oterhwise.
+ */
+int  containsinternlist(struct internlist *, char *);
+
+/*
+ * @TODO 11/26/17 Ben Culkin :ListIterator
+ * 	Write a iterator for intern lists.
+ */
 #endif

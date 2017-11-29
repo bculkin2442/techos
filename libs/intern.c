@@ -7,6 +7,10 @@
 
 #include "intern.h"
 
+/*
+ * Implementation of interntables.
+ */
+
 /* 
  * The number of hash buckets we use.
  *
@@ -290,7 +294,7 @@ const char *lookupkey(struct interntab *table, const internkey key) {
 	fkey    = kbucket->key;
 
 	/* Bail out early if the bucket is empty. */
-	if(kbucket->key == SIINVALID) return NULL;
+	if(fkey == SIINVALID) return NULL;
 
 	do {
 		/* Check if this is the right bucket. */
@@ -305,4 +309,154 @@ const char *lookupkey(struct interntab *table, const internkey key) {
 	/*
 	 * We didn't find anything. */
 	return NULL;
+}
+
+/* Execute an action for every key in a table. */
+void foreachintern(struct interntab *table, tableitr itr, void *pvData) {
+	int i;
+	/* Iterate over every bucket. */
+	for(i = 0; i < BUCKET_COUNT; i++) {
+		struct bucket *buck;
+		internkey      kFirst;
+		
+		/* Get the first bucket, and its key. */
+		buck = table->keys[i];
+		kFirst = buck->key;
+		
+		/* Ignore this bucket if its empty. */
+		if(kFirst == SIINVALID) continue;
+
+		do {
+			itr(buck->val, buck->key, pvData);
+			/* Bail out if we've looped or hit an empty bucket. */
+		} while(buck->key != kFirst && buck->key != SIINVALID);
+	}
+}
+
+/*
+ * Implementation of internlists
+ */
+struct internlist {
+	/* The dynamic array for storing data. */
+	void **paData;
+
+	/* Amount available/used in the array. */
+	int dataspace;
+	int datausage;
+
+	/* Mapping from string keys to array indexes. */
+	struct interntab *ptKeys;
+
+	/* Destructor function for data. */
+	void (*pfDestroy)(void *);
+};
+
+/*
+ * Create an intern list.
+ *
+ * Takes the initial capacity for the intern list, and the function to use to
+ * destroy items in the intern list.
+ */
+struct internlist *makeinternlist(int initcap, void (*pfDestroy)(void *)) {
+	/* Allocate the list, and fail if allocation fails. */
+	struct internlist *plList = malloc(sizeof(struct internlist));
+	assert(plList != NULL);
+
+	/* Create the key mapping. */
+	plList->ptKeys = makeinterntab();
+	/* Remember the destructor. */
+	plList->pfDestroy = pfDestroy;
+
+	/* Allocate space for the data. */
+	plList->paData = calloc(initcap, sizeof(void *));
+	assert(plList->paData != NULL);
+	/* Initialize capacity tracking. */
+	plList->dataspace = initcap;
+	plList->datausage = 0;
+
+	return plList;
+}
+
+/* Destroy an intern list. */
+void killinternlist(struct internlist * plList) {
+	/* Destruct the contained data. */
+	int i;
+	for(i = 0; i < plList->datausage; i++) {
+		plList->pfDestroy(plList->paData[i]);
+	}
+	/* Free the data storage. */
+	free(plList->paData);
+	/* Free key storage. */
+	killinterntab(plList->ptKeys);
+	/* Free the list. */
+	free(plList);
+}
+
+/* Insert an item into the list. */
+void putinternlist(struct internlist *plList, char *pszKey, void *pvData) {
+	/* Intern the name, and fail if interning fails */
+	internkey  kData = internstring(plList->ptKeys, pszKey);
+	assert(kData > 0);
+
+	if(plList->dataspace == plList->datausage) {
+		/* Allocate more space for the list. */
+		plList->dataspace *= 2;
+		plList->dataspace += 1;
+		plList->paData     = realloc(plList->paData, sizeof(void *) * plList->dataspace);
+		/* Fail if allocation fails. */
+		assert(plList->paData != NULL);
+	}
+
+	/* Delete any item that was in that slot. */
+	if(plList->paData[kData -1] != NULL) {
+		plList->pfDestroy(plList->paData[kData - 1]);
+	}
+
+	/* Insert the item. */
+	plList->paData[kData - 1]  = pvData;
+	plList->datausage         += 1;
+}
+
+/* 
+ * Get an item from an intern list. 
+ *
+ * Returns NULL if there is no item for that key. 
+ */
+void *getinternlist(struct internlist * plList, char *pszKey) {
+	/* Lookup the index. */
+	internkey kData = lookupstring(plList->ptKeys, pszKey);
+	/* Error if we don't have that key. */
+	if(kData == SIINVALID) return NULL;
+
+	/* Give back the stored data. */
+	return plList->paData[kData - 1];
+}
+
+/* Delete an item from an intern list. */
+void deleteinternlist(struct internlist *plList, char *pszKey) {
+	/* Lookup the index. */
+	internkey kData = lookupstring(plList->ptKeys, pszKey);
+	/* Error if we don't have that key. */
+	if(kData == SIINVALID) return;
+
+	if(plList->paData[kData - 1] != NULL)
+		plList->pfDestroy(plList->paData[kData - 1]);
+
+	plList->paData[kData - 1] = NULL;
+}
+
+/* 
+ * Check if an item is in an intern list. 
+ *
+ * Returns 0 if the item is not cotinained, 1 oterhwise.
+ */
+int containsinternlist(struct internlist *plList, char *pszKey) {
+	/* Lookup the index. */
+	internkey kData = lookupstring(plList->ptKeys, pszKey);
+	/* Error if we don't have that key. */
+	if(kData == SIINVALID) {
+		return 0;
+	} else {
+		return plList->paData[kData - 1] != NULL;
+	}
 }
