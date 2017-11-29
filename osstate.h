@@ -71,6 +71,8 @@ struct osstate {
 
 	/* Currently logged in user. */
 	struct user *puCurrent;
+	/* Database of users. */
+	struct userdb *pdUsers;
 };
 
 /* Create/delete an osstate. */
