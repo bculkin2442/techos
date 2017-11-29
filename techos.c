@@ -40,6 +40,8 @@ int main() {
 
 	fprintf(ostate->output, "Welcome to TechOS v%d.%d\n", major_ver, minor_ver);
 
+	/* user login */
+
 	/* Handle commands. */
 	comhan(ostate);
 
