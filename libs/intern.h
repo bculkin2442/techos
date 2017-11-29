@@ -90,8 +90,7 @@ void  deleteinternlist(struct internlist *, char *);
  */
 int  containsinternlist(struct internlist *, char *);
 
-/*
- * @TODO 11/26/17 Ben Culkin :ListIterator
- * 	Write a iterator for intern lists.
- */
+typedef void (*internlistitr)(char *, void *, void *);
+/* Execute something for every key-value pair in the list. */
+void foreachinternlist(struct internlist *, internlistitr, void *);
 #endif

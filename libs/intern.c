@@ -460,3 +460,27 @@ int containsinternlist(struct internlist *plList, char *pszKey) {
 		return plList->paData[kData - 1] != NULL;
 	}
 }
+
+struct listitrdata {
+	struct internlist *plList;
+
+	internlistitr pfFunc;
+
+	void *pvData;
+};
+
+static void dointernlistitr(const char *pszName, internkey kKey, void *pvData) {
+	struct listitrdata *pData = (struct listitrdata *)pvData;
+
+	pData->pfFunc((char *)pszName, getinternlist(pData->plList, (char *)pszName), pData->pvData);
+}
+
+void foreachinternlist(struct internlist *plList, internlistitr pfFunc, void *pvData) {
+	struct listitrdata dat;
+
+	dat.pfFunc = pfFunc;
+	dat.plList = plList;
+	dat.pvData = pvData;
+
+	foreachintern(plList->ptKeys, &dointernlistitr, &dat);
+}
