@@ -75,40 +75,46 @@ HANDLECOM(mkusr) {
 		}
 	}
 
-	/* The specified filename. */
         char *username;
 	char *pass = NULL;
 	size_t lsize;
 
-
-        if(argc <= (optind)) {
-         	fprintf(ostate->output, "\tERROR: Must provide the file to create as an argument\n");
-         	return 1;
-        }
-
-	username = argv[optind];
+       	if(argc <= (optind)) {
+       		fprintf(ostate->output, "\tERROR: Must provide the file to create as an argument\n");
+       		return 1;
+       	}
 
 
-	/* check if the user already exists */
-	if(udblookup(ostate->pdUsers,username) == NULL)
+	if(ostate->puCurrent->type != UTY_BASIC)
 	{
-		fprintf(ostate->output, "Enter password for new user %s:\n", username);
-		pass = getline(&pass, &lsize, stdin);
-		/* check if a password was entered */
-		if(sizeof(pass) > 0)
+		username = argv[optind];
+
+
+		/* check if the user already exists */
+		if(udblookup(ostate->pdUsers,username) == NULL)
 		{
-			udbinsert(ostate->pdUsers, UTY_BASIC, username, pass);
-			fprintf(ostate->output, "Sucessfully created user %s\n", username);
+			fprintf(ostate->output, "Enter password for new user %s:\n", username);
+			pass = getline(&pass, &lsize, stdin);
+			/* check if a password was entered */
+			if(sizeof(pass) > 0)
+			{
+				udbinsert(ostate->pdUsers, UTY_BASIC, username, pass);
+				fprintf(ostate->output, "Sucessfully created user %s\n", username);
+			}
+			else
+			{
+				fprintf(ostate->output, "\tPassword cannot be empty, try again\n");			
+			}
 		}
 		else
 		{
-			fprintf(ostate->output, "\tPassword cannot be empty, try again\n", username);			
+			fprintf(ostate->output, "\tERROR: That username already exists\n");
+			return 1;
 		}
 	}
 	else
 	{
-		fprintf(ostate->output, "\tERROR: That username already exists\n", username);
-		return 1;
+			fprintf(ostate->output, "\tERROR: Current user not authorized to use this command\n");
 	}
 
 	return 0;
@@ -280,6 +286,51 @@ HANDLECOM(mkadm) {
 
 		}
 	}
+
+        char *admname;
+	char *pass = NULL;
+	size_t lsize;
+
+      	if(argc <= (optind)) {
+       		fprintf(ostate->output, "\tERROR: Must provide the name of user to create as an argument\n");
+     		return 1;
+        }
+
+
+	if(ostate->puCurrent->type != UTY_BASIC)
+	{
+
+		admname = argv[optind];
+
+
+		/* check if the user already exists */
+		if(udblookup(ostate->pdUsers,admname) == NULL)
+		{
+			fprintf(ostate->output, "Enter password for new user %s:\n", admname);
+			pass = getline(&pass, &lsize, stdin);
+			/* check if a password was entered */
+			if(sizeof(pass) > 0)
+			{
+				udbinsert(ostate->pdUsers, UTY_ADMIN, admname, pass);
+				fprintf(ostate->output, "Sucessfully created user %s\n", username);
+			}
+			else
+			{
+				fprintf(ostate->output, "\tPassword cannot be empty, try again\n");			
+			}
+		}
+		else
+		{
+			fprintf(ostate->output, "\tERROR: That username already exists\n");
+			return 1;
+		}
+	}
+	else
+	{
+			fprintf(ostate->output, "\tERROR: Current user not authorized to use this command\n", username);
+	}
+
+
 	return 0;
 }
 
