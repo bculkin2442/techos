@@ -68,6 +68,9 @@ struct osstate {
 
 	/* Base working directory for the OS. */
 	int fWorkingDir;
+
+	/* Currently logged in user. */
+	struct user *puCurrent;
 };
 
 /* Create/delete an osstate. */
