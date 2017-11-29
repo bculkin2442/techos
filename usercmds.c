@@ -16,6 +16,7 @@
 #include "osstate.h"
 #include "command.h"
 
+#include "user.h"
 #include "usercmds.h"
 
 HANDLECOM(mkusr) {
@@ -37,9 +38,6 @@ HANDLECOM(mkusr) {
 		char *usage = "Usage ls [-h] [--help] [-l] <directory-name or path>";
 
 		static struct option opts[] = {
-			/* Show everything. */
-			{"long", no_argument, 0, 'l'},
-
 			/* Misc. options. */
 			{"help", no_argument, 0, 'h'},
 
@@ -48,7 +46,7 @@ HANDLECOM(mkusr) {
 		};
 
 		/* Get an option. */
-		opt = getopt_long(argc, argv, "hl", opts, &optidx);
+		opt = getopt_long(argc, argv, "h", opts, &optidx);
 		/* Break if we've processed everything. */
 		if(opt == -1) break;
 
@@ -77,7 +75,43 @@ HANDLECOM(mkusr) {
 		}
 	}
 
-	return 1;
+	/* The specified filename. */
+        char *username;
+	char *pass = NULL;
+	size_t lsize;
+
+
+        if(argc <= (optind)) {
+         	fprintf(ostate->output, "\tERROR: Must provide the file to create as an argument\n");
+         	return 1;
+        }
+
+	username = argv[optind];
+
+
+	/* check if the user already exists */
+	if(udblookup(ostate->pdUsers,username) == NULL)
+	{
+		fprintf(ostate->output, "Enter password for new user %s:\n", username);
+		pass = getline(&pass, &lsize, stdin);
+		/* check if a password was entered */
+		if(sizeof(pass) > 0)
+		{
+			udbinsert(ostate->pdUsers, UTY_BASIC, username, pass);
+			fprintf(ostate->output, "Sucessfully created user %s\n", username);
+		}
+		else
+		{
+			fprintf(ostate->output, "\tPassword cannot be empty, try again\n", username);			
+		}
+	}
+	else
+	{
+		fprintf(ostate->output, "\tERROR: That username already exists\n", username);
+		return 1;
+	}
+
+	return 0;
 }
 
 HANDLECOM(rmusr) {
