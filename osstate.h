@@ -5,6 +5,8 @@
 
 #include <time.h>
 
+#include "users.h"
+
 #define MAX_FMT_SIZE 256
 
 /* Default date formats. */

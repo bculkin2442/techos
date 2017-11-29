@@ -82,8 +82,10 @@ void ramfileintodb(struct userdb *pdDB, char *pszFilename) {
 		char *pszName, *pszPass, *pszType, *pSave;
 		enum utype type;
 
+		pSave = NULL;
+
 		/* Read username. */
-		pszName = (char *)strtok_r(pszName, ":", &pSave);
+		pszName = (char *)strtok_r(pszLine, ":", &pSave);
 		/* Skip improperly formatted records. */
 		if(pszName == NULL) continue;
 

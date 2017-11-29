@@ -16,7 +16,7 @@
 #include "osstate.h"
 #include "command.h"
 
-#include "user.h"
+#include "users.h"
 #include "usercmds.h"
 
 HANDLECOM(mkusr) {
@@ -94,7 +94,7 @@ HANDLECOM(mkusr) {
 		if(udblookup(ostate->pdUsers,username) == NULL)
 		{
 			fprintf(ostate->output, "Enter password for new user %s:\n", username);
-			pass = getline(&pass, &lsize, stdin);
+			pass = (char *)getline(&pass, &lsize, stdin);
 			/* check if a password was entered */
 			if(sizeof(pass) > 0)
 			{
@@ -307,12 +307,12 @@ HANDLECOM(mkadm) {
 		if(udblookup(ostate->pdUsers,admname) == NULL)
 		{
 			fprintf(ostate->output, "Enter password for new user %s:\n", admname);
-			pass = getline(&pass, &lsize, stdin);
+			pass = (char *)getline(&pass, &lsize, stdin);
 			/* check if a password was entered */
 			if(sizeof(pass) > 0)
 			{
 				udbinsert(ostate->pdUsers, UTY_ADMIN, admname, pass);
-				fprintf(ostate->output, "Sucessfully created user %s\n", username);
+				fprintf(ostate->output, "Sucessfully created user %s\n", admname);
 			}
 			else
 			{
@@ -327,7 +327,7 @@ HANDLECOM(mkadm) {
 	}
 	else
 	{
-			fprintf(ostate->output, "\tERROR: Current user not authorized to use this command\n", username);
+			fprintf(ostate->output, "\tERROR: Current user not authorized to use this command\n", admname);
 	}
 
 

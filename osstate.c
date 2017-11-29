@@ -62,11 +62,19 @@ struct osstate *makeosstate() {
 		assert(0);
 	}
 
+	/* Load user database. */
+	ostate->pdUsers = makeudb();
+	ramfileintodb(ostate->pdUsers, "users.txt");
+
 	return ostate;
 }
 
 /* Free/destroy OS state. */
 void killosstate(struct osstate *ostate) {
+	/* Save user changes and free DB. */
+	ramdbintofile(ostate->pdUsers, "users.txt");
+	killudb(ostate->pdUsers);
+
 	/* Close working directory. */
 	close(ostate->fWorkingDir);
 
