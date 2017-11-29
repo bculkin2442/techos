@@ -6,16 +6,17 @@
 
 #include "users.h"
 
+static void killuser(void *pvUser) {
+	struct user *puUser = (struct user *)pvUser;
+
+	free(puUser->pszName);
+	free(puUser->pszPass);
+
+	free(puUser);
+}
+
 struct userdb {
-	/* Contains the username to userid mapping. */
-	struct interntab *ptUsers;
-
-	/* Contains the dynamic array of users. */
-	struct user **paUsers;
-
-	/* Available/used space in user array. */
-	int userspace;
-	int usercount;
+	struct internlist *plUsers;
 };
 
 struct userdb *makeudb() {
@@ -25,16 +26,9 @@ struct userdb *makeudb() {
 	assert(pdDB != NULL);
 
 	/* Allocate memory for the user list. */
-	pdDB->paUsers = calloc(5, sizeof(struct user));
+	pdDB->plUsers = makeinternlist(5, &killuser);
 	/* Fail if allocation did. */
-	assert(pdDB->paUsers != NULL);
-
-	/* Set up array tracking. */
-	pdDB->userspace = 5;
-	pdDB->usercount = 0;
-
-	/* Allocate intern table. */
-	pdDB->ptUsers = makeinterntab();
+	assert(pdDB->plUsers != NULL);
 
 	return pdDB;
 }
@@ -42,20 +36,27 @@ struct userdb *makeudb() {
 void killudb(struct userdb *pdDB) {
 	int i;
 
-	killinterntab(pdDB->ptUsers);
-
-	for(i = 0; i < pdDB->usercount; i++) {
-		struct user *pUser = pdDB->paUsers[i];
-
-		free(pUser->pszName);
-		free(pUser->pszPass);
-	}
-
-	free(pdDB->paUsers);
+	killinternlist(pdDB->plUsers);
 
 	free(pdDB);
 }
 
 struct user *udblookup(struct userdb *pdDB, char *pszUsername) {
-	
+	return (struct user *)getinternlist(pdDB->plUsers, pszUsername);
+}
+
+void udbinsert(struct userdb *pdDB, enum utype type, char *pszUsername, char *pszPassword) {
+	struct user *puUser = malloc(sizeof(struct user));
+	assert(puUser != NULL);
+
+	puUser->type = type;
+
+	puUser->pszName = (char *)strdup(pszUsername);
+	puUser->pszPass = (char *)strdup(pszPassword);
+
+	putinternlist(pdDB->plUsers, pszUsername, puUser);
+}
+
+void udbremove(struct userdb *pdDB, char *pszUsername) {
+	deleteinternlist(pdDB->plUsers, pszUsername);
 }

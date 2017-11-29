@@ -52,4 +52,9 @@ void          udbinsert(struct userdb *, enum utype, char *, char *);
 struct user *udblookup(struct userdb *, char *);
 /* Remove a user by name from the user database. */
 void         udbremove(struct userdb *, char *);
+
+/* Load user database from a file. */
+void ramfileintodb(struct userdb *, char *);
+/* Save user database to a file. */
+void ramdbintofile(struct userdb *, char *);
 #endif
