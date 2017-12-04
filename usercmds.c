@@ -112,6 +112,12 @@ HANDLECOM(mkusr) {
 				lread = getline(&pszPassword, &llen, stdin);
 			}
 
+			/* Trim trailing newline. */
+			llen = strlen(pszPassword);
+			if(pszPassword[llen-1] == '\n') {
+				pszPassword[llen-1] = '\0';
+			}
+
 			udbinsert(ostate->pdUsers, UTY_BASIC, pszUsername, pszUsername);
 
 			fprintf(ostate->output, "Sucessfully created user '%s'\n", pszUsername);
@@ -332,6 +338,12 @@ HANDLECOM(pwd) {
 				lread = getline(&pszPassword, &llen, stdin);
 			}
 
+			/* Trim trailing newline. */
+			llen = strlen(pszPassword);
+			if(pszPassword[llen-1] == '\n') {
+				pszPassword[llen-1] = '\0';
+			}
+
 			free(puUser->pszPass);
 
 			puUser->pszPass = pszPassword;
@@ -427,7 +439,7 @@ HANDLECOM(toggleadm) {
 			fprintf(ostate->output, "\tERROR: Root is already all-powerful\n");
 			return 1;
 		}
-		
+
 		if(puUser->type == UTY_ADMIN)
 			fprintf(ostate->output, "\tSuccessfully toggled administration status for user '%s': ON\n", pszUsername);
 		else if(puUser->type == UTY_BASIC)

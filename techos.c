@@ -171,24 +171,30 @@ int execcom(struct command *com, struct cliargs args, char *argline, struct osst
 
 void loginuser(struct osstate *ostate) {
 	char *pszUsername, *pszPassword;
-	size_t llen, lread;
+	size_t llen, lread, lsize;
 
 	pszUsername = NULL;
 	pszPassword = NULL;
 
-	llen = 0;
+	lsize = 0;
 
 	while(1) {
 		struct user *puUser;
 
 		fprintf(ostate->output, "Username: ");
-		lread = getline(&pszUsername, &llen, ostate->strem);
+		lread = getline(&pszUsername, &lsize, ostate->strem);
 
 		while(lread <= 0) {
 			fprintf(ostate->output, "ERROR: Must specify a username.\n");
 
 			fprintf(ostate->output, "Username: ");
-			lread = getline(&pszUsername, &llen, ostate->strem);
+			lread = getline(&pszUsername, &lsize, ostate->strem);
+		}
+
+		/* Trim trailing newline. */
+		llen = strlen(pszUsername);
+		if(pszUsername[llen-1] == '\n') {
+			pszUsername[llen-1] = '\0';
 		}
 
 		puUser = udblookup(ostate->pdUsers, pszUsername);
@@ -198,13 +204,19 @@ void loginuser(struct osstate *ostate) {
 		}
 
 		fprintf(ostate->output, "Password: ");
-		lread = getline(&pszPassword, &llen, ostate->strem);
+		lread = getline(&pszPassword, &lsize, ostate->strem);
 
 		while(lread <= 0) {
 			fprintf(ostate->output, "ERROR: Must specify a password.\n");
 
 			fprintf(ostate->output, "Password: ");
-			lread = getline(&pszPassword, &llen, ostate->strem);
+			lread = getline(&pszPassword, &lsize, ostate->strem);
+		}
+
+		/* Trim trailing newline. */
+		llen = strlen(pszPassword);
+		if(pszPassword[llen-1] == '\n') {
+			pszPassword[llen-1] = '\0';
 		}
 
 		if(strcmp(puUser->pszPass, pszPassword) == 0) {
