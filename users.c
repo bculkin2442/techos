@@ -127,6 +127,10 @@ void offloaduser(char *pszUsername, void *pvUser, void *pvData) {
 	puUser   = (struct user *)pvUser;
 	pfOutput = (FILE *)pvData;
 
+	if(puUser == NULL) {
+		return;
+	}
+
 	switch(puUser->type) {
 	case UTY_BASIC:
 		pszKind = "rim";
