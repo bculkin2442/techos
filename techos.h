@@ -39,4 +39,7 @@ int handleline(struct osstate *, char *);
  * Gathers the CLI args for a command, and then executes it.
  */
 int execcom(struct command *, struct cliargs, char *, struct osstate *);
+
+/* Log a user in. */
+void loginuser(struct osstate *);
 #endif

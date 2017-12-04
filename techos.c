@@ -15,7 +15,7 @@
 #include "techos.h"
 
 /* The major/minor version of TechOS. */
-const int major_ver = 3;
+const int major_ver = 5;
 const int minor_ver = 0;
 
 /*
@@ -41,6 +41,7 @@ int main() {
 	fprintf(ostate->output, "Welcome to TechOS v%d.%d\n", major_ver, minor_ver);
 
 	/* user login */
+	loginuser(ostate);
 
 	/* Handle commands. */
 	comhan(ostate);
@@ -166,4 +167,54 @@ int execcom(struct command *com, struct cliargs args, char *argline, struct osst
 	}
 
 	return comret;
+}
+
+void loginuser(struct osstate *ostate) {
+	char *pszUsername, *pszPassword;
+	size_t llen, lread;
+
+	while(1) {
+		struct user *puUser;
+
+		fprintf(ostate->output, "Username: ");
+		lread = getline(&pszUsername, &llen, ostate->strem);
+
+		while(lread <= 0) {
+			fprintf(ostate->output, "ERROR: Must specify a username.\n");
+
+			fprintf(ostate->output, "Username: ");
+			lread = getline(&pszUsername, &llen, ostate->strem);
+		}
+
+		puUser = udblookup(ostate->pdUsers, pszUsername);
+		if(puUser == NULL) {
+			fprintf(ostate->output, "\tERROR: No user named '%s' exists\n", pszUsername);
+			continue;
+		}
+
+		fprintf(ostate->output, "Password: ");
+		lread = getline(&pszPassword, &llen, ostate->strem);
+
+		while(lread <= 0) {
+			fprintf(ostate->output, "ERROR: Must specify a password.\n");
+
+			fprintf(ostate->output, "Password: ");
+			lread = getline(&pszPassword, &llen, ostate->strem);
+		}
+
+		if(strcmp(puUser->pszPass, pszPassword) == 0) {
+			fprintf(ostate->output, "Welcome '%s'!\n", pszUsername);
+
+			ostate->puCurrent = puUser;
+			break;
+		}
+
+		fprintf(ostate->output, "\tERROR: Incorrect password\n");
+	}
+
+	if(pszUsername != NULL)
+		free(pszUsername);
+
+	if(pszPassword != NULL)
+		free(pszPassword);
 }

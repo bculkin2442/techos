@@ -8,7 +8,6 @@
 DECLCOM(mkusr);
 DECLCOM(rmusr);
 DECLCOM(pwd);
-DECLCOM(mkadm);
-DECLCOM(rmadm);
+DECLCOM(toggleadm);
 
 #endif

@@ -66,11 +66,10 @@ void addcommands(struct comlist *list) {
 	addcommand(list, "rm",    "Delete a file",                    &handle_rm);
 
 	/* User commands. */
-	addcommand(list, "mkusr", "Create a new user",                   &handle_mkusr);
-	addcommand(list, "rmusr", "Delete a user",                       &handle_rmusr);
-	addcommand(list, "pwd",   "Change current user password",        &handle_pwd);
-	addcommand(list, "mkadm", "Create a new admin user",             &handle_mkadm);
-	addcommand(list, "rmadm", "Delete an admin user",                &handle_rmadm);
+	addcommand(list, "mkusr",     "Create a new user",                   &handle_mkusr);
+	addcommand(list, "rmusr",     "Delete a user",                       &handle_rmusr);
+	addcommand(list, "pwd",       "Change current user password",        &handle_pwd);
+	addcommand(list, "toggleadm", "Toggle the admin status of a user",   &handle_toggleadm);
 
 	/* Misc. Commands. */
 	addcommand(list, "exit",    "Exit TechOS",                                    &handle_exit);
