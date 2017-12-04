@@ -101,14 +101,14 @@ HANDLECOM(mkusr) {
 			pszPassword = NULL;
 			llen        = 0;
 
-			fprintf(ostate->output, "Enter password for user '%s':\n", pszUsername);
+			fprintf(ostate->output, "Enter password for user '%s':", pszUsername);
 			lread = getline(&pszPassword, &llen, stdin);
 
 			/* Make sure a password is entered. */
 			while(lread <= 0) {
 				fprintf(ostate->output, "\tPassword cannot be empty, try again\n");			
 
-				fprintf(ostate->output, "Enter password for user '%s':\n", pszUsername);
+				fprintf(ostate->output, "Enter password for user '%s':", pszUsername);
 				lread = getline(&pszPassword, &llen, stdin);
 			}
 
@@ -118,7 +118,7 @@ HANDLECOM(mkusr) {
 				pszPassword[llen-1] = '\0';
 			}
 
-			udbinsert(ostate->pdUsers, UTY_BASIC, pszUsername, pszUsername);
+			udbinsert(ostate->pdUsers, UTY_BASIC, pszUsername, pszPassword);
 
 			fprintf(ostate->output, "Sucessfully created user '%s'\n", pszUsername);
 
@@ -327,14 +327,14 @@ HANDLECOM(pwd) {
 			pszPassword = NULL;
 			llen        = 0;
 
-			fprintf(ostate->output, "Enter password for user '%s':\n", pszUsername);
+			fprintf(ostate->output, "Enter password for user '%s':", pszUsername);
 			lread = getline(&pszPassword, &llen, stdin);
 
 			/* Make sure a password is entered. */
 			while(lread <= 0) {
 				fprintf(ostate->output, "\tPassword cannot be empty, try again\n");			
 
-				fprintf(ostate->output, "Enter password for user '%s':\n", pszUsername);
+				fprintf(ostate->output, "Enter password for user '%s':", pszUsername);
 				lread = getline(&pszPassword, &llen, stdin);
 			}
 
