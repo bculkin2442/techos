@@ -243,7 +243,7 @@ HANDLECOM(pwd) {
 		int opt, optidx;
 
 		/* Our usage message. */
-		char *usage = "Usage mkdir [-h] [--help] <directory-name>";
+		char *usage = "Usage pwd [-h] [--help] <username>";
 
 		static struct option opts[] = {
 			/* Misc. options. */
@@ -352,7 +352,7 @@ HANDLECOM(toggleadm) {
 		int opt, optidx;
 
 		/* Our usage message. */
-		char *pszUsage = "Usage: toggleadm [-h] [--help] <user-name>";
+		char *pszUsage = "Usage: toggleadm [-h] [--help] <username>";
 
 		static struct option opts[] = {
 			/* Misc. options. */
