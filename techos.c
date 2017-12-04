@@ -220,7 +220,24 @@ void loginuser(struct osstate *ostate) {
 		}
 
 		if(strcmp(puUser->pszPass, pszPassword) == 0) {
-			fprintf(ostate->output, "Welcome '%s'!\n", pszUsername);
+			char *pszKind;
+
+			switch(puUser->type) {
+			case UTY_BASIC:
+				pszKind = "rim";
+				break;
+			case UTY_ADMIN:
+				pszKind = "spoke";
+				break;
+			case UTY_ROOT:
+				pszKind = "hub";
+				break;
+			default:
+				/* Shouldn't happen. */
+				assert(0);
+			}
+
+			fprintf(ostate->output, "Welcome '%s'! You are a member of the '%s' group\n", pszUsername, pszKind);
 
 			ostate->puCurrent = puUser;
 			break;
