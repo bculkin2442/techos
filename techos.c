@@ -173,6 +173,11 @@ void loginuser(struct osstate *ostate) {
 	char *pszUsername, *pszPassword;
 	size_t llen, lread;
 
+	pszUsername = NULL;
+	pszPassword = NULL;
+
+	llen = 0;
+
 	while(1) {
 		struct user *puUser;
 
