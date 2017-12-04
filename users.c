@@ -9,6 +9,10 @@
 static void killuser(void *pvUser) {
 	struct user *puUser = (struct user *)pvUser;
 
+	if(pvUser == NULL) {
+		return;
+	}
+
 	free(puUser->pszName);
 	free(puUser->pszPass);
 
