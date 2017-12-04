@@ -101,14 +101,14 @@ HANDLECOM(mkusr) {
 			pszPassword = NULL;
 			llen        = 0;
 
-			fprintf(ostate->output, "Enter password for user '%s':", pszUsername);
+			fprintf(ostate->output, "Enter password for user '%s': ", pszUsername);
 			lread = getline(&pszPassword, &llen, stdin);
 
 			/* Make sure a password is entered. */
 			while(lread <= 0) {
 				fprintf(ostate->output, "\tPassword cannot be empty, try again\n");			
 
-				fprintf(ostate->output, "Enter password for user '%s':", pszUsername);
+				fprintf(ostate->output, "Enter password for user '%s': ", pszUsername);
 				lread = getline(&pszPassword, &llen, stdin);
 			}
 
@@ -207,6 +207,10 @@ HANDLECOM(rmusr) {
 			return 1;
 		}
 
+		if(strcmp(ostate->puCurrent->pszName, pszUsername) == 0) {
+			fprintf(ostate->output, "\tERROR: How do you propose to delete yourself?\n");
+		}
+
 		if(ostate->puCurrent->type == UTY_BASIC) {
 			fprintf(ostate->output, "\tERROR: You don't have permission to do that\n");
 			return 1;
@@ -290,7 +294,7 @@ HANDLECOM(pwd) {
 	}
 
 	if(argc <= (optind)) {
-		fprintf(ostate->output, "\tERROR: Must provide the name of the user to create as an argument\n");
+		fprintf(ostate->output, "\tERROR: Must provide the name of the user to change the password off as an argument\n");
 		return 1;
 	}
 
@@ -327,14 +331,14 @@ HANDLECOM(pwd) {
 			pszPassword = NULL;
 			llen        = 0;
 
-			fprintf(ostate->output, "Enter password for user '%s':", pszUsername);
+			fprintf(ostate->output, "Enter password for user '%s': ", pszUsername);
 			lread = getline(&pszPassword, &llen, stdin);
 
 			/* Make sure a password is entered. */
 			while(lread <= 0) {
 				fprintf(ostate->output, "\tPassword cannot be empty, try again\n");			
 
-				fprintf(ostate->output, "Enter password for user '%s':", pszUsername);
+				fprintf(ostate->output, "Enter password for user '%s': ", pszUsername);
 				lread = getline(&pszPassword, &llen, stdin);
 			}
 
@@ -405,7 +409,7 @@ HANDLECOM(toggleadm) {
 	}
 
 	if(argc <= (optind)) {
-		fprintf(ostate->output, "\tERROR: Must provide the name of the user to delete as an argument\n");
+		fprintf(ostate->output, "\tERROR: Must provide the name of the user to toggle admin status of as an argument\n");
 		return 1;
 	}
 
