@@ -341,7 +341,7 @@ HANDLECOM(pwd) {
 	return 0;
 }
 
-/* Handle removing a directory. */
+/* Handle adding or removing administrator privileges for a user. */
 HANDLECOM(toggleadm) {
 	/* Reinit getopt. */
 	optind = 1;
@@ -352,7 +352,7 @@ HANDLECOM(toggleadm) {
 		int opt, optidx;
 
 		/* Our usage message. */
-		char *pszUsage = "Usage: rmdir [-h] [--help] <directory-name>";
+		char *pszUsage = "Usage: toggleadm [-h] [--help] <user-name>";
 
 		static struct option opts[] = {
 			/* Misc. options. */
@@ -427,8 +427,11 @@ HANDLECOM(toggleadm) {
 			fprintf(ostate->output, "\tERROR: Root is already all-powerful\n");
 			return 1;
 		}
-
-		fprintf(ostate->output, "\tSuccessfully toggled administration status for user '%s'\n", pszUsername);
+		
+		if(puUser->type == UTY_ADMIN)
+			fprintf(ostate->output, "\tSuccessfully toggled administration status for user '%s': ON\n", pszUsername);
+		else if(puUser->type == UTY_BASIC)
+			fprintf(ostate->output, "\tSuccessfully toggled administration status for user '%s': OFF\n", pszUsername);
 	}
 
 	return 0;
