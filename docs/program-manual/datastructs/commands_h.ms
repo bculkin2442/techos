@@ -14,7 +14,7 @@ The list to add the commands to.
 .USAGE
 Cleanup global state for commands.
 .EFUNCT
-.COMDECL "version" "commands.h"
 .COMDECL "exit" "commands.h"
+.COMDECL "version" "commands.h"
 .COMDECL "help" "commands.h"
-.COMDECL "date" "datecmds.h"
+.COMDECL "moo" "commands.h"

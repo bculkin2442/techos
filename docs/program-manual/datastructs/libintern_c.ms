@@ -47,12 +47,15 @@ keys from strings, as well as strings from their corresponding keys.
 .ATTRS
 .ATTR "nextkey"
 The intern key that will be assigned to the next string interned into the table.
+.EATTR
 .ATTR "strings"
 A hash-table keyed off of the string values, for looking up keys based off of
 strings.
+.EATTR
 .ATTR "keys"
 A hash-table keyed off of the key values, for looking up strings based off of
 keys.
+.EATTR
 .EATTRS
 .EDATAST
 .FUNCT "void" "addbucket" "struct bucket *" "libs/intern.c"
@@ -61,5 +64,54 @@ Add a bucket to a bucket chain.
 .ARGS
 .ARG "struct bucket *"
 The chain to add a bucket to.
+.EARGS
+.EFUNCT
+.DATAST "struct internlist" "libs/intern.c"
+.USAGE
+The implementation for the opaque data type of the same name in libs/intern.h. A
+simple array-based mapping from strings to void pointers.
+.ATTRS
+.ATTR "paData"
+The actual data storage for the array.
+.EATTR
+.ATTR  "dataspace"
+The amount of space available in the data array.
+.EATTR
+.ATTR "datausage"
+The amount of space used in the data array.
+.EATTR
+.ATTR "ptKeys"
+The mapping from string keys to indexes into the array.
+.EATTR
+.ATTR "void (*pfDestroy)(void *)"
+The function to call on data items that are being deleted.
+.EATTR
+.EATTRS
+.EDATAST
+.DATAST "struct listitrdata" "libs/intern.c"
+.USAGE
+Storage for data used in dointernlistitr.
+.ATTRS
+.ATTR "plList"
+The list being iterated over.
+.EATTR
+.ATTR "pfFunc"
+The function to call for each pair.
+.EATTR
+.ATTR "pvData"
+The data to pass to pfFunc.
+.EATTR
+.EATTRS
+.EDATAST
+.BFUNCT "void" "dointernlistitr" "const char *, internkey, void *" "libs/intern.c"
+.USAGE
+Internal function for using foreachintern to implement foreachinternlist.
+.ARGS
+.ARG "const char *"
+The name of the entry in the intern list.
+.ARG "internkey"
+The key of the entry in the intern list.
+.ARG "void *"
+The listitrdata we use for data storage.
 .EARGS
 .EFUNCT

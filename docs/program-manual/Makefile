@@ -12,4 +12,4 @@ datastructs.ms: datastructs/*.ms
 	touch datastructs.ms
 
 preview: program-manual.pdf
-	mupdf-gl program-manual.pdf
+	mupdf-x11 program-manual.pdf

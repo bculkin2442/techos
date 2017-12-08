@@ -23,19 +23,26 @@ Positive if the command failed in a non-fatal manner.
 Negative if the command failed in a fatal manner.
 .RE
 .ETYPED
+.DATAST "enum commandtype" "command.h"
+.USAGE
+Represents the different types of command that exist.
+.ATTRS
+.ATTR "" "CT_NORMAL"
+A normal command, who is represented by a struct command.
+.EATTRS
+.EDATAST
 .DATAST "struct command" "command.h"
 .USAGE
 The core data structure that represents an executable command.
 .ATTRS
+.ATTR "enum commandtype" "type"
+The type of the command. For this struct, should be CT_NORMAL.
 .ATTR "char *" "name"
 The name of the command.
-.EATTR
 .ATTR "char *" "brief"
 A brief description of the command.
-.EATTR
 .ATTR "comfun_t" "comfun"
 The handler that executes the command.
-.EATTR
 .EATTRS
 .EDATAST
 .DATAST "DECLCOM(name)" "command.h"
@@ -65,25 +72,4 @@ The state of the OS.
 .EARGS
 .RETURN
 Always returns zero.
-.EFUNCT
-.FUNCT "struct command *" "makecommand" "char *, char *, comfun_t" "command.h"
-.USAGE
-Create a new normal (CT_NORMAL) command.
-.ARGS
-.ARG "char *"
-The name of the command,
-.ARG "char *"
-A brief description of the command.
-.ARG "comfun_t"
-The handler function for the command.
-.EARGS
-.RETURN
-A new normal command
-.EFUNCT
-.FUNCT "void" "killcommand" "struct command *" "command.h"
-Destroy a normal (CT_NORMAL) command.
-.ARGS
-.ARG "struct command *"
-The command to destroy.
-.EARGS
 .EFUNCT

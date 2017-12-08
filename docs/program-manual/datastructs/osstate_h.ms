@@ -1,3 +1,7 @@
+.DATAST "struct commandstate" "osstate.h"
+.USAGE
+Forward declaration of the state of commands, stored elsewhere.
+.EDATAST
 .DATAST "struct osstate" "osstate.h"
 .USAGE
 Contains general state for things the OS requires.
@@ -22,6 +26,18 @@ The source for writing output to.
 .EATTR
 .ATTR "struct pcbstate *" "pPCBstat"
 The state needed for PCBs.
+.EATTR
+.ATTR "struct commandstate *" "pComstate"
+The state of commands.
+.EATTR
+.ATTR "int" "fWorkingDir"
+File descriptor for the base working dir. of the OS.
+.EATTR
+.ATTR "struct user *" "puCurrent"
+The current logged in user.
+.EATTR
+.ATTR "struct userdb *" "pdUsers"
+The database of users.
 .EATTR
 .EATTRS
 .EDATAST

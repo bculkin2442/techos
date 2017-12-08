@@ -1,0 +1,6 @@
+.COMDECL "ls" "filecmds.h"
+.COMDECL "cd" "filecmds.h"
+.COMDECL "mkdir" "filecmds.h"
+.COMDECL "rmdir" "filecmds.h"
+.COMDECL "touch" "filecmds.h"
+.COMDECL "rm" "filecmds.h"

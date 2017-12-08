@@ -4,9 +4,11 @@ Contains the command-line arguments parsed from an input line.
 .ATTRS
 .ATTR "int" "argc"
 The number of command-line arguments in place.
+.EATTR
 .ATTR "char **" "argv"
 The array of the command-line arguments. Is an array of \fIargc\fP strings.
 .EATTR
+.EATTRS
 .EDATAST
 .FUNCT "struct cliargs" "parseargs" "char *" "libs/argparser.h"
 .USAGE

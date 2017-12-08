@@ -53,6 +53,12 @@ Indicates whether the PCB is running, ready to run, or blocked.
 .ATTR "enum pcbsusp" "susp"
 Indicates whether the PCB is suspended or not.
 .EATTR
+.ATTR "internkey" "kImage"
+The key for the image of this process.
+.EATTR
+.ATTR "int" "offset"
+The current execution offset of the process.
+.EATTR
 .ATTR "struct pcb *" "pNext"
 The next process in the queue this PCB is in.
 .EATTR
@@ -61,7 +67,14 @@ The previous process in the queue this PCB is in.
 .EATTR
 .EATTRS
 .EDATAST
-.BFUNCT "struct pcb *" "makepcb" "struct pcbstate *, char *, enum pcbclass, int" "pcb.h"
+.DATAST
+.USAGE
+Forward declaration for queues of PCBs.
+.EDATAST
+.USAGE
+Forward declaration for the container of all of the PCB states.
+.EDATAST
+.BFUNCT "struct pcb *" "makepcb" "struct pcbstate *, char *, char *, enum pcbclass, int" "pcb.h"
 .USAGE
 Allocate/initialize a new PCB.
 .ARGS
@@ -70,6 +83,9 @@ The current state for all PCBs.
 .EARG
 .ARG "char *"
 The name of the PCB.
+.EARG
+.ARG "char *"
+The path to the process image for the PCB.
 .EARG
 .ARG "enum pcbclass"
 The classification of the PCB.
@@ -183,4 +199,25 @@ The set of queues to remove a PCB from.
 The PCB to remove from the queues.
 .EARG
 .EARGS
+.EFUNCT
+.FUNCT "int" "candispatch" "struct pcbstate *" "pcb.h"
+.USAGE
+Check the number of currently dispatchable summons.
+.ARGS
+.ARG "struct pcbstate *"
+The state to look for PCBs in.
+.EARGS
+.RETURN
+The number of processes that can be dispatched.
+.EFUNCT
+.FUNCT "struct pcb *" "getdisppcb" "struct pcbstate *" "pcb.h"
+.USAGE
+Get a process to dispatch, which is the process with the highest priority that
+is not suspended.
+.ARGS
+.ARG "struct pcbstate *"
+The state to look for PCBs in.
+.EARGS
+.RETURN
+The dispatchable process, or NULL if there are no dispatchable processes.
 .EFUNCT
