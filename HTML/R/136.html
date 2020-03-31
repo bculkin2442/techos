@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<title>pcbstate</title>
+<meta name='robots' content='noindex,nofollow' />
+<meta name='generator' content='GLOBAL-6.3.1' />
+<meta http-equiv='Content-Style-Type' content='text/css' />
+<link rel='stylesheet' type='text/css' href='../style.css' />
+</head>
+<body>
+<pre>
+<span class='curline'><a href='../S/112.html#L66'>pcbstate</a>           66 osstate.h      	struct pcbstate *pPCBstat;</span>
+<span class='curline'><a href='../S/2.html#L13'>pcbstate</a>           13 pcb.c          struct pcb *makepcb(struct pcbstate *pState, char *pszPCBName, char *pszPCBImage, enum pcbclass clas, int prior) {</span>
+<span class='curline'><a href='../S/2.html#L157'>pcbstate</a>          157 pcb.c          struct pcb *findpcbnum(struct pcbstate *pState, int pcbnum) {</span>
+<span class='curline'><a href='../S/2.html#L174'>pcbstate</a>          174 pcb.c          struct pcb *findpcbname(struct pcbstate *pState, char *pszPCBName) {</span>
+<span class='curline'><a href='../S/2.html#L279'>pcbstate</a>          279 pcb.c          enum pcberror insertpcb(struct pcbstate *pState, struct pcb *pPCB) {</span>
+<span class='curline'><a href='../S/2.html#L319'>pcbstate</a>          319 pcb.c          void removepcb(struct pcbstate *pState, struct pcb *pPCB) {</span>
+<span class='curline'><a href='../S/2.html#L458'>pcbstate</a>          458 pcb.c          int candispatch(struct pcbstate *pState) {</span>
+<span class='curline'><a href='../S/2.html#L467'>pcbstate</a>          467 pcb.c          struct pcb *getdisppcb(struct pcbstate *pState) {</span>
+<span class='curline'><a href='../S/104.html#L77'>pcbstate</a>           77 pcb.h          struct pcbstate;</span>
+<span class='curline'><a href='../S/104.html#L80'>pcbstate</a>           80 pcb.h          struct pcb *makepcb(struct pcbstate *, char *, char *, enum pcbclass, int);</span>
+<span class='curline'><a href='../S/104.html#L89'>pcbstate</a>           89 pcb.h          struct pcb *findpcbnum(struct pcbstate *, int);</span>
+<span class='curline'><a href='../S/104.html#L98'>pcbstate</a>           98 pcb.h          struct pcb *findpcbname(struct pcbstate *, char *);</span>
+<span class='curline'><a href='../S/104.html#L118'>pcbstate</a>          118 pcb.h          enum pcberror insertpcb(struct pcbstate *, struct pcb *);</span>
+<span class='curline'><a href='../S/104.html#L125'>pcbstate</a>          125 pcb.h          void removepcb(struct pcbstate *, struct pcb *);</span>
+<span class='curline'><a href='../S/104.html#L143'>pcbstate</a>          143 pcb.h          int candispatch(struct pcbstate *);</span>
+<span class='curline'><a href='../S/104.html#L151'>pcbstate</a>          151 pcb.h          struct pcb *getdispppcb(struct pcbstate *);</span>
+<span class='curline'><a href='../S/7.html#L153'>pcbstate</a>          153 pcbinternals.c struct pcb *poppcb(struct pcbstate *pState, struct pcbqueue *pqQueue) {</span>
+<span class='curline'><a href='../S/7.html#L205'>pcbstate</a>          205 pcbinternals.c struct pcbstate *makepcbstate() {</span>
+<span class='curline'><a href='../S/7.html#L207'>pcbstate</a>          207 pcbinternals.c 	struct pcbstate *pState = malloc(sizeof(struct pcbstate));</span>
+<span class='curline'><a href='../S/7.html#L227'>pcbstate</a>          227 pcbinternals.c void killpcbstate(struct pcbstate *pState) {</span>
+<span class='curline'><a href='../S/46.html#L97'>pcbstate</a>           97 pcbinternals.h struct pcb *poppcb(struct pcbstate *, struct pcbqueue *);</span>
+<span class='curline'><a href='../S/46.html#L100'>pcbstate</a>          100 pcbinternals.h struct pcbstate *makepcbstate();</span>
+<span class='curline'><a href='../S/46.html#L102'>pcbstate</a>          102 pcbinternals.h void             killpcbstate(struct pcbstate *);</span>
+</pre>
+</body>
+</html>

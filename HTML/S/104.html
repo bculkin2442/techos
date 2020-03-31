@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<title>pcb.h</title>
+<meta name='robots' content='noindex,nofollow' />
+<meta name='generator' content='GLOBAL-6.3.1' />
+<meta http-equiv='Content-Style-Type' content='text/css' />
+<link rel='stylesheet' type='text/css' href='../style.css' />
+</head>
+<body>
+<a id='TOP' name='TOP'></a><h2 class='header'><a href='../mains.html'>root</a>/pcb.h</h2>
+<em class='comment'>/* [&lt;][&gt;][^][v][top]<a href='#BOTTOM'>[bottom]</a><a href='../mains.html'>[index]</a><a href='../help.html'>[help]</a> */</em>
+<hr />
+<h2 class='header'><a href='../J/23.html' title='Multiple included from 5 places.'>INCLUDED FROM</a></h2>
+<hr />
+<pre>
+<a id='L1' name='L1'></a>   1 <em class='sharp'>#ifndef</em> <a href='../S/104.html#L2' title='Defined at 2 in pcb.h.'>TECHOS_PCBH</a>
+<a id='L2' name='L2'></a>   2 <em class='sharp'>#define</em> <a href='../S/104.html#L1' title='Referred from 1 in pcb.h.'>TECHOS_PCBH</a>
+<a id='L3' name='L3'></a>   3 
+<a id='L4' name='L4'></a>   4 <em class='sharp'>#include</em> "<a href='98.html'>libs/intern.h</a>"
+<a id='L5' name='L5'></a>   5 
+<a id='L6' name='L6'></a>   6 <em class='sharp'>#define</em> <a href='../R/20.html' title='Multiple referred from 4 places.'>PCB_MINPRIOR</a> 0
+<a id='L7' name='L7'></a>   7 <em class='sharp'>#define</em> <a href='../R/19.html' title='Multiple referred from 11 places.'>PCB_MAXPRIOR</a> 9
+<a id='L8' name='L8'></a>   8 
+<a id='L9' name='L9'></a>   9 <em class='comment'>/* Represents the classification of a PCB. */</em>
+<a id='L10' name='L10'></a>  10 <strong class='reserved'>enum</strong> <a href='../R/132.html' title='Multiple referred from 4 places.'>pcbclass</a> <em class='brace'>{</em>
+<a id='L11' name='L11'></a>  11         <em class='comment'>/* A system process. */</em>
+<a id='L12' name='L12'></a>  12         <a href='../R/24.html' title='Multiple referred from 2 places.'>PCB_SYSTEM</a>      = 0,
+<a id='L13' name='L13'></a>  13         <em class='comment'>/* An application process. */</em>
+<a id='L14' name='L14'></a>  14         <a href='../R/16.html' title='Multiple referred from 3 places.'>PCB_APPLICATION</a> = 1,
+<a id='L15' name='L15'></a>  15 <em class='brace'>}</em>;
+<a id='L16' name='L16'></a>  16 
+<a id='L17' name='L17'></a>  17 <em class='comment'>/* PCB run status. */</em>
+<a id='L18' name='L18'></a>  18 <strong class='reserved'>enum</strong> <a href='../S/104.html#L57' title='Referred from 57 in pcb.h.'>pcbstatus</a> <em class='brace'>{</em>
+<a id='L19' name='L19'></a>  19         <em class='comment'>/* The process is blocked. */</em>
+<a id='L20' name='L20'></a>  20         <a href='../R/17.html' title='Multiple referred from 5 places.'>PCB_BLOCKED</a> = 0,
+<a id='L21' name='L21'></a>  21         <em class='comment'>/* The process is ready to run. */</em>
+<a id='L22' name='L22'></a>  22         <a href='../R/21.html' title='Multiple referred from 5 places.'>PCB_READY</a>   = 1,
+<a id='L23' name='L23'></a>  23         <em class='comment'>/* The process is running. */</em>
+<a id='L24' name='L24'></a>  24         <a href='../R/22.html' title='Multiple referred from 3 places.'>PCB_RUNNING</a> = 2,
+<a id='L25' name='L25'></a>  25 <em class='brace'>}</em>;
+<a id='L26' name='L26'></a>  26 
+<a id='L27' name='L27'></a>  27 <em class='comment'>/* PCB Suspension status. */</em>
+<a id='L28' name='L28'></a>  28 <strong class='reserved'>enum</strong> <a href='../S/104.html#L59' title='Referred from 59 in pcb.h.'>pcbsusp</a> <em class='brace'>{</em>
+<a id='L29' name='L29'></a>  29         <em class='comment'>/* The process is suspended. */</em>
+<a id='L30' name='L30'></a>  30         <a href='../R/23.html' title='Multiple referred from 5 places.'>PCB_SUSPENDED</a> = 0,
+<a id='L31' name='L31'></a>  31         <em class='comment'>/* The process is not suspended. */</em>
+<a id='L32' name='L32'></a>  32         <a href='../R/18.html' title='Multiple referred from 6 places.'>PCB_FREE</a>      = 1,
+<a id='L33' name='L33'></a>  33 <em class='brace'>}</em>;
+<a id='L34' name='L34'></a>  34 
+<a id='L35' name='L35'></a>  35 <em class='comment'>/* Represents a running process. */</em>
+<a id='L36' name='L36'></a>  36 <strong class='reserved'>struct</strong> <a href='../R/131.html' title='Multiple referred from 54 places.'>pcb</a> <em class='brace'>{</em>
+<a id='L37' name='L37'></a>  37         <em class='comment'>/* </em>
+<a id='L38' name='L38'></a>  38 <em class='comment'>         * Process ID.</em>
+<a id='L39' name='L39'></a>  39 <em class='comment'>         *</em>
+<a id='L40' name='L40'></a>  40 <em class='comment'>         * Unique identifier for the processes.</em>
+<a id='L41' name='L41'></a>  41 <em class='comment'>         */</em>
+<a id='L42' name='L42'></a>  42         <strong class='reserved'>int</strong> id;
+<a id='L43' name='L43'></a>  43         <em class='comment'>/* </em>
+<a id='L44' name='L44'></a>  44 <em class='comment'>         * Process name.</em>
+<a id='L45' name='L45'></a>  45 <em class='comment'>         *</em>
+<a id='L46' name='L46'></a>  46 <em class='comment'>         * Stored as a interned string, for fast comparisons.</em>
+<a id='L47' name='L47'></a>  47 <em class='comment'>         */</em>
+<a id='L48' name='L48'></a>  48         <a href='../S/98.html#L9' title='Defined at 9 in libs/intern.h.'>internkey</a>     kName;
+<a id='L49' name='L49'></a>  49 
+<a id='L50' name='L50'></a>  50         <em class='comment'>/* Process class. */</em>
+<a id='L51' name='L51'></a>  51         <strong class='reserved'>enum</strong> <a href='../S/104.html#L10' title='Defined at 10 in pcb.h.'>pcbclass</a> clas;
+<a id='L52' name='L52'></a>  52         <em class='comment'>/* Process priority. */</em>
+<a id='L53' name='L53'></a>  53         <strong class='reserved'>int</strong>           priority;
+<a id='L54' name='L54'></a>  54 
+<a id='L55' name='L55'></a>  55         <em class='comment'>/* PCB status indicators. */</em>
+<a id='L56' name='L56'></a>  56         <em class='comment'>/* Whether the PCB is ready, running or blocked. */</em>
+<a id='L57' name='L57'></a>  57         <strong class='reserved'>enum</strong> <a href='../S/104.html#L18' title='Defined at 18 in pcb.h.'>pcbstatus</a> status;
+<a id='L58' name='L58'></a>  58         <em class='comment'>/* Whether the PCB is suspended or not. */</em>
+<a id='L59' name='L59'></a>  59         <strong class='reserved'>enum</strong> <a href='../S/104.html#L28' title='Defined at 28 in pcb.h.'>pcbsusp</a>   susp;
+<a id='L60' name='L60'></a>  60 
+<a id='L61' name='L61'></a>  61         <em class='comment'>/* Process state indicators. */</em>
+<a id='L62' name='L62'></a>  62         <em class='comment'>/* The image for this process. */</em>
+<a id='L63' name='L63'></a>  63         <a href='../S/98.html#L9' title='Defined at 9 in libs/intern.h.'>internkey</a> kImage;
+<a id='L64' name='L64'></a>  64         <em class='comment'>/* The current offset into the process. */</em>
+<a id='L65' name='L65'></a>  65         <strong class='reserved'>int</strong> offset;
+<a id='L66' name='L66'></a>  66 
+<a id='L67' name='L67'></a>  67         <em class='comment'>/* The next process in whatever queue this PCB is in. */</em>
+<a id='L68' name='L68'></a>  68         <strong class='reserved'>struct</strong> <a href='../S/104.html#L36' title='Defined at 36 in pcb.h.'>pcb</a> *pNext;
+<a id='L69' name='L69'></a>  69         <em class='comment'>/* The previous process in whatever queue this PCB is in. */</em>
+<a id='L70' name='L70'></a>  70         <strong class='reserved'>struct</strong> <a href='../S/104.html#L36' title='Defined at 36 in pcb.h.'>pcb</a> *pPrev;
+<a id='L71' name='L71'></a>  71 <em class='brace'>}</em>;
+<a id='L72' name='L72'></a>  72 
+<a id='L73' name='L73'></a>  73 <em class='comment'>/* Represents a circular queue of PCBs. */</em>
+<a id='L74' name='L74'></a>  74 <strong class='reserved'>struct</strong> <a href='../S/46.html#L25' title='Defined at 25 in pcbinternals.h.'>pcbqueue</a>;
+<a id='L75' name='L75'></a>  75 
+<a id='L76' name='L76'></a>  76 <em class='comment'>/* Contains all of the PCB queues. */</em>
+<a id='L77' name='L77'></a>  77 <strong class='reserved'>struct</strong> <a href='../S/46.html#L57' title='Defined at 57 in pcbinternals.h.'>pcbstate</a>;
+<a id='L78' name='L78'></a>  78 
+<a id='L79' name='L79'></a>  79 <em class='comment'>/* Allocate a new PCB. */</em>
+<a id='L80' name='L80'></a>  80 <strong class='reserved'>struct</strong> <a href='../S/104.html#L36' title='Defined at 36 in pcb.h.'>pcb</a> *<a href='../S/2.html#L13' title='Defined at 13 in pcb.c.'>makepcb</a>(<strong class='reserved'>struct</strong> <a href='../S/46.html#L57' title='Defined at 57 in pcbinternals.h.'>pcbstate</a> *, <strong class='reserved'>char</strong> *, <strong class='reserved'>char</strong> *, <strong class='reserved'>enum</strong> <a href='../S/104.html#L10' title='Defined at 10 in pcb.h.'>pcbclass</a>, <strong class='reserved'>int</strong>);
+<a id='L81' name='L81'></a>  81 <em class='comment'>/* Deallocate a PCB. */</em>
+<a id='L82' name='L82'></a>  82 <strong class='reserved'>void</strong>        <a href='../S/2.html#L49' title='Defined at 49 in pcb.c.'>killpcb</a>(<strong class='reserved'>struct</strong> <a href='../S/104.html#L36' title='Defined at 36 in pcb.h.'>pcb</a> *);
+<a id='L83' name='L83'></a>  83 
+<a id='L84' name='L84'></a>  84 <em class='comment'>/*</em>
+<a id='L85' name='L85'></a>  85 <em class='comment'> * Find a PCB by its process number in a set of queues. </em>
+<a id='L86' name='L86'></a>  86 <em class='comment'> *</em>
+<a id='L87' name='L87'></a>  87 <em class='comment'> * Returns NULL if the PCB wasn't found.</em>
+<a id='L88' name='L88'></a>  88 <em class='comment'> */</em>
+<a id='L89' name='L89'></a>  89 <strong class='reserved'>struct</strong> <a href='../S/104.html#L36' title='Defined at 36 in pcb.h.'>pcb</a> *<a href='../S/2.html#L157' title='Defined at 157 in pcb.c.'>findpcbnum</a>(<strong class='reserved'>struct</strong> <a href='../S/46.html#L57' title='Defined at 57 in pcbinternals.h.'>pcbstate</a> *, <strong class='reserved'>int</strong>);
+<a id='L90' name='L90'></a>  90 <em class='comment'>/*</em>
+<a id='L91' name='L91'></a>  91 <em class='comment'> * Find a PCB by its process name in a set of queues.</em>
+<a id='L92' name='L92'></a>  92 <em class='comment'> *</em>
+<a id='L93' name='L93'></a>  93 <em class='comment'> * Returns NULL if the PCB wasn't found.</em>
+<a id='L94' name='L94'></a>  94 <em class='comment'> *</em>
+<a id='L95' name='L95'></a>  95 <em class='comment'> * WARNING: Will only return the first PCB by a given name, searching the</em>
+<a id='L96' name='L96'></a>  96 <em class='comment'> * queues in a defined but unspecified way.</em>
+<a id='L97' name='L97'></a>  97 <em class='comment'> */</em>
+<a id='L98' name='L98'></a>  98 <strong class='reserved'>struct</strong> <a href='../S/104.html#L36' title='Defined at 36 in pcb.h.'>pcb</a> *<a href='../S/2.html#L174' title='Defined at 174 in pcb.c.'>findpcbname</a>(<strong class='reserved'>struct</strong> <a href='../S/46.html#L57' title='Defined at 57 in pcbinternals.h.'>pcbstate</a> *, <strong class='reserved'>char</strong> *);
+<a id='L99' name='L99'></a>  99 
+<a id='L100' name='L100'></a> 100 <em class='comment'>/* insertpcb() errors */</em>
+<a id='L101' name='L101'></a> 101 <strong class='reserved'>enum</strong> <a href='../R/133.html' title='Multiple referred from 4 places.'>pcberror</a> <em class='brace'>{</em>
+<a id='L102' name='L102'></a> 102         <a href='../R/15.html' title='Multiple referred from 2 places.'>PCBSUCCESS</a> =  0,
+<a id='L103' name='L103'></a> 103         <a href='../R/13.html' title='Multiple referred from 3 places.'>PCBINVSUSP</a> = -1,
+<a id='L104' name='L104'></a> 104         <a href='../R/12.html' title='Multiple referred from 3 places.'>PCBINVSTAT</a> = -2,
+<a id='L105' name='L105'></a> 105         <a href='../R/14.html' title='Multiple referred from 3 places.'>PCBRUNNING</a> = -3,
+<a id='L106' name='L106'></a> 106         <a href='../R/11.html' title='Multiple referred from 3 places.'>PCBINQUEUE</a> = -4,
+<a id='L107' name='L107'></a> 107 <em class='brace'>}</em>;
+<a id='L108' name='L108'></a> 108 <em class='comment'>/*</em>
+<a id='L109' name='L109'></a> 109 <em class='comment'> * Insert a PCB into the proper queue.</em>
+<a id='L110' name='L110'></a> 110 <em class='comment'> *</em>
+<a id='L111' name='L111'></a> 111 <em class='comment'> * Returns PCBSUCCESS on success or an error code on failure.</em>
+<a id='L112' name='L112'></a> 112 <em class='comment'> * Can have one of the following errors:</em>
+<a id='L113' name='L113'></a> 113 <em class='comment'> * - PCBINVSUSP: Invalid PCB suspension status</em>
+<a id='L114' name='L114'></a> 114 <em class='comment'> * - PCBINVSTAT: Invalid PCB run status</em>
+<a id='L115' name='L115'></a> 115 <em class='comment'> * - PCBRUNNING: Attempted to add a running PCB to a queue.</em>
+<a id='L116' name='L116'></a> 116 <em class='comment'> * - PCBINQUEUE: Attempted to add a PCB that is already in a queue.</em>
+<a id='L117' name='L117'></a> 117 <em class='comment'> */</em>
+<a id='L118' name='L118'></a> 118 <strong class='reserved'>enum</strong> <a href='../S/104.html#L101' title='Defined at 101 in pcb.h.'>pcberror</a> <a href='../S/2.html#L279' title='Defined at 279 in pcb.c.'>insertpcb</a>(<strong class='reserved'>struct</strong> <a href='../S/46.html#L57' title='Defined at 57 in pcbinternals.h.'>pcbstate</a> *, <strong class='reserved'>struct</strong> <a href='../S/104.html#L36' title='Defined at 36 in pcb.h.'>pcb</a> *);
+<a id='L119' name='L119'></a> 119 <em class='comment'>/*</em>
+<a id='L120' name='L120'></a> 120 <em class='comment'> * Remove a PCB from the queue it is in.</em>
+<a id='L121' name='L121'></a> 121 <em class='comment'> *</em>
+<a id='L122' name='L122'></a> 122 <em class='comment'> * WARNING: Attempting to remove a PCB that is not in a queue from a queue may</em>
+<a id='L123' name='L123'></a> 123 <em class='comment'> * cause weirdness to happen.</em>
+<a id='L124' name='L124'></a> 124 <em class='comment'> */</em>
+<a id='L125' name='L125'></a> 125 <strong class='reserved'>void</strong> <a href='../S/2.html#L319' title='Defined at 319 in pcb.c.'>removepcb</a>(<strong class='reserved'>struct</strong> <a href='../S/46.html#L57' title='Defined at 57 in pcbinternals.h.'>pcbstate</a> *, <strong class='reserved'>struct</strong> <a href='../S/104.html#L36' title='Defined at 36 in pcb.h.'>pcb</a> *);
+<a id='L126' name='L126'></a> 126 <em class='comment'>/*</em>
+<a id='L127' name='L127'></a> 127 <em class='comment'> * Print a PCB.</em>
+<a id='L128' name='L128'></a> 128 <em class='comment'> *</em>
+<a id='L129' name='L129'></a> 129 <em class='comment'> * The void pointer should be a pointer to an OS state, but is a void* to comply</em>
+<a id='L130' name='L130'></a> 130 <em class='comment'> * with foreachpcb()</em>
+<a id='L131' name='L131'></a> 131 <em class='comment'> */</em>
+<a id='L132' name='L132'></a> 132 <strong class='reserved'>void</strong> <a href='../S/2.html#L377' title='Defined at 377 in pcb.c.'>printpcb</a>(<strong class='reserved'>struct</strong> <a href='../S/104.html#L36' title='Defined at 36 in pcb.h.'>pcb</a> *, <strong class='reserved'>void</strong> *);
+<a id='L133' name='L133'></a> 133 
+<a id='L134' name='L134'></a> 134 <em class='comment'>/*</em>
+<a id='L135' name='L135'></a> 135 <em class='comment'> * Dispatching related commands.</em>
+<a id='L136' name='L136'></a> 136 <em class='comment'> */</em>
+<a id='L137' name='L137'></a> 137 
+<a id='L138' name='L138'></a> 138 <em class='comment'>/*</em>
+<a id='L139' name='L139'></a> 139 <em class='comment'> * Check if there are any processes to dispatch.</em>
+<a id='L140' name='L140'></a> 140 <em class='comment'> *</em>
+<a id='L141' name='L141'></a> 141 <em class='comment'> * Returns the number of dispatchable processes.</em>
+<a id='L142' name='L142'></a> 142 <em class='comment'> */</em>
+<a id='L143' name='L143'></a> 143 <strong class='reserved'>int</strong> <a href='../S/2.html#L458' title='Defined at 458 in pcb.c.'>candispatch</a>(<strong class='reserved'>struct</strong> <a href='../S/46.html#L57' title='Defined at 57 in pcbinternals.h.'>pcbstate</a> *);
+<a id='L144' name='L144'></a> 144 <em class='comment'>/* </em>
+<a id='L145' name='L145'></a> 145 <em class='comment'> * Get a process to dispatch. </em>
+<a id='L146' name='L146'></a> 146 <em class='comment'> *</em>
+<a id='L147' name='L147'></a> 147 <em class='comment'> * A dispatchable process is one that is not suspended.</em>
+<a id='L148' name='L148'></a> 148 <em class='comment'> *</em>
+<a id='L149' name='L149'></a> 149 <em class='comment'> * Returns the dispatchable process, or NULL if none were available.</em>
+<a id='L150' name='L150'></a> 150 <em class='comment'> */</em>
+<a id='L151' name='L151'></a> 151 <strong class='reserved'>struct</strong> <a href='../S/104.html#L36' title='Defined at 36 in pcb.h.'>pcb</a> *getdispppcb(<strong class='reserved'>struct</strong> <a href='../S/46.html#L57' title='Defined at 57 in pcbinternals.h.'>pcbstate</a> *);
+<a id='L152' name='L152'></a> 152 <em class='sharp'>#endif</em>
+</pre>
+<hr />
+<a id='BOTTOM' name='BOTTOM'></a>
+<em class='comment'>/* [&lt;][&gt;][^][v]<a href='#TOP'>[top]</a>[bottom]<a href='../mains.html'>[index]</a><a href='../help.html'>[help]</a> */</em>
+</body>
+</html>

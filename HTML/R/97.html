@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<title>internlist</title>
+<meta name='robots' content='noindex,nofollow' />
+<meta name='generator' content='GLOBAL-6.3.1' />
+<meta http-equiv='Content-Style-Type' content='text/css' />
+<link rel='stylesheet' type='text/css' href='../style.css' />
+</head>
+<body>
+<pre>
+<span class='curline'><a href='../S/101.html#L360'>internlist</a>        360 libs/intern.c  struct internlist *makeinternlist(int initcap, void (*pfDestroy)(void *)) {</span>
+<span class='curline'><a href='../S/101.html#L362'>internlist</a>        362 libs/intern.c  	struct internlist *plList = malloc(sizeof(struct internlist));</span>
+<span class='curline'><a href='../S/101.html#L381'>internlist</a>        381 libs/intern.c  void killinternlist(struct internlist * plList) {</span>
+<span class='curline'><a href='../S/101.html#L396'>internlist</a>        396 libs/intern.c  void putinternlist(struct internlist *plList, char *pszKey, void *pvData) {</span>
+<span class='curline'><a href='../S/101.html#L425'>internlist</a>        425 libs/intern.c  void *getinternlist(struct internlist * plList, char *pszKey) {</span>
+<span class='curline'><a href='../S/101.html#L436'>internlist</a>        436 libs/intern.c  void deleteinternlist(struct internlist *plList, char *pszKey) {</span>
+<span class='curline'><a href='../S/101.html#L453'>internlist</a>        453 libs/intern.c  int containsinternlist(struct internlist *plList, char *pszKey) {</span>
+<span class='curline'><a href='../S/101.html#L465'>internlist</a>        465 libs/intern.c  	struct internlist *plList;</span>
+<span class='curline'><a href='../S/101.html#L484'>internlist</a>        484 libs/intern.c  void foreachinternlist(struct internlist *plList, internlistitr pfFunc, void *pvData) {</span>
+<span class='curline'><a href='../S/98.html#L64'>internlist</a>         64 libs/intern.h  struct internlist;</span>
+<span class='curline'><a href='../S/98.html#L72'>internlist</a>         72 libs/intern.h  struct internlist *makeinternlist(int, void (*pfDestroy)(void *));</span>
+<span class='curline'><a href='../S/98.html#L74'>internlist</a>         74 libs/intern.h  void               killinternlist(struct internlist *);</span>
+<span class='curline'><a href='../S/98.html#L77'>internlist</a>         77 libs/intern.h  void  putinternlist(struct internlist *, char *, void *);</span>
+<span class='curline'><a href='../S/98.html#L83'>internlist</a>         83 libs/intern.h  void *getinternlist(struct internlist *, char *);</span>
+<span class='curline'><a href='../S/98.html#L85'>internlist</a>         85 libs/intern.h  void  deleteinternlist(struct internlist *, char *);</span>
+<span class='curline'><a href='../S/98.html#L91'>internlist</a>         91 libs/intern.h  int  containsinternlist(struct internlist *, char *);</span>
+<span class='curline'><a href='../S/98.html#L95'>internlist</a>         95 libs/intern.h  void foreachinternlist(struct internlist *, internlistitr, void *);</span>
+<span class='curline'><a href='../S/10.html#L23'>internlist</a>         23 users.c        	struct internlist *plUsers;</span>
+</pre>
+</body>
+</html>

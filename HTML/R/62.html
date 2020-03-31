@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<title>bucket</title>
+<meta name='robots' content='noindex,nofollow' />
+<meta name='generator' content='GLOBAL-6.3.1' />
+<meta http-equiv='Content-Style-Type' content='text/css' />
+<link rel='stylesheet' type='text/css' href='../style.css' />
+</head>
+<body>
+<pre>
+<span class='curline'><a href='../S/101.html#L61'>bucket</a>             61 libs/intern.c  	struct bucket *next;</span>
+<span class='curline'><a href='../S/101.html#L63'>bucket</a>             63 libs/intern.c  	struct bucket *prev;</span>
+<span class='curline'><a href='../S/101.html#L72'>bucket</a>             72 libs/intern.c  	struct bucket *strings[BUCKET_COUNT];</span>
+<span class='curline'><a href='../S/101.html#L74'>bucket</a>             74 libs/intern.c  	struct bucket *keys[BUCKET_COUNT];</span>
+<span class='curline'><a href='../S/101.html#L92'>bucket</a>             92 libs/intern.c  		tab-&gt;strings[i]       = malloc(sizeof(struct bucket));</span>
+<span class='curline'><a href='../S/101.html#L99'>bucket</a>             99 libs/intern.c  		tab-&gt;keys[i]       = malloc(sizeof(struct bucket));</span>
+<span class='curline'><a href='../S/101.html#L110'>bucket</a>            110 libs/intern.c  static void killbucket(struct bucket *buck, int freestrings) {</span>
+<span class='curline'><a href='../S/101.html#L123'>bucket</a>            123 libs/intern.c  		struct bucket *tmp;</span>
+<span class='curline'><a href='../S/101.html#L153'>bucket</a>            153 libs/intern.c  static void addbucket(struct bucket *bucket) {</span>
+<span class='curline'><a href='../S/101.html#L155'>bucket</a>            155 libs/intern.c  	struct bucket *nbucket;</span>
+<span class='curline'><a href='../S/101.html#L156'>bucket</a>            156 libs/intern.c  	nbucket = malloc(sizeof(struct bucket));</span>
+<span class='curline'><a href='../S/101.html#L159'>bucket</a>            159 libs/intern.c  	if(bucket-&gt;next == NULL) {</span>
+<span class='curline'><a href='../S/101.html#L161'>bucket</a>            161 libs/intern.c  		bucket-&gt;next  = nbucket;</span>
+<span class='curline'><a href='../S/101.html#L162'>bucket</a>            162 libs/intern.c  		bucket-&gt;prev  = nbucket;</span>
+<span class='curline'><a href='../S/101.html#L164'>bucket</a>            164 libs/intern.c  		nbucket-&gt;next = bucket;</span>
+<span class='curline'><a href='../S/101.html#L165'>bucket</a>            165 libs/intern.c  		nbucket-&gt;prev = bucket;</span>
+<span class='curline'><a href='../S/101.html#L170'>bucket</a>            170 libs/intern.c  		struct bucket *nextbucket;</span>
+<span class='curline'><a href='../S/101.html#L171'>bucket</a>            171 libs/intern.c  		nextbucket = bucket-&gt;next;</span>
+<span class='curline'><a href='../S/101.html#L174'>bucket</a>            174 libs/intern.c  		bucket-&gt;next     = nbucket;</span>
+<span class='curline'><a href='../S/101.html#L178'>bucket</a>            178 libs/intern.c  		nbucket-&gt;prev = bucket;</span>
+<span class='curline'><a href='../S/101.html#L189'>bucket</a>            189 libs/intern.c  	struct bucket *sbucket, *kbucket;</span>
+<span class='curline'><a href='../S/101.html#L250'>bucket</a>            250 libs/intern.c  	struct bucket *sbucket;</span>
+<span class='curline'><a href='../S/101.html#L284'>bucket</a>            284 libs/intern.c  	struct bucket *kbucket;</span>
+<span class='curline'><a href='../S/101.html#L319'>bucket</a>            319 libs/intern.c  		struct bucket *buck;</span>
+</pre>
+</body>
+</html>

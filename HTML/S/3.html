@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<title>users.h</title>
+<meta name='robots' content='noindex,nofollow' />
+<meta name='generator' content='GLOBAL-6.3.1' />
+<meta http-equiv='Content-Style-Type' content='text/css' />
+<link rel='stylesheet' type='text/css' href='../style.css' />
+</head>
+<body>
+<a id='TOP' name='TOP'></a><h2 class='header'><a href='../mains.html'>root</a>/users.h</h2>
+<em class='comment'>/* [&lt;][&gt;][^][v][top]<a href='#BOTTOM'>[bottom]</a><a href='../mains.html'>[index]</a><a href='../help.html'>[help]</a> */</em>
+<hr />
+<h2 class='header'><a href='../J/37.html' title='Multiple included from 3 places.'>INCLUDED FROM</a></h2>
+<hr />
+<pre>
+<a id='L1' name='L1'></a>   1 <em class='sharp'>#ifndef</em> <a href='../S/3.html#L2' title='Defined at 2 in users.h.'>TECHOS_USERS_H</a>
+<a id='L2' name='L2'></a>   2 <em class='sharp'>#define</em> <a href='../S/3.html#L1' title='Referred from 1 in users.h.'>TECHOS_USERS_H</a>
+<a id='L3' name='L3'></a>   3 
+<a id='L4' name='L4'></a>   4 <em class='comment'>/* The types of users available. */</em>
+<a id='L5' name='L5'></a>   5 <strong class='reserved'>enum</strong> <a href='../R/159.html' title='Multiple referred from 4 places.'>utype</a> <em class='brace'>{</em>
+<a id='L6' name='L6'></a>   6         <em class='comment'>/* Basic User</em>
+<a id='L7' name='L7'></a>   7 <em class='comment'>         *</em>
+<a id='L8' name='L8'></a>   8 <em class='comment'>         * Have access to all normal commands.</em>
+<a id='L9' name='L9'></a>   9 <em class='comment'>         */</em>
+<a id='L10' name='L10'></a>  10         <a href='../R/57.html' title='Multiple referred from 10 places.'>UTY_BASIC</a>,
+<a id='L11' name='L11'></a>  11         <em class='comment'>/*</em>
+<a id='L12' name='L12'></a>  12 <em class='comment'>         * Administrator</em>
+<a id='L13' name='L13'></a>  13 <em class='comment'>         *</em>
+<a id='L14' name='L14'></a>  14 <em class='comment'>         * All the permissions of basic users, plus the ability to</em>
+<a id='L15' name='L15'></a>  15 <em class='comment'>         * create/delete/modify basic users.</em>
+<a id='L16' name='L16'></a>  16 <em class='comment'>         */</em>
+<a id='L17' name='L17'></a>  17         <a href='../R/56.html' title='Multiple referred from 9 places.'>UTY_ADMIN</a>,
+<a id='L18' name='L18'></a>  18         <em class='comment'>/*</em>
+<a id='L19' name='L19'></a>  19 <em class='comment'>         * Root Administrator</em>
+<a id='L20' name='L20'></a>  20 <em class='comment'>         *</em>
+<a id='L21' name='L21'></a>  21 <em class='comment'>         * All the permissions of administrators, plus the ability to</em>
+<a id='L22' name='L22'></a>  22 <em class='comment'>         * create/delete/modify administrators.</em>
+<a id='L23' name='L23'></a>  23 <em class='comment'>         */</em>
+<a id='L24' name='L24'></a>  24         <a href='../R/58.html' title='Multiple referred from 7 places.'>UTY_ROOT</a>,
+<a id='L25' name='L25'></a>  25 <em class='brace'>}</em>;
+<a id='L26' name='L26'></a>  26 
+<a id='L27' name='L27'></a>  27 <em class='comment'>/* Represents a TechOS user. */</em>
+<a id='L28' name='L28'></a>  28 <strong class='reserved'>struct</strong> <a href='../R/157.html' title='Multiple referred from 13 places.'>user</a> <em class='brace'>{</em>
+<a id='L29' name='L29'></a>  29         <em class='comment'>/* The type of the user. */</em>
+<a id='L30' name='L30'></a>  30         <strong class='reserved'>enum</strong> <a href='../S/3.html#L5' title='Defined at 5 in users.h.'>utype</a> type;
+<a id='L31' name='L31'></a>  31 
+<a id='L32' name='L32'></a>  32         <em class='comment'>/* The name of the user. */</em>
+<a id='L33' name='L33'></a>  33         <strong class='reserved'>char</strong> *pszName;
+<a id='L34' name='L34'></a>  34         <em class='comment'>/* The password of the user. */</em>
+<a id='L35' name='L35'></a>  35         <strong class='reserved'>char</strong> *pszPass;
+<a id='L36' name='L36'></a>  36 <em class='brace'>}</em>;
+<a id='L37' name='L37'></a>  37 
+<a id='L38' name='L38'></a>  38 <em class='comment'>/* Represents all of the available users. */</em>
+<a id='L39' name='L39'></a>  39 <strong class='reserved'>struct</strong> <a href='../S/10.html#L22' title='Defined at 22 in users.c.'>userdb</a>;
+<a id='L40' name='L40'></a>  40 
+<a id='L41' name='L41'></a>  41 <em class='comment'>/* Create a user DB. */</em>
+<a id='L42' name='L42'></a>  42 <strong class='reserved'>struct</strong> <a href='../S/10.html#L22' title='Defined at 22 in users.c.'>userdb</a> *<a href='../S/10.html#L26' title='Defined at 26 in users.c.'>makeudb</a>();
+<a id='L43' name='L43'></a>  43 <em class='comment'>/* Destroy a user DB. */</em>
+<a id='L44' name='L44'></a>  44 <strong class='reserved'>void</strong>           <a href='../S/10.html#L40' title='Defined at 40 in users.c.'>killudb</a>(<strong class='reserved'>struct</strong> <a href='../S/10.html#L22' title='Defined at 22 in users.c.'>userdb</a> *);
+<a id='L45' name='L45'></a>  45 <em class='comment'>/* Insert a user into the database. */</em>
+<a id='L46' name='L46'></a>  46 <strong class='reserved'>void</strong>          <a href='../S/10.html#L52' title='Defined at 52 in users.c.'>udbinsert</a>(<strong class='reserved'>struct</strong> <a href='../S/10.html#L22' title='Defined at 22 in users.c.'>userdb</a> *, <strong class='reserved'>enum</strong> <a href='../S/3.html#L5' title='Defined at 5 in users.h.'>utype</a>, <strong class='reserved'>char</strong> *, <strong class='reserved'>char</strong> *);
+<a id='L47' name='L47'></a>  47 <em class='comment'>/* </em>
+<a id='L48' name='L48'></a>  48 <em class='comment'> * Lookup a user in the user database.</em>
+<a id='L49' name='L49'></a>  49 <em class='comment'> *</em>
+<a id='L50' name='L50'></a>  50 <em class='comment'> * Returns NULL if there  is no user by that name.</em>
+<a id='L51' name='L51'></a>  51 <em class='comment'> */</em>
+<a id='L52' name='L52'></a>  52 <strong class='reserved'>struct</strong> <a href='../S/3.html#L28' title='Defined at 28 in users.h.'>user</a> *<a href='../S/10.html#L48' title='Defined at 48 in users.c.'>udblookup</a>(<strong class='reserved'>struct</strong> <a href='../S/10.html#L22' title='Defined at 22 in users.c.'>userdb</a> *, <strong class='reserved'>char</strong> *);
+<a id='L53' name='L53'></a>  53 <em class='comment'>/* Remove a user by name from the user database. */</em>
+<a id='L54' name='L54'></a>  54 <strong class='reserved'>void</strong>         <a href='../S/10.html#L64' title='Defined at 64 in users.c.'>udbremove</a>(<strong class='reserved'>struct</strong> <a href='../S/10.html#L22' title='Defined at 22 in users.c.'>userdb</a> *, <strong class='reserved'>char</strong> *);
+<a id='L55' name='L55'></a>  55 
+<a id='L56' name='L56'></a>  56 <em class='comment'>/* Load user database from a file. */</em>
+<a id='L57' name='L57'></a>  57 <strong class='reserved'>void</strong> <a href='../S/10.html#L69' title='Defined at 69 in users.c.'>ramfileintodb</a>(<strong class='reserved'>struct</strong> <a href='../S/10.html#L22' title='Defined at 22 in users.c.'>userdb</a> *, <strong class='reserved'>char</strong> *);
+<a id='L58' name='L58'></a>  58 <em class='comment'>/* Save user database to a file. */</em>
+<a id='L59' name='L59'></a>  59 <strong class='reserved'>void</strong> <a href='../S/10.html#L157' title='Defined at 157 in users.c.'>ramdbintofile</a>(<strong class='reserved'>struct</strong> <a href='../S/10.html#L22' title='Defined at 22 in users.c.'>userdb</a> *, <strong class='reserved'>char</strong> *);
+<a id='L60' name='L60'></a>  60 <em class='sharp'>#endif</em>
+</pre>
+<hr />
+<a id='BOTTOM' name='BOTTOM'></a>
+<em class='comment'>/* [&lt;][&gt;][^][v]<a href='#TOP'>[top]</a>[bottom]<a href='../mains.html'>[index]</a><a href='../help.html'>[help]</a> */</em>
+</body>
+</html>

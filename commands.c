@@ -275,8 +275,8 @@ HANDLECOM(help) {
 
 	return 0;
 }
-HANDLECOM(moo) {
 
+HANDLECOM(moo) {
 	fprintf(ostate->output, "        (__)\n");
 	fprintf(ostate->output, "        (oo)\n");
 	fprintf(ostate->output, "  /------\\/\n");

@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<title>pcb</title>
+<meta name='robots' content='noindex,nofollow' />
+<meta name='generator' content='GLOBAL-6.3.1' />
+<meta http-equiv='Content-Style-Type' content='text/css' />
+<link rel='stylesheet' type='text/css' href='../style.css' />
+</head>
+<body>
+<pre>
+<span class='curline'><a href='../S/49.html#L41'>pcb</a>                41 dispatchcmds.c 		struct pcb *pPCB;</span>
+<span class='curline'><a href='../S/49.html#L50'>pcb</a>                50 dispatchcmds.c 		pPCB = (struct pcb *)getdisppcb(ostate-&gt;pPCBstat);</span>
+<span class='curline'><a href='../S/2.html#L13'>pcb</a>                13 pcb.c          struct pcb *makepcb(struct pcbstate *pState, char *pszPCBName, char *pszPCBImage, enum pcbclass clas, int prior) {</span>
+<span class='curline'><a href='../S/2.html#L15'>pcb</a>                15 pcb.c          	struct pcb *pPCB;</span>
+<span class='curline'><a href='../S/2.html#L21'>pcb</a>                21 pcb.c          	pPCB = malloc(sizeof(struct pcb));</span>
+<span class='curline'><a href='../S/2.html#L49'>pcb</a>                49 pcb.c          void killpcb(struct pcb * pPCB) {</span>
+<span class='curline'><a href='../S/2.html#L54'>pcb</a>                54 pcb.c          static struct pcb *queuefindpcbnum(struct pcbqueue *pqQueue, int pcbnum) {</span>
+<span class='curline'><a href='../S/2.html#L61'>pcb</a>                61 pcb.c          			struct pcb *pPCB;</span>
+<span class='curline'><a href='../S/2.html#L86'>pcb</a>                86 pcb.c          				struct pcb *pPCB;</span>
+<span class='curline'><a href='../S/2.html#L103'>pcb</a>               103 pcb.c          static struct pcb *queuefindpcbname(struct pcbqueue *pqQueue, int kPCBName) {</span>
+<span class='curline'><a href='../S/2.html#L110'>pcb</a>               110 pcb.c          			struct pcb *pPCB;</span>
+<span class='curline'><a href='../S/2.html#L141'>pcb</a>               141 pcb.c          				struct pcb *pPCB;</span>
+<span class='curline'><a href='../S/2.html#L157'>pcb</a>               157 pcb.c          struct pcb *findpcbnum(struct pcbstate *pState, int pcbnum) {</span>
+<span class='curline'><a href='../S/2.html#L159'>pcb</a>               159 pcb.c          	struct pcb *pPCB;</span>
+<span class='curline'><a href='../S/2.html#L174'>pcb</a>               174 pcb.c          struct pcb *findpcbname(struct pcbstate *pState, char *pszPCBName) {</span>
+<span class='curline'><a href='../S/2.html#L176'>pcb</a>               176 pcb.c          	struct pcb *pPCB;</span>
+<span class='curline'><a href='../S/2.html#L198'>pcb</a>               198 pcb.c          static int fillqueue(struct pcbqueue *pqQueue, struct pcb *pPCB) {</span>
+<span class='curline'><a href='../S/2.html#L211'>pcb</a>               211 pcb.c          static void fifoinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {</span>
+<span class='curline'><a href='../S/2.html#L216'>pcb</a>               216 pcb.c          	struct pcb *pHead;</span>
+<span class='curline'><a href='../S/2.html#L218'>pcb</a>               218 pcb.c          	struct pcb *pTail;</span>
+<span class='curline'><a href='../S/2.html#L236'>pcb</a>               236 pcb.c          static void filoinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {</span>
+<span class='curline'><a href='../S/2.html#L251'>pcb</a>               251 pcb.c          static void priorinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {</span>
+<span class='curline'><a href='../S/2.html#L265'>pcb</a>               265 pcb.c          void doinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {</span>
+<span class='curline'><a href='../S/2.html#L279'>pcb</a>               279 pcb.c          enum pcberror insertpcb(struct pcbstate *pState, struct pcb *pPCB) {</span>
+<span class='curline'><a href='../S/2.html#L319'>pcb</a>               319 pcb.c          void removepcb(struct pcbstate *pState, struct pcb *pPCB) {</span>
+<span class='curline'><a href='../S/2.html#L321'>pcb</a>               321 pcb.c          	struct pcb *pPrev, *pNext;</span>
+<span class='curline'><a href='../S/2.html#L377'>pcb</a>               377 pcb.c          void printpcb(struct pcb *pPCB, void *pvState) {</span>
+<span class='curline'><a href='../S/2.html#L467'>pcb</a>               467 pcb.c          struct pcb *getdisppcb(struct pcbstate *pState) {</span>
+<span class='curline'><a href='../S/104.html#L68'>pcb</a>                68 pcb.h          	struct pcb *pNext;</span>
+<span class='curline'><a href='../S/104.html#L70'>pcb</a>                70 pcb.h          	struct pcb *pPrev;</span>
+<span class='curline'><a href='../S/104.html#L80'>pcb</a>                80 pcb.h          struct pcb *makepcb(struct pcbstate *, char *, char *, enum pcbclass, int);</span>
+<span class='curline'><a href='../S/104.html#L82'>pcb</a>                82 pcb.h          void        killpcb(struct pcb *);</span>
+<span class='curline'><a href='../S/104.html#L89'>pcb</a>                89 pcb.h          struct pcb *findpcbnum(struct pcbstate *, int);</span>
+<span class='curline'><a href='../S/104.html#L98'>pcb</a>                98 pcb.h          struct pcb *findpcbname(struct pcbstate *, char *);</span>
+<span class='curline'><a href='../S/104.html#L118'>pcb</a>               118 pcb.h          enum pcberror insertpcb(struct pcbstate *, struct pcb *);</span>
+<span class='curline'><a href='../S/104.html#L125'>pcb</a>               125 pcb.h          void removepcb(struct pcbstate *, struct pcb *);</span>
+<span class='curline'><a href='../S/104.html#L132'>pcb</a>               132 pcb.h          void printpcb(struct pcb *, void *);</span>
+<span class='curline'><a href='../S/104.html#L151'>pcb</a>               151 pcb.h          struct pcb *getdispppcb(struct pcbstate *);</span>
+<span class='curline'><a href='../S/103.html#L164'>pcb</a>               164 pcbcmds.c      	struct pcb *madePCB = makepcb(ostate-&gt;pPCBstat, pszPCBName, pszPCBImage, clas, priority);</span>
+<span class='curline'><a href='../S/103.html#L214'>pcb</a>               214 pcbcmds.c      	struct pcb *pPCB;</span>
+<span class='curline'><a href='../S/103.html#L419'>pcb</a>               419 pcbcmds.c      		struct pcb *foundPCB;</span>
+<span class='curline'><a href='../S/103.html#L538'>pcb</a>               538 pcbcmds.c      	struct pcb *foundPCB;</span>
+<span class='curline'><a href='../S/103.html#L658'>pcb</a>               658 pcbcmds.c      	struct pcb *foundPCB;</span>
+<span class='curline'><a href='../S/103.html#L848'>pcb</a>               848 pcbcmds.c      			struct pcb *pPCB;</span>
+<span class='curline'><a href='../S/7.html#L64'>pcb</a>                64 pcbinternals.c 			struct pcb *pPCB;</span>
+<span class='curline'><a href='../S/7.html#L73'>pcb</a>                73 pcbinternals.c 				struct pcb *tmp;</span>
+<span class='curline'><a href='../S/7.html#L109'>pcb</a>               109 pcbinternals.c void foreachpcb(struct pcbqueue *pqQueue, void(*pcbitr)(struct pcb *, void *), void *arg) {</span>
+<span class='curline'><a href='../S/7.html#L117'>pcb</a>               117 pcbinternals.c 			struct pcb *pPCB;</span>
+<span class='curline'><a href='../S/7.html#L153'>pcb</a>               153 pcbinternals.c struct pcb *poppcb(struct pcbstate *pState, struct pcbqueue *pqQueue) {</span>
+<span class='curline'><a href='../S/7.html#L158'>pcb</a>               158 pcbinternals.c 			struct pcb *pPCB;</span>
+<span class='curline'><a href='../S/7.html#L187'>pcb</a>               187 pcbinternals.c 				struct pcb *pPCB;</span>
+<span class='curline'><a href='../S/46.html#L37'>pcb</a>                37 pcbinternals.h 	struct pcb *pHead;</span>
+<span class='curline'><a href='../S/46.html#L78'>pcb</a>                78 pcbinternals.h void foreachpcb(struct pcbqueue *, void (*pcbitr)(struct pcb *, void *), void *);</span>
+<span class='curline'><a href='../S/46.html#L97'>pcb</a>                97 pcbinternals.h struct pcb *poppcb(struct pcbstate *, struct pcbqueue *);</span>
+</pre>
+</body>
+</html>

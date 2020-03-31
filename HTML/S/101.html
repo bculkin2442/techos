@@ -1,0 +1,535 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<title>libs/intern.c</title>
+<meta name='robots' content='noindex,nofollow' />
+<meta name='generator' content='GLOBAL-6.3.1' />
+<meta http-equiv='Content-Style-Type' content='text/css' />
+<link rel='stylesheet' type='text/css' href='../style.css' />
+</head>
+<body>
+<a id='TOP' name='TOP'></a><h2 class='header'><a href='../mains.html'>root</a>/<a href='../files/113.html'>libs</a>/intern.c</h2>
+<em class='comment'>/* [&lt;][&gt;]<a href='#L22'>[^]</a><a href='#L484'>[v]</a>[top]<a href='#BOTTOM'>[bottom]</a><a href='../mains.html'>[index]</a><a href='../help.html'>[help]</a> */</em>
+<hr />
+<h2 class='header'>DEFINITIONS</h2>
+This source file includes following definitions.
+<ol>
+<li><a href='#L22' title='Defined at 22.'>hashstring</a></li>
+<li><a href='#L45' title='Defined at 45.'>hashkey</a></li>
+<li><a href='#L78' title='Defined at 78.'>makeinterntab</a></li>
+<li><a href='#L110' title='Defined at 110.'>killbucket</a></li>
+<li><a href='#L136' title='Defined at 136.'>killinterntab</a></li>
+<li><a href='#L153' title='Defined at 153.'>addbucket</a></li>
+<li><a href='#L183' title='Defined at 183.'>internstring</a></li>
+<li><a href='#L246' title='Defined at 246.'>lookupstring</a></li>
+<li><a href='#L280' title='Defined at 280.'>lookupkey</a></li>
+<li><a href='#L315' title='Defined at 315.'>foreachintern</a></li>
+<li><a href='#L360' title='Defined at 360.'>makeinternlist</a></li>
+<li><a href='#L381' title='Defined at 381.'>killinternlist</a></li>
+<li><a href='#L396' title='Defined at 396.'>putinternlist</a></li>
+<li><a href='#L425' title='Defined at 425.'>getinternlist</a></li>
+<li><a href='#L436' title='Defined at 436.'>deleteinternlist</a></li>
+<li><a href='#L453' title='Defined at 453.'>containsinternlist</a></li>
+<li><a href='#L472' title='Defined at 472.'>dointernlistitr</a></li>
+<li><a href='#L484' title='Defined at 484.'>foreachinternlist</a></li>
+</ol>
+<hr />
+<pre>
+<a id='L1' name='L1'></a>   1 <em class='sharp'>#include</em> &lt;assert.h&gt;
+<a id='L2' name='L2'></a>   2 <em class='sharp'>#include</em> &lt;stdlib.h&gt;
+<a id='L3' name='L3'></a>   3 <em class='sharp'>#include</em> &lt;string.h&gt;
+<a id='L4' name='L4'></a>   4 
+<a id='L5' name='L5'></a>   5 <em class='comment'>/* Debugging. */</em>
+<a id='L6' name='L6'></a>   6 <em class='sharp'>#include</em> &lt;stdio.h&gt;
+<a id='L7' name='L7'></a>   7 
+<a id='L8' name='L8'></a>   8 <em class='sharp'>#include</em> "<a href='98.html'>intern.h</a>"
+<a id='L9' name='L9'></a>   9 
+<a id='L10' name='L10'></a>  10 <em class='comment'>/*</em>
+<a id='L11' name='L11'></a>  11 <em class='comment'> * Implementation of interntables.</em>
+<a id='L12' name='L12'></a>  12 <em class='comment'> */</em>
+<a id='L13' name='L13'></a>  13 
+<a id='L14' name='L14'></a>  14 <em class='comment'>/* </em>
+<a id='L15' name='L15'></a>  15 <em class='comment'> * The number of hash buckets we use.</em>
+<a id='L16' name='L16'></a>  16 <em class='comment'> *</em>
+<a id='L17' name='L17'></a>  17 <em class='comment'> * This should be a prime number.</em>
+<a id='L18' name='L18'></a>  18 <em class='comment'> */</em>
+<a id='L19' name='L19'></a>  19 <em class='sharp'>#define</em> <a href='../R/2.html' title='Multiple referred from 10 places.'>BUCKET_COUNT</a> 13
+<a id='L20' name='L20'></a>  20 
+<a id='L21' name='L21'></a>  21 <em class='comment'>/* Convert a string to a hashcode. */</em>
+<a id='L22' name='L22'></a>  22 <strong class='reserved'>static</strong> <strong class='reserved'>unsigned</strong> <strong class='reserved'>long</strong> <a href='../R/93.html' title='Multiple referred from 2 places.'>hashstring</a>(<strong class='reserved'>const</strong> <strong class='reserved'>char</strong> *val) <em class='brace'>{</em>
+<a id='L23' name='L23'></a>  23         <em class='comment'>/* This is the DJB2K33 algorithm. It generally works quite well. */</em>
+<a id='L24' name='L24'></a>  24         <strong class='reserved'>unsigned</strong> <strong class='reserved'>long</strong> hash = 5381;
+<a id='L25' name='L25'></a>  25         <strong class='reserved'>int</strong> c;
+<a id='L26' name='L26'></a>  26 
+<a id='L27' name='L27'></a>  27         <em class='comment'>/* Get the current string character. */</em>
+<a id='L28' name='L28'></a>  28         c    = *val;
+<a id='L29' name='L29'></a>  29         val += 1;
+<a id='L30' name='L30'></a>  30 
+<a id='L31' name='L31'></a>  31         <em class='comment'>/* While we're not at the end of the string. */</em>
+<a id='L32' name='L32'></a>  32         <strong class='reserved'>while</strong>(c) <em class='brace'>{</em>
+<a id='L33' name='L33'></a>  33                 <em class='comment'>/* hash * 33 + c */</em>
+<a id='L34' name='L34'></a>  34                 hash = ((hash &lt;&lt; 5) + hash) + c; 
+<a id='L35' name='L35'></a>  35 
+<a id='L36' name='L36'></a>  36                 <em class='comment'>/* Advance to the next character. */</em>
+<a id='L37' name='L37'></a>  37                 c    = *val;
+<a id='L38' name='L38'></a>  38                 val += 1;
+<a id='L39' name='L39'></a>  39         <em class='brace'>}</em>
+<a id='L40' name='L40'></a>  40 
+<a id='L41' name='L41'></a>  41         <strong class='reserved'>return</strong> hash;
+<a id='L42' name='L42'></a>  42 <em class='brace'>}</em>
+<a id='L43' name='L43'></a>  43 
+<a id='L44' name='L44'></a>  44 <em class='comment'>/* Convert an integer to a hashcode. */</em>
+<a id='L45' name='L45'></a>  45 <strong class='reserved'>static</strong> <strong class='reserved'>unsigned</strong> <strong class='reserved'>long</strong> <a href='../R/92.html' title='Multiple referred from 2 places.'>hashkey</a>(<strong class='reserved'>const</strong> <strong class='reserved'>int</strong> val) <em class='brace'>{</em>
+<a id='L46' name='L46'></a>  46         <strong class='reserved'>return</strong> val;
+<a id='L47' name='L47'></a>  47 <em class='brace'>}</em>
+<a id='L48' name='L48'></a>  48 
+<a id='L49' name='L49'></a>  49 <em class='comment'>/* A bucket in the intern table */</em>
+<a id='L50' name='L50'></a>  50 <strong class='reserved'>struct</strong> <a href='../R/62.html' title='Multiple referred from 24 places.'>bucket</a> <em class='brace'>{</em>
+<a id='L51' name='L51'></a>  51         <em class='comment'>/* The string in this bucket. */</em>
+<a id='L52' name='L52'></a>  52         <strong class='reserved'>char</strong>      *val;
+<a id='L53' name='L53'></a>  53         <em class='comment'>/* The intern key for this string. */</em>
+<a id='L54' name='L54'></a>  54         <a href='../S/98.html#L9' title='Defined at 9 in libs/intern.h.'>internkey</a>  key;
+<a id='L55' name='L55'></a>  55 
+<a id='L56' name='L56'></a>  56         <em class='comment'>/*</em>
+<a id='L57' name='L57'></a>  57 <em class='comment'>         * Next/prev form a circular list of buckets.</em>
+<a id='L58' name='L58'></a>  58 <em class='comment'>         */</em>
+<a id='L59' name='L59'></a>  59 
+<a id='L60' name='L60'></a>  60         <em class='comment'>/* The next bucket in the chain. */</em>
+<a id='L61' name='L61'></a>  61         <strong class='reserved'>struct</strong> <a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a> *next;
+<a id='L62' name='L62'></a>  62         <em class='comment'>/* The previous bucket in the chain. */</em>
+<a id='L63' name='L63'></a>  63         <strong class='reserved'>struct</strong> <a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a> *prev;
+<a id='L64' name='L64'></a>  64 <em class='brace'>}</em>;
+<a id='L65' name='L65'></a>  65 
+<a id='L66' name='L66'></a>  66 <em class='comment'>/* Definition of an intern table. */</em>
+<a id='L67' name='L67'></a>  67 <strong class='reserved'>struct</strong> <a href='../R/99.html' title='Multiple referred from 19 places.'>interntab</a> <em class='brace'>{</em>
+<a id='L68' name='L68'></a>  68         <em class='comment'>/* The next intern key to use. */</em>
+<a id='L69' name='L69'></a>  69         <a href='../S/98.html#L9' title='Defined at 9 in libs/intern.h.'>internkey</a> nextkey;
+<a id='L70' name='L70'></a>  70         
+<a id='L71' name='L71'></a>  71         <em class='comment'>/* The table of strings */</em>
+<a id='L72' name='L72'></a>  72         <strong class='reserved'>struct</strong> <a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a> *strings[<a href='../S/101.html#L19' title='Defined at 19 in libs/intern.c.'>BUCKET_COUNT</a>];
+<a id='L73' name='L73'></a>  73         <em class='comment'>/* The table of keys */</em>
+<a id='L74' name='L74'></a>  74         <strong class='reserved'>struct</strong> <a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a> *keys[<a href='../S/101.html#L19' title='Defined at 19 in libs/intern.c.'>BUCKET_COUNT</a>];
+<a id='L75' name='L75'></a>  75 <em class='brace'>}</em>;
+<a id='L76' name='L76'></a>  76 
+<a id='L77' name='L77'></a>  77 <em class='comment'>/* Allocate/initialize an intern table. */</em>
+<a id='L78' name='L78'></a>  78 <strong class='reserved'>struct</strong> <a href='../S/101.html#L67' title='Defined at 67 in libs/intern.c.'>interntab</a> *<a href='../R/120.html' title='Multiple referred from 5 places.'>makeinterntab</a>() <em class='brace'>{</em>
+<a id='L79' name='L79'></a>  79         <em class='comment'>/* The table. */</em>
+<a id='L80' name='L80'></a>  80         <strong class='reserved'>struct</strong> <a href='../S/101.html#L67' title='Defined at 67 in libs/intern.c.'>interntab</a> *tab;
+<a id='L81' name='L81'></a>  81         <em class='comment'>/* The counter for entry initialization */</em>
+<a id='L82' name='L82'></a>  82         <strong class='reserved'>int</strong> i;
+<a id='L83' name='L83'></a>  83 
+<a id='L84' name='L84'></a>  84         <em class='comment'>/* Create a new intern table, and set its key value. */</em>
+<a id='L85' name='L85'></a>  85         tab = malloc(<strong class='reserved'>sizeof</strong>(<strong class='reserved'>struct</strong> <a href='../S/101.html#L67' title='Defined at 67 in libs/intern.c.'>interntab</a>));
+<a id='L86' name='L86'></a>  86         assert(tab != NULL);
+<a id='L87' name='L87'></a>  87         tab-&gt;nextkey = 1;
+<a id='L88' name='L88'></a>  88 
+<a id='L89' name='L89'></a>  89         <em class='comment'>/* Initialize the tables. */</em>
+<a id='L90' name='L90'></a>  90         <strong class='reserved'>for</strong>(i = 0; i &lt; <a href='../S/101.html#L19' title='Defined at 19 in libs/intern.c.'>BUCKET_COUNT</a>; i++) <em class='brace'>{</em>
+<a id='L91' name='L91'></a>  91                 <em class='comment'>/* Initialize string table. */</em>
+<a id='L92' name='L92'></a>  92                 tab-&gt;strings[i]       = malloc(<strong class='reserved'>sizeof</strong>(<strong class='reserved'>struct</strong> <a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a>));
+<a id='L93' name='L93'></a>  93                 tab-&gt;strings[i]-&gt;val  = NULL;
+<a id='L94' name='L94'></a>  94                 tab-&gt;strings[i]-&gt;key  = SIINVALID;
+<a id='L95' name='L95'></a>  95                 tab-&gt;strings[i]-&gt;next = NULL;
+<a id='L96' name='L96'></a>  96                 tab-&gt;strings[i]-&gt;prev = NULL;
+<a id='L97' name='L97'></a>  97 
+<a id='L98' name='L98'></a>  98                 <em class='comment'>/* Initialize key table. */</em>
+<a id='L99' name='L99'></a>  99                 tab-&gt;keys[i]       = malloc(<strong class='reserved'>sizeof</strong>(<strong class='reserved'>struct</strong> <a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a>));
+<a id='L100' name='L100'></a> 100                 tab-&gt;keys[i]-&gt;val  = NULL;
+<a id='L101' name='L101'></a> 101                 tab-&gt;keys[i]-&gt;key  = SIINVALID;
+<a id='L102' name='L102'></a> 102                 tab-&gt;keys[i]-&gt;next = NULL;
+<a id='L103' name='L103'></a> 103                 tab-&gt;keys[i]-&gt;prev = NULL;
+<a id='L104' name='L104'></a> 104         <em class='brace'>}</em>
+<a id='L105' name='L105'></a> 105 
+<a id='L106' name='L106'></a> 106         <strong class='reserved'>return</strong> tab;
+<a id='L107' name='L107'></a> 107 <em class='brace'>}</em>
+<a id='L108' name='L108'></a> 108 
+<a id='L109' name='L109'></a> 109 <em class='comment'>/* Destroy a bucket chain. */</em>
+<a id='L110' name='L110'></a> 110 <strong class='reserved'>static</strong> <strong class='reserved'>void</strong> <a href='../R/100.html' title='Multiple referred from 2 places.'>killbucket</a>(<strong class='reserved'>struct</strong> <a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a> *buck, <strong class='reserved'>int</strong> freestrings) <em class='brace'>{</em>
+<a id='L111' name='L111'></a> 111         <em class='comment'>/* Terminate the chain. */</em>
+<a id='L112' name='L112'></a> 112         <em class='comment'>/*</em>
+<a id='L113' name='L113'></a> 113 <em class='comment'>         * NOTE:</em>
+<a id='L114' name='L114'></a> 114 <em class='comment'>         *      buck-&gt;prev is only null in the case where nothing has</em>
+<a id='L115' name='L115'></a> 115 <em class='comment'>         *      been inserted into this bucket before. </em>
+<a id='L116' name='L116'></a> 116 <em class='comment'>         */</em>
+<a id='L117' name='L117'></a> 117         <strong class='reserved'>if</strong>(buck-&gt;prev != NULL) <em class='brace'>{</em>
+<a id='L118' name='L118'></a> 118                 buck-&gt;prev-&gt;next = NULL;
+<a id='L119' name='L119'></a> 119         <em class='brace'>}</em>
+<a id='L120' name='L120'></a> 120 
+<a id='L121' name='L121'></a> 121         <strong class='reserved'>while</strong>(buck != NULL &amp;&amp; buck-&gt;next != NULL) <em class='brace'>{</em>
+<a id='L122' name='L122'></a> 122                 <em class='comment'>/* Next bucket. */</em>
+<a id='L123' name='L123'></a> 123                 <strong class='reserved'>struct</strong> <a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a> *tmp;
+<a id='L124' name='L124'></a> 124 
+<a id='L125' name='L125'></a> 125                 <em class='comment'>/* Advance the queue. */</em>
+<a id='L126' name='L126'></a> 126                 tmp  = buck;
+<a id='L127' name='L127'></a> 127                 buck = buck-&gt;next;
+<a id='L128' name='L128'></a> 128 
+<a id='L129' name='L129'></a> 129                 <em class='comment'>/* Free the string we own. */</em>
+<a id='L130' name='L130'></a> 130                 <strong class='reserved'>if</strong>(tmp-&gt;val != NULL &amp;&amp; freestrings == 1) free(tmp-&gt;val);
+<a id='L131' name='L131'></a> 131                 <em class='comment'>/* Free the bucket. */</em>
+<a id='L132' name='L132'></a> 132                 free(tmp);
+<a id='L133' name='L133'></a> 133         <em class='brace'>}</em>
+<a id='L134' name='L134'></a> 134 <em class='brace'>}</em>
+<a id='L135' name='L135'></a> 135 
+<a id='L136' name='L136'></a> 136 <strong class='reserved'>void</strong> <a href='../R/105.html' title='Multiple referred from 4 places.'>killinterntab</a>(<strong class='reserved'>struct</strong> <a href='../S/101.html#L67' title='Defined at 67 in libs/intern.c.'>interntab</a> *table) <em class='brace'>{</em>
+<a id='L137' name='L137'></a> 137         <em class='comment'>/* Loop index. */</em>
+<a id='L138' name='L138'></a> 138         <strong class='reserved'>int</strong> i;
+<a id='L139' name='L139'></a> 139 
+<a id='L140' name='L140'></a> 140         <em class='comment'>/* Free strings table. */</em>
+<a id='L141' name='L141'></a> 141         <strong class='reserved'>for</strong>(i = 0; i &lt; <a href='../S/101.html#L19' title='Defined at 19 in libs/intern.c.'>BUCKET_COUNT</a>; i++) <em class='brace'>{</em>
+<a id='L142' name='L142'></a> 142                 <a href='../S/101.html#L110' title='Defined at 110 in libs/intern.c.'>killbucket</a>(table-&gt;strings[i], 0);
+<a id='L143' name='L143'></a> 143         <em class='brace'>}</em>
+<a id='L144' name='L144'></a> 144         <em class='comment'>/* Free keys table. */</em>
+<a id='L145' name='L145'></a> 145         <strong class='reserved'>for</strong>(i = 0; i &lt; <a href='../S/101.html#L19' title='Defined at 19 in libs/intern.c.'>BUCKET_COUNT</a>; i++) <em class='brace'>{</em>
+<a id='L146' name='L146'></a> 146                 <a href='../S/101.html#L110' title='Defined at 110 in libs/intern.c.'>killbucket</a>(table-&gt;keys[i], 1);
+<a id='L147' name='L147'></a> 147         <em class='brace'>}</em>
+<a id='L148' name='L148'></a> 148 
+<a id='L149' name='L149'></a> 149         free(table);
+<a id='L150' name='L150'></a> 150 <em class='brace'>}</em>
+<a id='L151' name='L151'></a> 151 
+<a id='L152' name='L152'></a> 152 <em class='comment'>/* Add a bucket to a bucket chain. */</em>
+<a id='L153' name='L153'></a> 153 <strong class='reserved'>static</strong> <strong class='reserved'>void</strong> <a href='../R/59.html' title='Multiple referred from 2 places.'>addbucket</a>(<strong class='reserved'>struct</strong> <a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a> *<a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a>) <em class='brace'>{</em>
+<a id='L154' name='L154'></a> 154         <em class='comment'>/* Allocate a new bucket. */</em>
+<a id='L155' name='L155'></a> 155         <strong class='reserved'>struct</strong> <a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a> *nbucket;
+<a id='L156' name='L156'></a> 156         nbucket = malloc(<strong class='reserved'>sizeof</strong>(<strong class='reserved'>struct</strong> <a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a>));
+<a id='L157' name='L157'></a> 157         assert(nbucket != NULL);
+<a id='L158' name='L158'></a> 158 
+<a id='L159' name='L159'></a> 159         <strong class='reserved'>if</strong>(<a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a>-&gt;next == NULL) <em class='brace'>{</em>
+<a id='L160' name='L160'></a> 160                 <em class='comment'>/* Solo bucket. */</em>
+<a id='L161' name='L161'></a> 161                 <a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a>-&gt;next  = nbucket;
+<a id='L162' name='L162'></a> 162                 <a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a>-&gt;prev  = nbucket;
+<a id='L163' name='L163'></a> 163 
+<a id='L164' name='L164'></a> 164                 nbucket-&gt;next = <a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a>;
+<a id='L165' name='L165'></a> 165                 nbucket-&gt;prev = <a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a>;
+<a id='L166' name='L166'></a> 166         <em class='brace'>}</em> <strong class='reserved'>else</strong> <em class='brace'>{</em>
+<a id='L167' name='L167'></a> 167                 <em class='comment'>/* Chain bucket. */</em>
+<a id='L168' name='L168'></a> 168 
+<a id='L169' name='L169'></a> 169                 <em class='comment'>/* The next bucket in the list. */</em>
+<a id='L170' name='L170'></a> 170                 <strong class='reserved'>struct</strong> <a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a> *nextbucket;
+<a id='L171' name='L171'></a> 171                 nextbucket = <a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a>-&gt;next;
+<a id='L172' name='L172'></a> 172 
+<a id='L173' name='L173'></a> 173                 <em class='comment'>/* Insert our bucket into the chain. */</em>
+<a id='L174' name='L174'></a> 174                 <a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a>-&gt;next     = nbucket;
+<a id='L175' name='L175'></a> 175                 nextbucket-&gt;prev = nbucket;
+<a id='L176' name='L176'></a> 176 
+<a id='L177' name='L177'></a> 177                 nbucket-&gt;next = nextbucket;
+<a id='L178' name='L178'></a> 178                 nbucket-&gt;prev = <a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a>;
+<a id='L179' name='L179'></a> 179         <em class='brace'>}</em>
+<a id='L180' name='L180'></a> 180 <em class='brace'>}</em>
+<a id='L181' name='L181'></a> 181 
+<a id='L182' name='L182'></a> 182 <em class='comment'>/* Intern a string. */</em>
+<a id='L183' name='L183'></a> 183 <a href='../S/98.html#L9' title='Defined at 9 in libs/intern.h.'>internkey</a> <a href='../R/98.html' title='Multiple referred from 5 places.'>internstring</a>(<strong class='reserved'>struct</strong> <a href='../S/101.html#L67' title='Defined at 67 in libs/intern.c.'>interntab</a> *table, <strong class='reserved'>const</strong> <strong class='reserved'>char</strong> *string) <em class='brace'>{</em>
+<a id='L184' name='L184'></a> 184         <em class='comment'>/* The intern key we use. */</em>
+<a id='L185' name='L185'></a> 185         <a href='../S/98.html#L9' title='Defined at 9 in libs/intern.h.'>internkey</a> key;
+<a id='L186' name='L186'></a> 186         <em class='comment'>/* The key/string hashes. */</em>
+<a id='L187' name='L187'></a> 187         <strong class='reserved'>int</strong> khash, shash;
+<a id='L188' name='L188'></a> 188         <em class='comment'>/* The string/key buckets. */</em>
+<a id='L189' name='L189'></a> 189         <strong class='reserved'>struct</strong> <a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a> *sbucket, *kbucket;
+<a id='L190' name='L190'></a> 190 
+<a id='L191' name='L191'></a> 191         <em class='comment'>/* Don't duplicate an already interned string. */</em>
+<a id='L192' name='L192'></a> 192         key = <a href='../S/101.html#L246' title='Defined at 246 in libs/intern.c.'>lookupstring</a>(table, string);
+<a id='L193' name='L193'></a> 193         <strong class='reserved'>if</strong>(key != SIINVALID) <strong class='reserved'>return</strong> key;
+<a id='L194' name='L194'></a> 194 
+<a id='L195' name='L195'></a> 195         <em class='comment'>/* Get the next valid intern key. */</em>
+<a id='L196' name='L196'></a> 196         key = table-&gt;nextkey;
+<a id='L197' name='L197'></a> 197         table-&gt;nextkey += 1;
+<a id='L198' name='L198'></a> 198         <em class='comment'>/* Fail if we ran out of space for strings. */</em>
+<a id='L199' name='L199'></a> 199         <strong class='reserved'>if</strong>(key &lt; 0) <strong class='reserved'>return</strong> SITABFULL;
+<a id='L200' name='L200'></a> 200         <em class='comment'>/* Make sure we never make the invalid key valid. */</em>
+<a id='L201' name='L201'></a> 201         assert(key != SIINVALID);
+<a id='L202' name='L202'></a> 202 
+<a id='L203' name='L203'></a> 203         <em class='comment'>/* Create a copy of the string we own. */</em>
+<a id='L204' name='L204'></a> 204         <strong class='reserved'>char</strong> *strang = (<strong class='reserved'>char</strong> *)strdup(string);
+<a id='L205' name='L205'></a> 205 
+<a id='L206' name='L206'></a> 206         <em class='comment'>/* Get both hashes. */</em>
+<a id='L207' name='L207'></a> 207         shash = <a href='../S/101.html#L22' title='Defined at 22 in libs/intern.c.'>hashstring</a>(strang) % <a href='../S/101.html#L19' title='Defined at 19 in libs/intern.c.'>BUCKET_COUNT</a>;
+<a id='L208' name='L208'></a> 208         khash = <a href='../S/101.html#L45' title='Defined at 45 in libs/intern.c.'>hashkey</a>(key)       % <a href='../S/101.html#L19' title='Defined at 19 in libs/intern.c.'>BUCKET_COUNT</a>;
+<a id='L209' name='L209'></a> 209 
+<a id='L210' name='L210'></a> 210         <em class='comment'>/* Get the buckets for each hash. */</em>
+<a id='L211' name='L211'></a> 211         sbucket = table-&gt;strings[shash];
+<a id='L212' name='L212'></a> 212         kbucket = table-&gt;keys[khash];
+<a id='L213' name='L213'></a> 213 
+<a id='L214' name='L214'></a> 214         <strong class='reserved'>if</strong>(sbucket-&gt;key != SIINVALID) <em class='brace'>{</em>
+<a id='L215' name='L215'></a> 215                 <em class='comment'>/*</em>
+<a id='L216' name='L216'></a> 216 <em class='comment'>                 * Non-empty bucket. </em>
+<a id='L217' name='L217'></a> 217 <em class='comment'>                 *</em>
+<a id='L218' name='L218'></a> 218 <em class='comment'>                 * Insert into a new one.</em>
+<a id='L219' name='L219'></a> 219 <em class='comment'>                 */</em>
+<a id='L220' name='L220'></a> 220                 sbucket = sbucket-&gt;prev;
+<a id='L221' name='L221'></a> 221         <em class='brace'>}</em>
+<a id='L222' name='L222'></a> 222         <strong class='reserved'>if</strong>(kbucket-&gt;key != SIINVALID) <em class='brace'>{</em>
+<a id='L223' name='L223'></a> 223                 <em class='comment'>/*</em>
+<a id='L224' name='L224'></a> 224 <em class='comment'>                 * Non-empty bucket. </em>
+<a id='L225' name='L225'></a> 225 <em class='comment'>                 *</em>
+<a id='L226' name='L226'></a> 226 <em class='comment'>                 * Insert into a new one.</em>
+<a id='L227' name='L227'></a> 227 <em class='comment'>                 */</em>
+<a id='L228' name='L228'></a> 228                 kbucket = kbucket-&gt;prev;
+<a id='L229' name='L229'></a> 229         <em class='brace'>}</em>
+<a id='L230' name='L230'></a> 230 
+<a id='L231' name='L231'></a> 231         <em class='comment'>/* Insert into the right bucket in both tables. */</em>
+<a id='L232' name='L232'></a> 232         sbucket-&gt;val = strang;
+<a id='L233' name='L233'></a> 233         kbucket-&gt;val = strang;
+<a id='L234' name='L234'></a> 234 
+<a id='L235' name='L235'></a> 235         sbucket-&gt;key = key;
+<a id='L236' name='L236'></a> 236         kbucket-&gt;key = key;
+<a id='L237' name='L237'></a> 237 
+<a id='L238' name='L238'></a> 238         <em class='comment'>/* Add a new empty bucket to both tables. */</em>
+<a id='L239' name='L239'></a> 239         <a href='../S/101.html#L153' title='Defined at 153 in libs/intern.c.'>addbucket</a>(sbucket);
+<a id='L240' name='L240'></a> 240         <a href='../S/101.html#L153' title='Defined at 153 in libs/intern.c.'>addbucket</a>(kbucket);
+<a id='L241' name='L241'></a> 241 
+<a id='L242' name='L242'></a> 242         <strong class='reserved'>return</strong> key;
+<a id='L243' name='L243'></a> 243 <em class='brace'>}</em>
+<a id='L244' name='L244'></a> 244 
+<a id='L245' name='L245'></a> 245 <em class='comment'>/* Lookup a interned key for a string. */</em>
+<a id='L246' name='L246'></a> 246 <a href='../S/98.html#L9' title='Defined at 9 in libs/intern.h.'>internkey</a> <a href='../R/115.html' title='Multiple referred from 7 places.'>lookupstring</a>(<strong class='reserved'>struct</strong> <a href='../S/101.html#L67' title='Defined at 67 in libs/intern.c.'>interntab</a> *table, <strong class='reserved'>const</strong> <strong class='reserved'>char</strong> *string) <em class='brace'>{</em>
+<a id='L247' name='L247'></a> 247         <em class='comment'>/* The string hash. */</em>
+<a id='L248' name='L248'></a> 248         <strong class='reserved'>int</strong> shash;
+<a id='L249' name='L249'></a> 249         <em class='comment'>/* The string bucket. */</em>
+<a id='L250' name='L250'></a> 250         <strong class='reserved'>struct</strong> <a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a> *sbucket;
+<a id='L251' name='L251'></a> 251         <em class='comment'>/* The first key in a bucket. */</em>
+<a id='L252' name='L252'></a> 252         <strong class='reserved'>int</strong> fkey;
+<a id='L253' name='L253'></a> 253 
+<a id='L254' name='L254'></a> 254         <em class='comment'>/* Get the bucket for this string. */</em>
+<a id='L255' name='L255'></a> 255         shash   = <a href='../S/101.html#L22' title='Defined at 22 in libs/intern.c.'>hashstring</a>(string) % <a href='../S/101.html#L19' title='Defined at 19 in libs/intern.c.'>BUCKET_COUNT</a>;
+<a id='L256' name='L256'></a> 256         sbucket = table-&gt;strings[shash];
+<a id='L257' name='L257'></a> 257         fkey    = sbucket-&gt;key;
+<a id='L258' name='L258'></a> 258 
+<a id='L259' name='L259'></a> 259         <em class='comment'>/* Bail out early if the bucket is empty. */</em>
+<a id='L260' name='L260'></a> 260         <strong class='reserved'>if</strong>(sbucket-&gt;key == SIINVALID) <strong class='reserved'>return</strong> SIINVALID;
+<a id='L261' name='L261'></a> 261 
+<a id='L262' name='L262'></a> 262         <strong class='reserved'>do</strong> <em class='brace'>{</em>
+<a id='L263' name='L263'></a> 263                 <em class='comment'>/* Only check buckets with valid values. */</em>
+<a id='L264' name='L264'></a> 264                 <strong class='reserved'>if</strong>(sbucket-&gt;val != NULL) <em class='brace'>{</em>
+<a id='L265' name='L265'></a> 265                         <em class='comment'>/* Check if this is the right bucket. */</em>
+<a id='L266' name='L266'></a> 266                         <strong class='reserved'>if</strong>(strcmp(string, sbucket-&gt;val) == 0) <strong class='reserved'>return</strong> sbucket-&gt;key;
+<a id='L267' name='L267'></a> 267                 <em class='brace'>}</em>
+<a id='L268' name='L268'></a> 268 
+<a id='L269' name='L269'></a> 269                 <em class='comment'>/* Move to next bucket. */</em>
+<a id='L270' name='L270'></a> 270                 sbucket = sbucket-&gt;next;
+<a id='L271' name='L271'></a> 271 
+<a id='L272' name='L272'></a> 272                 <em class='comment'>/* Bail out if we've looped or hit an empty bucket. */</em>
+<a id='L273' name='L273'></a> 273         <em class='brace'>}</em> <strong class='reserved'>while</strong>(sbucket-&gt;key != fkey &amp;&amp; sbucket-&gt;key != SIINVALID);
+<a id='L274' name='L274'></a> 274 
+<a id='L275' name='L275'></a> 275         <em class='comment'>/* We didn't find anything. */</em>
+<a id='L276' name='L276'></a> 276         <strong class='reserved'>return</strong> SIINVALID;
+<a id='L277' name='L277'></a> 277 <em class='brace'>}</em>
+<a id='L278' name='L278'></a> 278 
+<a id='L279' name='L279'></a> 279 <em class='comment'>/* Lookup the string for an interned key. */</em>
+<a id='L280' name='L280'></a> 280 <strong class='reserved'>const</strong> <strong class='reserved'>char</strong> *<a href='../R/114.html' title='Multiple referred from 5 places.'>lookupkey</a>(<strong class='reserved'>struct</strong> <a href='../S/101.html#L67' title='Defined at 67 in libs/intern.c.'>interntab</a> *table, <strong class='reserved'>const</strong> <a href='../S/98.html#L9' title='Defined at 9 in libs/intern.h.'>internkey</a> key) <em class='brace'>{</em>
+<a id='L281' name='L281'></a> 281         <em class='comment'>/* The key hash. */</em>
+<a id='L282' name='L282'></a> 282         <strong class='reserved'>int</strong> khash;
+<a id='L283' name='L283'></a> 283         <em class='comment'>/* The key bucket. */</em>
+<a id='L284' name='L284'></a> 284         <strong class='reserved'>struct</strong> <a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a> *kbucket;
+<a id='L285' name='L285'></a> 285         <em class='comment'>/* The first key in a bucket. */</em>
+<a id='L286' name='L286'></a> 286         <strong class='reserved'>int</strong> fkey;
+<a id='L287' name='L287'></a> 287 
+<a id='L288' name='L288'></a> 288         <em class='comment'>/* This key can't possibly be in the table. */</em>
+<a id='L289' name='L289'></a> 289         <strong class='reserved'>if</strong>(table-&gt;nextkey &lt; key) <strong class='reserved'>return</strong> NULL;
+<a id='L290' name='L290'></a> 290 
+<a id='L291' name='L291'></a> 291         <em class='comment'>/* Get the bucket for this key. */</em>
+<a id='L292' name='L292'></a> 292         khash   = <a href='../S/101.html#L45' title='Defined at 45 in libs/intern.c.'>hashkey</a>(key) % <a href='../S/101.html#L19' title='Defined at 19 in libs/intern.c.'>BUCKET_COUNT</a>;
+<a id='L293' name='L293'></a> 293         kbucket = table-&gt;keys[khash];
+<a id='L294' name='L294'></a> 294         fkey    = kbucket-&gt;key;
+<a id='L295' name='L295'></a> 295 
+<a id='L296' name='L296'></a> 296         <em class='comment'>/* Bail out early if the bucket is empty. */</em>
+<a id='L297' name='L297'></a> 297         <strong class='reserved'>if</strong>(fkey == SIINVALID) <strong class='reserved'>return</strong> NULL;
+<a id='L298' name='L298'></a> 298 
+<a id='L299' name='L299'></a> 299         <strong class='reserved'>do</strong> <em class='brace'>{</em>
+<a id='L300' name='L300'></a> 300                 <em class='comment'>/* Check if this is the right bucket. */</em>
+<a id='L301' name='L301'></a> 301                 <strong class='reserved'>if</strong>(key == kbucket-&gt;key) <strong class='reserved'>return</strong> kbucket-&gt;val;
+<a id='L302' name='L302'></a> 302 
+<a id='L303' name='L303'></a> 303                 <em class='comment'>/* Move to next bucket. */</em>
+<a id='L304' name='L304'></a> 304                 kbucket = kbucket-&gt;next;
+<a id='L305' name='L305'></a> 305 
+<a id='L306' name='L306'></a> 306                 <em class='comment'>/* Bail out if we've looped or hit an empty bucket. */</em>
+<a id='L307' name='L307'></a> 307         <em class='brace'>}</em> <strong class='reserved'>while</strong>(kbucket-&gt;key != fkey &amp;&amp; kbucket-&gt;key != SIINVALID);
+<a id='L308' name='L308'></a> 308 
+<a id='L309' name='L309'></a> 309         <em class='comment'>/*</em>
+<a id='L310' name='L310'></a> 310 <em class='comment'>         * We didn't find anything. */</em>
+<a id='L311' name='L311'></a> 311         <strong class='reserved'>return</strong> NULL;
+<a id='L312' name='L312'></a> 312 <em class='brace'>}</em>
+<a id='L313' name='L313'></a> 313 
+<a id='L314' name='L314'></a> 314 <em class='comment'>/* Execute an action for every key in a table. */</em>
+<a id='L315' name='L315'></a> 315 <strong class='reserved'>void</strong> <a href='../R/85.html' title='Multiple referred from 2 places.'>foreachintern</a>(<strong class='reserved'>struct</strong> <a href='../S/101.html#L67' title='Defined at 67 in libs/intern.c.'>interntab</a> *table, tableitr itr, <strong class='reserved'>void</strong> *pvData) <em class='brace'>{</em>
+<a id='L316' name='L316'></a> 316         <strong class='reserved'>int</strong> i;
+<a id='L317' name='L317'></a> 317         <em class='comment'>/* Iterate over every bucket. */</em>
+<a id='L318' name='L318'></a> 318         <strong class='reserved'>for</strong>(i = 0; i &lt; <a href='../S/101.html#L19' title='Defined at 19 in libs/intern.c.'>BUCKET_COUNT</a>; i++) <em class='brace'>{</em>
+<a id='L319' name='L319'></a> 319                 <strong class='reserved'>struct</strong> <a href='../S/101.html#L50' title='Defined at 50 in libs/intern.c.'>bucket</a> *buck;
+<a id='L320' name='L320'></a> 320                 <a href='../S/98.html#L9' title='Defined at 9 in libs/intern.h.'>internkey</a>      kFirst;
+<a id='L321' name='L321'></a> 321                 
+<a id='L322' name='L322'></a> 322                 <em class='comment'>/* Get the first bucket, and its key. */</em>
+<a id='L323' name='L323'></a> 323                 buck = table-&gt;keys[i];
+<a id='L324' name='L324'></a> 324                 kFirst = buck-&gt;key;
+<a id='L325' name='L325'></a> 325                 
+<a id='L326' name='L326'></a> 326                 <em class='comment'>/* Ignore this bucket if its empty. */</em>
+<a id='L327' name='L327'></a> 327                 <strong class='reserved'>if</strong>(kFirst == SIINVALID) <strong class='reserved'>continue</strong>;
+<a id='L328' name='L328'></a> 328 
+<a id='L329' name='L329'></a> 329                 <strong class='reserved'>do</strong> <em class='brace'>{</em>
+<a id='L330' name='L330'></a> 330                         itr(buck-&gt;val, buck-&gt;key, pvData);
+<a id='L331' name='L331'></a> 331                         <em class='comment'>/* Bail out if we've looped or hit an empty bucket. */</em>
+<a id='L332' name='L332'></a> 332                 <em class='brace'>}</em> <strong class='reserved'>while</strong>(buck-&gt;key != kFirst &amp;&amp; buck-&gt;key != SIINVALID);
+<a id='L333' name='L333'></a> 333         <em class='brace'>}</em>
+<a id='L334' name='L334'></a> 334 <em class='brace'>}</em>
+<a id='L335' name='L335'></a> 335 
+<a id='L336' name='L336'></a> 336 <em class='comment'>/*</em>
+<a id='L337' name='L337'></a> 337 <em class='comment'> * Implementation of internlists</em>
+<a id='L338' name='L338'></a> 338 <em class='comment'> */</em>
+<a id='L339' name='L339'></a> 339 <strong class='reserved'>struct</strong> <a href='../R/97.html' title='Multiple referred from 18 places.'>internlist</a> <em class='brace'>{</em>
+<a id='L340' name='L340'></a> 340         <em class='comment'>/* The dynamic array for storing data. */</em>
+<a id='L341' name='L341'></a> 341         <strong class='reserved'>void</strong> **paData;
+<a id='L342' name='L342'></a> 342 
+<a id='L343' name='L343'></a> 343         <em class='comment'>/* Amount available/used in the array. */</em>
+<a id='L344' name='L344'></a> 344         <strong class='reserved'>int</strong> dataspace;
+<a id='L345' name='L345'></a> 345         <strong class='reserved'>int</strong> datausage;
+<a id='L346' name='L346'></a> 346 
+<a id='L347' name='L347'></a> 347         <em class='comment'>/* Mapping from string keys to array indexes. */</em>
+<a id='L348' name='L348'></a> 348         <strong class='reserved'>struct</strong> <a href='../S/101.html#L67' title='Defined at 67 in libs/intern.c.'>interntab</a> *ptKeys;
+<a id='L349' name='L349'></a> 349 
+<a id='L350' name='L350'></a> 350         <em class='comment'>/* Destructor function for data. */</em>
+<a id='L351' name='L351'></a> 351         <strong class='reserved'>void</strong> (*pfDestroy)(<strong class='reserved'>void</strong> *);
+<a id='L352' name='L352'></a> 352 <em class='brace'>}</em>;
+<a id='L353' name='L353'></a> 353 
+<a id='L354' name='L354'></a> 354 <em class='comment'>/*</em>
+<a id='L355' name='L355'></a> 355 <em class='comment'> * Create an intern list.</em>
+<a id='L356' name='L356'></a> 356 <em class='comment'> *</em>
+<a id='L357' name='L357'></a> 357 <em class='comment'> * Takes the initial capacity for the intern list, and the function to use to</em>
+<a id='L358' name='L358'></a> 358 <em class='comment'> * destroy items in the intern list.</em>
+<a id='L359' name='L359'></a> 359 <em class='comment'> */</em>
+<a id='L360' name='L360'></a> 360 <strong class='reserved'>struct</strong> <a href='../S/101.html#L339' title='Defined at 339 in libs/intern.c.'>internlist</a> *<a href='../R/119.html' title='Multiple referred from 2 places.'>makeinternlist</a>(<strong class='reserved'>int</strong> initcap, <strong class='reserved'>void</strong> (*pfDestroy)(<strong class='reserved'>void</strong> *)) <em class='brace'>{</em>
+<a id='L361' name='L361'></a> 361         <em class='comment'>/* Allocate the list, and fail if allocation fails. */</em>
+<a id='L362' name='L362'></a> 362         <strong class='reserved'>struct</strong> <a href='../S/101.html#L339' title='Defined at 339 in libs/intern.c.'>internlist</a> *plList = malloc(<strong class='reserved'>sizeof</strong>(<strong class='reserved'>struct</strong> <a href='../S/101.html#L339' title='Defined at 339 in libs/intern.c.'>internlist</a>));
+<a id='L363' name='L363'></a> 363         assert(plList != NULL);
+<a id='L364' name='L364'></a> 364 
+<a id='L365' name='L365'></a> 365         <em class='comment'>/* Create the key mapping. */</em>
+<a id='L366' name='L366'></a> 366         plList-&gt;ptKeys = <a href='../S/101.html#L78' title='Defined at 78 in libs/intern.c.'>makeinterntab</a>();
+<a id='L367' name='L367'></a> 367         <em class='comment'>/* Remember the destructor. */</em>
+<a id='L368' name='L368'></a> 368         plList-&gt;pfDestroy = pfDestroy;
+<a id='L369' name='L369'></a> 369 
+<a id='L370' name='L370'></a> 370         <em class='comment'>/* Allocate space for the data. */</em>
+<a id='L371' name='L371'></a> 371         plList-&gt;paData = calloc(initcap, <strong class='reserved'>sizeof</strong>(<strong class='reserved'>void</strong> *));
+<a id='L372' name='L372'></a> 372         assert(plList-&gt;paData != NULL);
+<a id='L373' name='L373'></a> 373         <em class='comment'>/* Initialize capacity tracking. */</em>
+<a id='L374' name='L374'></a> 374         plList-&gt;dataspace = initcap;
+<a id='L375' name='L375'></a> 375         plList-&gt;datausage = 0;
+<a id='L376' name='L376'></a> 376 
+<a id='L377' name='L377'></a> 377         <strong class='reserved'>return</strong> plList;
+<a id='L378' name='L378'></a> 378 <em class='brace'>}</em>
+<a id='L379' name='L379'></a> 379 
+<a id='L380' name='L380'></a> 380 <em class='comment'>/* Destroy an intern list. */</em>
+<a id='L381' name='L381'></a> 381 <strong class='reserved'>void</strong> <a href='../R/104.html' title='Multiple referred from 2 places.'>killinternlist</a>(<strong class='reserved'>struct</strong> <a href='../S/101.html#L339' title='Defined at 339 in libs/intern.c.'>internlist</a> * plList) <em class='brace'>{</em>
+<a id='L382' name='L382'></a> 382         <em class='comment'>/* Destruct the contained data. */</em>
+<a id='L383' name='L383'></a> 383         <strong class='reserved'>int</strong> i;
+<a id='L384' name='L384'></a> 384         <strong class='reserved'>for</strong>(i = 0; i &lt; plList-&gt;datausage; i++) <em class='brace'>{</em>
+<a id='L385' name='L385'></a> 385                 plList-&gt;pfDestroy(plList-&gt;paData[i]);
+<a id='L386' name='L386'></a> 386         <em class='brace'>}</em>
+<a id='L387' name='L387'></a> 387         <em class='comment'>/* Free the data storage. */</em>
+<a id='L388' name='L388'></a> 388         free(plList-&gt;paData);
+<a id='L389' name='L389'></a> 389         <em class='comment'>/* Free key storage. */</em>
+<a id='L390' name='L390'></a> 390         <a href='../S/101.html#L136' title='Defined at 136 in libs/intern.c.'>killinterntab</a>(plList-&gt;ptKeys);
+<a id='L391' name='L391'></a> 391         <em class='comment'>/* Free the list. */</em>
+<a id='L392' name='L392'></a> 392         free(plList);
+<a id='L393' name='L393'></a> 393 <em class='brace'>}</em>
+<a id='L394' name='L394'></a> 394 
+<a id='L395' name='L395'></a> 395 <em class='comment'>/* Insert an item into the list. */</em>
+<a id='L396' name='L396'></a> 396 <strong class='reserved'>void</strong> <a href='../R/144.html' title='Multiple referred from 2 places.'>putinternlist</a>(<strong class='reserved'>struct</strong> <a href='../S/101.html#L339' title='Defined at 339 in libs/intern.c.'>internlist</a> *plList, <strong class='reserved'>char</strong> *pszKey, <strong class='reserved'>void</strong> *pvData) <em class='brace'>{</em>
+<a id='L397' name='L397'></a> 397         <em class='comment'>/* Intern the name, and fail if interning fails */</em>
+<a id='L398' name='L398'></a> 398         <a href='../S/98.html#L9' title='Defined at 9 in libs/intern.h.'>internkey</a>  kData = <a href='../S/101.html#L183' title='Defined at 183 in libs/intern.c.'>internstring</a>(plList-&gt;ptKeys, pszKey);
+<a id='L399' name='L399'></a> 399         assert(kData &gt; 0);
+<a id='L400' name='L400'></a> 400 
+<a id='L401' name='L401'></a> 401         <strong class='reserved'>if</strong>(plList-&gt;dataspace == plList-&gt;datausage) <em class='brace'>{</em>
+<a id='L402' name='L402'></a> 402                 <em class='comment'>/* Allocate more space for the list. */</em>
+<a id='L403' name='L403'></a> 403                 plList-&gt;dataspace *= 2;
+<a id='L404' name='L404'></a> 404                 plList-&gt;dataspace += 1;
+<a id='L405' name='L405'></a> 405                 plList-&gt;paData     = realloc(plList-&gt;paData, <strong class='reserved'>sizeof</strong>(<strong class='reserved'>void</strong> *) * plList-&gt;dataspace);
+<a id='L406' name='L406'></a> 406                 <em class='comment'>/* Fail if allocation fails. */</em>
+<a id='L407' name='L407'></a> 407                 assert(plList-&gt;paData != NULL);
+<a id='L408' name='L408'></a> 408         <em class='brace'>}</em>
+<a id='L409' name='L409'></a> 409 
+<a id='L410' name='L410'></a> 410         <em class='comment'>/* Delete any item that was in that slot. */</em>
+<a id='L411' name='L411'></a> 411         <strong class='reserved'>if</strong>(plList-&gt;paData[kData -1] != NULL) <em class='brace'>{</em>
+<a id='L412' name='L412'></a> 412                 plList-&gt;pfDestroy(plList-&gt;paData[kData - 1]);
+<a id='L413' name='L413'></a> 413         <em class='brace'>}</em>
+<a id='L414' name='L414'></a> 414 
+<a id='L415' name='L415'></a> 415         <em class='comment'>/* Insert the item. */</em>
+<a id='L416' name='L416'></a> 416         plList-&gt;paData[kData - 1]  = pvData;
+<a id='L417' name='L417'></a> 417         plList-&gt;datausage         += 1;
+<a id='L418' name='L418'></a> 418 <em class='brace'>}</em>
+<a id='L419' name='L419'></a> 419 
+<a id='L420' name='L420'></a> 420 <em class='comment'>/* </em>
+<a id='L421' name='L421'></a> 421 <em class='comment'> * Get an item from an intern list. </em>
+<a id='L422' name='L422'></a> 422 <em class='comment'> *</em>
+<a id='L423' name='L423'></a> 423 <em class='comment'> * Returns NULL if there is no item for that key. </em>
+<a id='L424' name='L424'></a> 424 <em class='comment'> */</em>
+<a id='L425' name='L425'></a> 425 <strong class='reserved'>void</strong> *<a href='../R/90.html' title='Multiple referred from 3 places.'>getinternlist</a>(<strong class='reserved'>struct</strong> <a href='../S/101.html#L339' title='Defined at 339 in libs/intern.c.'>internlist</a> * plList, <strong class='reserved'>char</strong> *pszKey) <em class='brace'>{</em>
+<a id='L426' name='L426'></a> 426         <em class='comment'>/* Lookup the index. */</em>
+<a id='L427' name='L427'></a> 427         <a href='../S/98.html#L9' title='Defined at 9 in libs/intern.h.'>internkey</a> kData = <a href='../S/101.html#L246' title='Defined at 246 in libs/intern.c.'>lookupstring</a>(plList-&gt;ptKeys, pszKey);
+<a id='L428' name='L428'></a> 428         <em class='comment'>/* Error if we don't have that key. */</em>
+<a id='L429' name='L429'></a> 429         <strong class='reserved'>if</strong>(kData == SIINVALID) <strong class='reserved'>return</strong> NULL;
+<a id='L430' name='L430'></a> 430 
+<a id='L431' name='L431'></a> 431         <em class='comment'>/* Give back the stored data. */</em>
+<a id='L432' name='L432'></a> 432         <strong class='reserved'>return</strong> plList-&gt;paData[kData - 1];
+<a id='L433' name='L433'></a> 433 <em class='brace'>}</em>
+<a id='L434' name='L434'></a> 434 
+<a id='L435' name='L435'></a> 435 <em class='comment'>/* Delete an item from an intern list. */</em>
+<a id='L436' name='L436'></a> 436 <strong class='reserved'>void</strong> <a href='../R/72.html' title='Multiple referred from 2 places.'>deleteinternlist</a>(<strong class='reserved'>struct</strong> <a href='../S/101.html#L339' title='Defined at 339 in libs/intern.c.'>internlist</a> *plList, <strong class='reserved'>char</strong> *pszKey) <em class='brace'>{</em>
+<a id='L437' name='L437'></a> 437         <em class='comment'>/* Lookup the index. */</em>
+<a id='L438' name='L438'></a> 438         <a href='../S/98.html#L9' title='Defined at 9 in libs/intern.h.'>internkey</a> kData = <a href='../S/101.html#L246' title='Defined at 246 in libs/intern.c.'>lookupstring</a>(plList-&gt;ptKeys, pszKey);
+<a id='L439' name='L439'></a> 439         <em class='comment'>/* Error if we don't have that key. */</em>
+<a id='L440' name='L440'></a> 440         <strong class='reserved'>if</strong>(kData == SIINVALID) <strong class='reserved'>return</strong>;
+<a id='L441' name='L441'></a> 441 
+<a id='L442' name='L442'></a> 442         <strong class='reserved'>if</strong>(plList-&gt;paData[kData - 1] != NULL)
+<a id='L443' name='L443'></a> 443                 plList-&gt;pfDestroy(plList-&gt;paData[kData - 1]);
+<a id='L444' name='L444'></a> 444 
+<a id='L445' name='L445'></a> 445         plList-&gt;paData[kData - 1] = NULL;
+<a id='L446' name='L446'></a> 446 <em class='brace'>}</em>
+<a id='L447' name='L447'></a> 447 
+<a id='L448' name='L448'></a> 448 <em class='comment'>/* </em>
+<a id='L449' name='L449'></a> 449 <em class='comment'> * Check if an item is in an intern list. </em>
+<a id='L450' name='L450'></a> 450 <em class='comment'> *</em>
+<a id='L451' name='L451'></a> 451 <em class='comment'> * Returns 0 if the item is not cotinained, 1 oterhwise.</em>
+<a id='L452' name='L452'></a> 452 <em class='comment'> */</em>
+<a id='L453' name='L453'></a> 453 <strong class='reserved'>int</strong> <a href='../S/98.html#L91' title='Referred from 91 in libs/intern.h.'>containsinternlist</a>(<strong class='reserved'>struct</strong> <a href='../S/101.html#L339' title='Defined at 339 in libs/intern.c.'>internlist</a> *plList, <strong class='reserved'>char</strong> *pszKey) <em class='brace'>{</em>
+<a id='L454' name='L454'></a> 454         <em class='comment'>/* Lookup the index. */</em>
+<a id='L455' name='L455'></a> 455         <a href='../S/98.html#L9' title='Defined at 9 in libs/intern.h.'>internkey</a> kData = <a href='../S/101.html#L246' title='Defined at 246 in libs/intern.c.'>lookupstring</a>(plList-&gt;ptKeys, pszKey);
+<a id='L456' name='L456'></a> 456         <em class='comment'>/* Error if we don't have that key. */</em>
+<a id='L457' name='L457'></a> 457         <strong class='reserved'>if</strong>(kData == SIINVALID) <em class='brace'>{</em>
+<a id='L458' name='L458'></a> 458                 <strong class='reserved'>return</strong> 0;
+<a id='L459' name='L459'></a> 459         <em class='brace'>}</em> <strong class='reserved'>else</strong> <em class='brace'>{</em>
+<a id='L460' name='L460'></a> 460                 <strong class='reserved'>return</strong> plList-&gt;paData[kData - 1] != NULL;
+<a id='L461' name='L461'></a> 461         <em class='brace'>}</em>
+<a id='L462' name='L462'></a> 462 <em class='brace'>}</em>
+<a id='L463' name='L463'></a> 463 
+<a id='L464' name='L464'></a> 464 <strong class='reserved'>struct</strong> <a href='../R/112.html' title='Multiple referred from 2 places.'>listitrdata</a> <em class='brace'>{</em>
+<a id='L465' name='L465'></a> 465         <strong class='reserved'>struct</strong> <a href='../S/101.html#L339' title='Defined at 339 in libs/intern.c.'>internlist</a> *plList;
+<a id='L466' name='L466'></a> 466 
+<a id='L467' name='L467'></a> 467         internlistitr pfFunc;
+<a id='L468' name='L468'></a> 468 
+<a id='L469' name='L469'></a> 469         <strong class='reserved'>void</strong> *pvData;
+<a id='L470' name='L470'></a> 470 <em class='brace'>}</em>;
+<a id='L471' name='L471'></a> 471 
+<a id='L472' name='L472'></a> 472 <strong class='reserved'>static</strong> <strong class='reserved'>void</strong> <a href='../S/101.html#L491' title='Referred from 491 in libs/intern.c.'>dointernlistitr</a>(<strong class='reserved'>const</strong> <strong class='reserved'>char</strong> *pszName, <a href='../S/98.html#L9' title='Defined at 9 in libs/intern.h.'>internkey</a> kKey, <strong class='reserved'>void</strong> *pvData) <em class='brace'>{</em>
+<a id='L473' name='L473'></a> 473         <strong class='reserved'>void</strong> *pvItem;
+<a id='L474' name='L474'></a> 474 
+<a id='L475' name='L475'></a> 475         <strong class='reserved'>struct</strong> <a href='../S/101.html#L464' title='Defined at 464 in libs/intern.c.'>listitrdata</a> *pData = (<strong class='reserved'>struct</strong> <a href='../S/101.html#L464' title='Defined at 464 in libs/intern.c.'>listitrdata</a> *)pvData;
+<a id='L476' name='L476'></a> 476 
+<a id='L477' name='L477'></a> 477         pvItem = <a href='../S/101.html#L425' title='Defined at 425 in libs/intern.c.'>getinternlist</a>(pData-&gt;plList, (<strong class='reserved'>char</strong> *)pszName);
+<a id='L478' name='L478'></a> 478 
+<a id='L479' name='L479'></a> 479         <strong class='reserved'>if</strong>(pvItem != NULL) <em class='brace'>{</em>
+<a id='L480' name='L480'></a> 480                 pData-&gt;pfFunc((<strong class='reserved'>char</strong> *)pszName, pvItem, pData-&gt;pvData);
+<a id='L481' name='L481'></a> 481         <em class='brace'>}</em>
+<a id='L482' name='L482'></a> 482 <em class='brace'>}</em>
+<a id='L483' name='L483'></a> 483 
+<a id='L484' name='L484'></a> 484 <strong class='reserved'>void</strong> <a href='../R/86.html' title='Multiple referred from 2 places.'>foreachinternlist</a>(<strong class='reserved'>struct</strong> <a href='../S/101.html#L339' title='Defined at 339 in libs/intern.c.'>internlist</a> *plList, internlistitr pfFunc, <strong class='reserved'>void</strong> *pvData) <em class='brace'>{</em>
+<a id='L485' name='L485'></a> 485         <strong class='reserved'>struct</strong> <a href='../S/101.html#L464' title='Defined at 464 in libs/intern.c.'>listitrdata</a> dat;
+<a id='L486' name='L486'></a> 486 
+<a id='L487' name='L487'></a> 487         dat.pfFunc = pfFunc;
+<a id='L488' name='L488'></a> 488         dat.plList = plList;
+<a id='L489' name='L489'></a> 489         dat.pvData = pvData;
+<a id='L490' name='L490'></a> 490 
+<a id='L491' name='L491'></a> 491         <a href='../S/101.html#L315' title='Defined at 315 in libs/intern.c.'>foreachintern</a>(plList-&gt;ptKeys, &amp;<a href='../S/101.html#L472' title='Defined at 472 in libs/intern.c.'>dointernlistitr</a>, &amp;dat);
+<a id='L492' name='L492'></a> 492 <em class='brace'>}</em>
+</pre>
+<hr />
+<a id='BOTTOM' name='BOTTOM'></a>
+<em class='comment'>/* [&lt;][&gt;]<a href='#L22'>[^]</a><a href='#L484'>[v]</a><a href='#TOP'>[top]</a>[bottom]<a href='../mains.html'>[index]</a><a href='../help.html'>[help]</a> */</em>
+</body>
+</html>

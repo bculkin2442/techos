@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<title>techos</title>
+<meta name='robots' content='noindex,nofollow' />
+<meta name='generator' content='GLOBAL-6.3.1' />
+<meta http-equiv='Content-Style-Type' content='text/css' />
+<link rel='stylesheet' type='text/css' href='style.css' />
+<script type='text/javascript' src='js/jquery.js'></script>
+<link rel='stylesheet' type='text/css' href='js/jquery.suggest.css' />
+<script type='text/javascript' src='js/jquery.suggest.js'></script>
+<script type='text/javascript'>
+function getType() {
+	return $('input:radio[name=type]:checked').val();
+}
+function getCheck(name) {
+	return $('input[name=' + name + ']').attr('checked') ? 1 : 0;
+}
+$(function() {
+	$('#pattern').suggest('cgi-bin/completion.cgi',{
+		minchars: 2,
+		delay: 100,
+		extraParams : {
+			type:  function() { return getType(); },
+			id:  '',
+			limit: '10',
+			icase: function() { return getCheck('icase'); },
+			other: function() { return getCheck('other'); },
+		}
+	});
+});
+</script>
+</head>
+<body>
+<h1 class='title'>techos</h1>
+<div class='poweredby'>
+Last updated Sat Oct 13 11:33:53 ADT 2018<br />
+Powered by <a href='http://www.gnu.org/software/global/' title='Go to the GLOBAL project page.'>GLOBAL-6.3.1</a>.<br />
+</div>
+<hr />
+<h2 class='header'>SEARCH</h2>
+Please input object name and select [Search]. POSIX's regular expression is allowed.<br />
+<form method='get' action='cgi-bin/global.cgi'>
+<input name='pattern' id='pattern' />
+<input type='hidden' name='id' id='id' value='' />
+<input type='submit' value='Search' />
+<input type='reset' value='Reset' /><br />
+<input type='radio' name='type' id='type' value='definition' checked='checked' title='Retrieve the definition place of the specified symbol.' />Definition
+<input type='radio' name='type' id='type' value='reference' title='Retrieve the reference place of the specified symbol.' />Reference
+<input type='radio' name='type' id='type' value='symbol' title='Retrieve the place of the specified symbol is used.' />Other symbol
+<input type='radio' name='type' id='type' value='path' title='Look for path name which matches to the specified pattern.' />Path name
+<input type='radio' name='type' id='type' value='grep' title='Retrieve lines which matches to the specified pattern.' />Grep pattern
+<br />
+<input type='checkbox' name='icase' id='icase' title='Ignore case distinctions in the pattern.' />Ignore case
+</form>
+<hr />
+<h2 class='header'>MAINS</h2>
+<pre>
+<span class='curline'><a href='S/97.html#L7'>main</a>                7 libs/argparser_test.c int main() {</span>
+<span class='curline'><a href='S/43.html#L28'>main</a>               28 techos.c       int main() {</span>
+</pre>
+<hr />
+<h2 class='header'>DEFINITIONS</h2>
+<a href='defines/A.html' title='1 definition'>[A]</a>
+<a href='defines/B.html' title='1 definition'>[B]</a>
+<a href='defines/C.html' title='1 definition'>[C]</a>
+<a href='defines/D.html' title='1 definition'>[D]</a>
+<a href='defines/F.html' title='3 definitions'>[F]</a>
+<a href='defines/H.html' title='1 definition'>[H]</a>
+<a href='defines/I.html' title='1 definition'>[I]</a>
+<a href='defines/M.html' title='2 definitions'>[M]</a>
+<a href='defines/P.html' title='16 definitions'>[P]</a>
+<a href='defines/Q.html' title='5 definitions'>[Q]</a>
+<a href='defines/S.html' title='9 definitions'>[S]</a>
+<a href='defines/T.html' title='16 definitions'>[T]</a>
+<a href='defines/U.html' title='3 definitions'>[U]</a>
+<a href='defines/_.html' title='2 definitions'>[_]</a>
+<a href='defines/la.html' title='3 definitions'>[a]</a>
+<a href='defines/lb.html' title='1 definition'>[b]</a>
+<a href='defines/lc.html' title='9 definitions'>[c]</a>
+<a href='defines/ld.html' title='5 definitions'>[d]</a>
+<a href='defines/le.html' title='2 definitions'>[e]</a>
+<a href='defines/lf.html' title='10 definitions'>[f]</a>
+<a href='defines/lg.html' title='3 definitions'>[g]</a>
+<a href='defines/lh.html' title='3 definitions'>[h]</a>
+<a href='defines/li.html' title='6 definitions'>[i]</a>
+<a href='defines/lk.html' title='12 definitions'>[k]</a>
+<a href='defines/ll.html' title='4 definitions'>[l]</a>
+<a href='defines/lm.html' title='12 definitions'>[m]</a>
+<a href='defines/lo.html' title='2 definitions'>[o]</a>
+<a href='defines/lp.html' title='16 definitions'>[p]</a>
+<a href='defines/lq.html' title='4 definitions'>[q]</a>
+<a href='defines/lr.html' title='3 definitions'>[r]</a>
+<a href='defines/ls.html' title='4 definitions'>[s]</a>
+<a href='defines/lu.html' title='6 definitions'>[u]</a>
+<hr />
+<h2 class='header'>FILES</h2>
+<ol>
+<li><a href='S/9.html' title='3,397 bytes'>comlist.c</a></li>
+<li><a href='S/4.html' title='907 bytes'>comlist.h</a></li>
+<li><a href='S/48.html' title='1,065 bytes'>command.c</a></li>
+<li><a href='S/6.html' title='1,353 bytes'>command.h</a></li>
+<li><a href='S/93.html' title='8,311 bytes'>commands.c</a></li>
+<li><a href='S/106.html' title='446 bytes'>commands.h</a></li>
+<li><a href='S/92.html' title='432 bytes'>commandstate.c</a></li>
+<li><a href='S/89.html' title='309 bytes'>commandstate.h</a></li>
+<li><a href='S/107.html' title='7,614 bytes'>datecmds.c</a></li>
+<li><a href='S/86.html' title='200 bytes'>datecmds.h</a></li>
+<li><a href='S/49.html' title='4,350 bytes'>dispatchcmds.c</a></li>
+<li><a href='S/102.html' title='139 bytes'>dispatchcmds.h</a></li>
+<li><a href='S/5.html' title='16,918 bytes'>filecmds.c</a></li>
+<li><a href='S/91.html' title='227 bytes'>filecmds.h</a></li>
+<li><a href='files/113.html' title='5 files'>libs/</a></li>
+<li><a href='S/105.html' title='2,197 bytes'>osstate.c</a></li>
+<li><a href='S/112.html' title='2,357 bytes'>osstate.h</a></li>
+<li><a href='S/2.html' title='11,765 bytes'>pcb.c</a></li>
+<li><a href='S/104.html' title='3,503 bytes'>pcb.h</a></li>
+<li><a href='S/103.html' title='22,534 bytes'>pcbcmds.c</a></li>
+<li><a href='S/108.html' title='233 bytes'>pcbcmds.h</a></li>
+<li><a href='S/7.html' title='5,124 bytes'>pcbinternals.c</a></li>
+<li><a href='S/46.html' title='2,172 bytes'>pcbinternals.h</a></li>
+<li><a href='S/8.html' title='674 bytes'>procexecute.c</a></li>
+<li><a href='S/94.html' title='288 bytes'>procexecute.h</a></li>
+<li><a href='S/42.html' title='2,271 bytes'>scriptcmds.c</a></li>
+<li><a href='S/95.html' title='213 bytes'>scriptcmds.h</a></li>
+<li><a href='S/43.html' title='5,826 bytes'>techos.c</a></li>
+<li><a href='S/44.html' title='923 bytes'>techos.h</a></li>
+<li><a href='S/96.html' title='10,277 bytes'>usercmds.c</a></li>
+<li><a href='S/11.html' title='206 bytes'>usercmds.h</a></li>
+<li><a href='S/10.html' title='3,336 bytes'>users.c</a></li>
+<li><a href='S/3.html' title='1,369 bytes'>users.h</a></li>
+</ol>
+<hr />
+</body>
+</html>

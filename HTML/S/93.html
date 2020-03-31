@@ -1,0 +1,320 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<title>commands.c</title>
+<meta name='robots' content='noindex,nofollow' />
+<meta name='generator' content='GLOBAL-6.3.1' />
+<meta http-equiv='Content-Style-Type' content='text/css' />
+<link rel='stylesheet' type='text/css' href='../style.css' />
+</head>
+<body>
+<a id='TOP' name='TOP'></a><h2 class='header'><a href='../mains.html'>root</a>/commands.c</h2>
+<em class='comment'>/* [&lt;][&gt;]<a href='#L30'>[^]</a><a href='#L279'>[v]</a>[top]<a href='#BOTTOM'>[bottom]</a><a href='../mains.html'>[index]</a><a href='../help.html'>[help]</a> */</em>
+<hr />
+<h2 class='header'>DEFINITIONS</h2>
+This source file includes following definitions.
+<ol>
+<li><a href='#L30' title='Defined at 30.'>initcoms</a></li>
+<li><a href='#L35' title='Defined at 35.'>disposecoms</a></li>
+<li><a href='#L40' title='Defined at 40.'>addcommands</a></li>
+<li><a href='#L86' title='Defined at 86.'>HANDLECOM</a></li>
+<li><a href='#L132' title='Defined at 132.'>HANDLECOM</a></li>
+<li><a href='#L210' title='Defined at 210.'>HANDLECOM</a></li>
+<li><a href='#L279' title='Defined at 279.'>HANDLECOM</a></li>
+</ol>
+<hr />
+<pre>
+<a id='L1' name='L1'></a>   1 <em class='sharp'>#include</em> &lt;assert.h&gt;
+<a id='L2' name='L2'></a>   2 <em class='sharp'>#include</em> &lt;ctype.h&gt;
+<a id='L3' name='L3'></a>   3 <em class='sharp'>#include</em> &lt;fcntl.h&gt;
+<a id='L4' name='L4'></a>   4 <em class='sharp'>#include</em> &lt;getopt.h&gt;
+<a id='L5' name='L5'></a>   5 <em class='sharp'>#include</em> &lt;stdio.h&gt;
+<a id='L6' name='L6'></a>   6 <em class='sharp'>#include</em> &lt;stdlib.h&gt;
+<a id='L7' name='L7'></a>   7 <em class='sharp'>#include</em> &lt;string.h&gt;
+<a id='L8' name='L8'></a>   8 <em class='sharp'>#include</em> &lt;unistd.h&gt;
+<a id='L9' name='L9'></a>   9 
+<a id='L10' name='L10'></a>  10 <em class='sharp'>#include</em> &lt;sys/types.h&gt;
+<a id='L11' name='L11'></a>  11 <em class='sharp'>#include</em> &lt;sys/stat.h&gt;
+<a id='L12' name='L12'></a>  12 
+<a id='L13' name='L13'></a>  13 <em class='sharp'>#include</em> "<a href='112.html'>osstate.h</a>"
+<a id='L14' name='L14'></a>  14 
+<a id='L15' name='L15'></a>  15 <em class='sharp'>#include</em> "<a href='6.html'>command.h</a>"
+<a id='L16' name='L16'></a>  16 <em class='sharp'>#include</em> "<a href='4.html'>comlist.h</a>"
+<a id='L17' name='L17'></a>  17 <em class='sharp'>#include</em> "<a href='89.html'>commandstate.h</a>"
+<a id='L18' name='L18'></a>  18 <em class='sharp'>#include</em> "<a href='106.html'>commands.h</a>"
+<a id='L19' name='L19'></a>  19 
+<a id='L20' name='L20'></a>  20 <em class='sharp'>#include</em> "<a href='102.html'>dispatchcmds.h</a>"
+<a id='L21' name='L21'></a>  21 <em class='sharp'>#include</em> "<a href='86.html'>datecmds.h</a>"
+<a id='L22' name='L22'></a>  22 <em class='sharp'>#include</em> "<a href='95.html'>scriptcmds.h</a>"
+<a id='L23' name='L23'></a>  23 <em class='sharp'>#include</em> "<a href='108.html'>pcbcmds.h</a>"
+<a id='L24' name='L24'></a>  24 <em class='sharp'>#include</em> "<a href='91.html'>filecmds.h</a>"
+<a id='L25' name='L25'></a>  25 <em class='sharp'>#include</em> "<a href='11.html'>usercmds.h</a>"
+<a id='L26' name='L26'></a>  26 
+<a id='L27' name='L27'></a>  27 <em class='sharp'>#include</em> "<a href='44.html'>techos.h</a>"
+<a id='L28' name='L28'></a>  28 
+<a id='L29' name='L29'></a>  29 <em class='comment'>/* Initialize commands. */</em>
+<a id='L30' name='L30'></a>  30 <strong class='reserved'>void</strong> <a href='../R/94.html' title='Multiple referred from 2 places.'>initcoms</a>() <em class='brace'>{</em>
+<a id='L31' name='L31'></a>  31         <em class='comment'>/* Doing nothing at the moment. */</em>
+<a id='L32' name='L32'></a>  32 <em class='brace'>}</em>
+<a id='L33' name='L33'></a>  33 
+<a id='L34' name='L34'></a>  34 <em class='comment'>/* Dispose of commands. */</em>
+<a id='L35' name='L35'></a>  35 <strong class='reserved'>void</strong> <a href='../R/73.html' title='Multiple referred from 2 places.'>disposecoms</a>() <em class='brace'>{</em>
+<a id='L36' name='L36'></a>  36         <em class='comment'>/* Doing nothing at the moment. */</em>
+<a id='L37' name='L37'></a>  37 <em class='brace'>}</em>
+<a id='L38' name='L38'></a>  38 
+<a id='L39' name='L39'></a>  39 <em class='comment'>/* Add commands to a command list. */</em>
+<a id='L40' name='L40'></a>  40 <strong class='reserved'>void</strong> <a href='../R/61.html' title='Multiple referred from 2 places.'>addcommands</a>(<strong class='reserved'>struct</strong> <a href='../S/9.html#L11' title='Defined at 11 in comlist.c.'>comlist</a> *list) <em class='brace'>{</em>
+<a id='L41' name='L41'></a>  41         <em class='comment'>/* Date/time commands. */</em>
+<a id='L42' name='L42'></a>  42         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "date",    "Display the current date/time",                &amp;handle_date);
+<a id='L43' name='L43'></a>  43         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "datefmt", "Set the format the date is displayed/read in", &amp;handle_datefmt);
+<a id='L44' name='L44'></a>  44         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "setdate", "Set the current date",                         &amp;handle_setdate);
+<a id='L45' name='L45'></a>  45         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "time",    "Display the current time",                     &amp;handle_time);
+<a id='L46' name='L46'></a>  46 
+<a id='L47' name='L47'></a>  47         <em class='comment'>/* Script commands. */</em>
+<a id='L48' name='L48'></a>  48         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "script",    "Execute a script file",        &amp;handle_script);
+<a id='L49' name='L49'></a>  49 
+<a id='L50' name='L50'></a>  50         <em class='comment'>/* PCB commands. */</em>
+<a id='L51' name='L51'></a>  51         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "mkpcb",     "Create PCB and insert into queue",          &amp;handle_mkpcb);
+<a id='L52' name='L52'></a>  52         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "sspcb",     "Suspend PCB and reinsert into queue",       &amp;handle_sspcb);
+<a id='L53' name='L53'></a>  53         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "rspcb",     "Set PCB state to unsuspended and reinsert", &amp;handle_rspcb);
+<a id='L54' name='L54'></a>  54         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "sppcb",     "Set PCB priority and reinserts",            &amp;handle_sppcb);
+<a id='L55' name='L55'></a>  55         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "shpcb",     "Display PCB/queue information",             &amp;handle_shpcb);
+<a id='L56' name='L56'></a>  56 
+<a id='L57' name='L57'></a>  57         <em class='comment'>/* Dispatching commands. */</em>
+<a id='L58' name='L58'></a>  58         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "dispatch", "Dispatch all processes currently available", &amp;handle_dispatch);
+<a id='L59' name='L59'></a>  59 
+<a id='L60' name='L60'></a>  60         <em class='comment'>/* File commands. */</em>
+<a id='L61' name='L61'></a>  61         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "ls",    "Show all files in the directory",  &amp;handle_ls);
+<a id='L62' name='L62'></a>  62         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "cd",    "Change the current directory",     &amp;handle_cd);
+<a id='L63' name='L63'></a>  63         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "mkdir", "Create a new file directory",   &amp;handle_mkdir);
+<a id='L64' name='L64'></a>  64         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "rmdir", "Delete a  directory",           &amp;handle_rmdir);
+<a id='L65' name='L65'></a>  65         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "touch", "Create a file",                 &amp;handle_touch);
+<a id='L66' name='L66'></a>  66         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "rm",    "Delete a file",                    &amp;handle_rm);
+<a id='L67' name='L67'></a>  67 
+<a id='L68' name='L68'></a>  68         <em class='comment'>/* User commands. */</em>
+<a id='L69' name='L69'></a>  69         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "mkusr",     "Create a new user",                   &amp;handle_mkusr);
+<a id='L70' name='L70'></a>  70         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "rmusr",     "Delete a user",                       &amp;handle_rmusr);
+<a id='L71' name='L71'></a>  71         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "pwd",       "Change current user password",        &amp;handle_pwd);
+<a id='L72' name='L72'></a>  72         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "toggleadm", "Toggle the admin status of a user",   &amp;handle_toggleadm);
+<a id='L73' name='L73'></a>  73 
+<a id='L74' name='L74'></a>  74         <em class='comment'>/* Misc. Commands. */</em>
+<a id='L75' name='L75'></a>  75         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "exit",    "Exit TechOS",                                    &amp;handle_exit);
+<a id='L76' name='L76'></a>  76         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "help",    "Get help for commands, or list available ones.", &amp;handle_help);
+<a id='L77' name='L77'></a>  77         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "version", "Display version/author information",             &amp;handle_version);
+<a id='L78' name='L78'></a>  78         <a href='../S/9.html#L72' title='Defined at 72 in comlist.c.'>addcommand</a>(list, "moo", " ~~moo~~",                                           &amp;handle_moo);
+<a id='L79' name='L79'></a>  79 <em class='brace'>}</em>
+<a id='L80' name='L80'></a>  80 
+<a id='L81' name='L81'></a>  81 <em class='comment'>/*</em>
+<a id='L82' name='L82'></a>  82 <em class='comment'> * Handle exiting from the prompt.</em>
+<a id='L83' name='L83'></a>  83 <em class='comment'> *</em>
+<a id='L84' name='L84'></a>  84 <em class='comment'> * Make sure to confirm before hand.</em>
+<a id='L85' name='L85'></a>  85 <em class='comment'> */</em>
+<a id='L86' name='L86'></a>  86 HANDLECOM(exit) <em class='brace'>{</em>
+<a id='L87' name='L87'></a>  87         <em class='comment'>/* Variables for line input. */</em>
+<a id='L88' name='L88'></a>  88         <strong class='reserved'>char</strong>  *pszLine = NULL;
+<a id='L89' name='L89'></a>  89         size_t lread, lsize;
+<a id='L90' name='L90'></a>  90 
+<a id='L91' name='L91'></a>  91         <em class='comment'>/* Command return status. */</em>
+<a id='L92' name='L92'></a>  92         <strong class='reserved'>int</strong> ret;
+<a id='L93' name='L93'></a>  93 
+<a id='L94' name='L94'></a>  94         <em class='comment'>/* Init vars. */</em>
+<a id='L95' name='L95'></a>  95         ret     = 0;
+<a id='L96' name='L96'></a>  96         pszLine = NULL;
+<a id='L97' name='L97'></a>  97 
+<a id='L98' name='L98'></a>  98         <em class='comment'>/* Handle CLI args. */</em>
+<a id='L99' name='L99'></a>  99         <strong class='reserved'>if</strong>(argc &gt; 1) <em class='brace'>{</em>
+<a id='L100' name='L100'></a> 100                 <strong class='reserved'>return</strong> <a href='../S/48.html#L10' title='Defined at 10 in command.c.'>checkhelpargs</a>(argc, argv, "Usage: exit [-h] [--help]\n", ostate);
+<a id='L101' name='L101'></a> 101         <em class='brace'>}</em>
+<a id='L102' name='L102'></a> 102 
+<a id='L103' name='L103'></a> 103         fprintf(ostate-&gt;output, "Are you sure you want to exit? (y/n) ");
+<a id='L104' name='L104'></a> 104         lread = getline(&amp;pszLine, &amp;lsize, stdin);
+<a id='L105' name='L105'></a> 105 
+<a id='L106' name='L106'></a> 106         <em class='comment'>/* Use rpmatch() to pick an action. */</em>
+<a id='L107' name='L107'></a> 107         <strong class='reserved'>if</strong>(lread &gt; 1) <em class='brace'>{</em>
+<a id='L108' name='L108'></a> 108                 <strong class='reserved'>int</strong> result = rpmatch(pszLine);
+<a id='L109' name='L109'></a> 109 
+<a id='L110' name='L110'></a> 110                 <strong class='reserved'>switch</strong>(result) <em class='brace'>{</em>
+<a id='L111' name='L111'></a> 111                 <strong class='reserved'>case</strong> 1:
+<a id='L112' name='L112'></a> 112                         ret = -1;
+<a id='L113' name='L113'></a> 113                         <strong class='reserved'>break</strong>;
+<a id='L114' name='L114'></a> 114                 <strong class='reserved'>case</strong> 0:
+<a id='L115' name='L115'></a> 115                         ret = 0;
+<a id='L116' name='L116'></a> 116                         <strong class='reserved'>break</strong>;
+<a id='L117' name='L117'></a> 117                 <strong class='reserved'>case</strong> -1:
+<a id='L118' name='L118'></a> 118                 <strong class='reserved'>default</strong>:
+<a id='L119' name='L119'></a> 119                         fprintf(ostate-&gt;output, "ERROR: Unknown response '%s'\n", pszLine);
+<a id='L120' name='L120'></a> 120                 <em class='brace'>}</em>
+<a id='L121' name='L121'></a> 121         <em class='brace'>}</em>
+<a id='L122' name='L122'></a> 122 
+<a id='L123' name='L123'></a> 123         <em class='comment'>/*</em>
+<a id='L124' name='L124'></a> 124 <em class='comment'>         * Cleanup after ourselves.</em>
+<a id='L125' name='L125'></a> 125 <em class='comment'>         */</em>
+<a id='L126' name='L126'></a> 126         <strong class='reserved'>if</strong>(pszLine != NULL) free(pszLine);
+<a id='L127' name='L127'></a> 127 
+<a id='L128' name='L128'></a> 128         <strong class='reserved'>return</strong> ret;
+<a id='L129' name='L129'></a> 129 <em class='brace'>}</em>
+<a id='L130' name='L130'></a> 130 
+<a id='L131' name='L131'></a> 131 <em class='comment'>/* Print out version/author information. */</em>
+<a id='L132' name='L132'></a> 132 HANDLECOM(version) <em class='brace'>{</em>
+<a id='L133' name='L133'></a> 133                 <strong class='reserved'>return</strong> <a href='../S/48.html#L10' title='Defined at 10 in command.c.'>checkhelpargs</a>(argc, argv, "Usage: version [-advh] [--author] [--date] [--version] [--help]\n", ostate);
+<a id='L134' name='L134'></a> 134 
+<a id='L135' name='L135'></a> 135         <em class='comment'>/* Should version info be printed? */</em>
+<a id='L136' name='L136'></a> 136         <strong class='reserved'>int</strong> printVersion = 1;
+<a id='L137' name='L137'></a> 137         <em class='comment'>/* Should author information be printed? */</em>
+<a id='L138' name='L138'></a> 138         <strong class='reserved'>int</strong> printAuthor  = 0;
+<a id='L139' name='L139'></a> 139         <em class='comment'>/* Should date information be printed? */</em>
+<a id='L140' name='L140'></a> 140         <strong class='reserved'>int</strong> printDate    = 0;
+<a id='L141' name='L141'></a> 141 
+<a id='L142' name='L142'></a> 142         <em class='comment'>/* Reinit getopt. */</em>
+<a id='L143' name='L143'></a> 143         optind = 1;
+<a id='L144' name='L144'></a> 144 
+<a id='L145' name='L145'></a> 145         <em class='comment'>/* Process options. */</em>
+<a id='L146' name='L146'></a> 146         <strong class='reserved'>while</strong>(1) <em class='brace'>{</em>
+<a id='L147' name='L147'></a> 147                 <em class='comment'>/*</em>
+<a id='L148' name='L148'></a> 148 <em class='comment'>                 * @TODO 10/07/17 Ben Culkin :VersionOpts</em>
+<a id='L149' name='L149'></a> 149 <em class='comment'>                 *      Adjust these options to some better way of indicating</em>
+<a id='L150' name='L150'></a> 150 <em class='comment'>                 *      which information we do/do not want to show. If this was</em>
+<a id='L151' name='L151'></a> 151 <em class='comment'>                 *      java, I'd just go with a custom format string sorta</em>
+<a id='L152' name='L152'></a> 152 <em class='comment'>                 *      thing, but that'd have to be reimplemented for C, and'd</em>
+<a id='L153' name='L153'></a> 153 <em class='comment'>                 *      be kinda painful. Maybe we'd want to look into something</em>
+<a id='L154' name='L154'></a> 154 <em class='comment'>                 *      with getsubopt()?</em>
+<a id='L155' name='L155'></a> 155 <em class='comment'>                 */</em>
+<a id='L156' name='L156'></a> 156 
+<a id='L157' name='L157'></a> 157                 <em class='comment'>/* The current option/long option. */</em>
+<a id='L158' name='L158'></a> 158                 <strong class='reserved'>int</strong> opt, optidx;
+<a id='L159' name='L159'></a> 159                 <em class='comment'>/* Usage message. */</em>
+<a id='L160' name='L160'></a> 160                 <strong class='reserved'>static</strong> <strong class='reserved'>char</strong> *usage = "Usage: version [-advh] [--author] [--date] [--version] [--help]\n";
+<a id='L161' name='L161'></a> 161 
+<a id='L162' name='L162'></a> 162                 <strong class='reserved'>static</strong> <strong class='reserved'>struct</strong> option longopts[] = <em class='brace'>{</em>
+<a id='L163' name='L163'></a> 163                         <em class='comment'>/* Info ctl. options. */</em>
+<a id='L164' name='L164'></a> 164                         <em class='brace'>{</em>"author",  no_argument, 0, 'a'<em class='brace'>}</em>,
+<a id='L165' name='L165'></a> 165                         <em class='brace'>{</em>"date",    no_argument, 0, 'd'<em class='brace'>}</em>,
+<a id='L166' name='L166'></a> 166                         <em class='brace'>{</em>"version", no_argument, 0, 'v'<em class='brace'>}</em>,
+<a id='L167' name='L167'></a> 167 
+<a id='L168' name='L168'></a> 168                         <em class='comment'>/* Misc. options. */</em>
+<a id='L169' name='L169'></a> 169                         <em class='brace'>{</em>"help", no_argument, 0, 'h'<em class='brace'>}</em>,
+<a id='L170' name='L170'></a> 170 
+<a id='L171' name='L171'></a> 171                         <em class='comment'>/* Terminating option. */</em>
+<a id='L172' name='L172'></a> 172                         <em class='brace'>{</em>0, 0, 0, 0<em class='brace'>}</em>
+<a id='L173' name='L173'></a> 173                 <em class='brace'>}</em>;
+<a id='L174' name='L174'></a> 174 
+<a id='L175' name='L175'></a> 175                 <em class='comment'>/* Get an option. */</em>
+<a id='L176' name='L176'></a> 176                 opt = getopt_long(argc, argv, "advh", longopts, &amp;optidx);
+<a id='L177' name='L177'></a> 177 
+<a id='L178' name='L178'></a> 178                 <em class='comment'>/* Finish options. */</em>
+<a id='L179' name='L179'></a> 179                 <strong class='reserved'>if</strong>(opt == -1) <strong class='reserved'>break</strong>;
+<a id='L180' name='L180'></a> 180 
+<a id='L181' name='L181'></a> 181                 <strong class='reserved'>switch</strong>(opt) <em class='brace'>{</em>
+<a id='L182' name='L182'></a> 182                         <em class='comment'>/* a, d and v are toggle options. */</em>
+<a id='L183' name='L183'></a> 183                 <strong class='reserved'>case</strong> 'a':
+<a id='L184' name='L184'></a> 184                         printAuthor = 1 - printAuthor;
+<a id='L185' name='L185'></a> 185                         <strong class='reserved'>break</strong>;
+<a id='L186' name='L186'></a> 186                 <strong class='reserved'>case</strong> 'd':
+<a id='L187' name='L187'></a> 187                         printDate = 1 - printDate;
+<a id='L188' name='L188'></a> 188                         <strong class='reserved'>break</strong>;
+<a id='L189' name='L189'></a> 189                 <strong class='reserved'>case</strong> 'v':
+<a id='L190' name='L190'></a> 190                         printVersion = 1 - printDate;
+<a id='L191' name='L191'></a> 191                         <strong class='reserved'>break</strong>;
+<a id='L192' name='L192'></a> 192                 <strong class='reserved'>case</strong> 'h':
+<a id='L193' name='L193'></a> 193                         fprintf(ostate-&gt;output, "%s", usage);
+<a id='L194' name='L194'></a> 194                         <strong class='reserved'>return</strong> 0;
+<a id='L195' name='L195'></a> 195                 <strong class='reserved'>default</strong>:
+<a id='L196' name='L196'></a> 196                         fprintf(ostate-&gt;output, "ERROR: Unknown short option '%c'\n", opt);
+<a id='L197' name='L197'></a> 197                         fprintf(ostate-&gt;output, "%s", usage);
+<a id='L198' name='L198'></a> 198                         <strong class='reserved'>return</strong> 1;
+<a id='L199' name='L199'></a> 199                 <em class='brace'>}</em>
+<a id='L200' name='L200'></a> 200         <em class='brace'>}</em>
+<a id='L201' name='L201'></a> 201 
+<a id='L202' name='L202'></a> 202         <em class='comment'>/* Print version info. */</em>
+<a id='L203' name='L203'></a> 203         <strong class='reserved'>if</strong>(printVersion) fprintf(ostate-&gt;output, "\tTechOS v%d.%d\n", major_ver, minor_ver);
+<a id='L204' name='L204'></a> 204         <strong class='reserved'>if</strong>(printAuthor)  fprintf(ostate-&gt;output, "\tAuthors: Benjamin Culkin, Lucas Darnell, Jared Miller\n");
+<a id='L205' name='L205'></a> 205         <strong class='reserved'>if</strong>(printDate)    fprintf(ostate-&gt;output, "\tCompletion Date: 9/13/17\n");
+<a id='L206' name='L206'></a> 206 
+<a id='L207' name='L207'></a> 207         <strong class='reserved'>return</strong> 0;
+<a id='L208' name='L208'></a> 208 <em class='brace'>}</em>
+<a id='L209' name='L209'></a> 209 
+<a id='L210' name='L210'></a> 210 HANDLECOM(help) <em class='brace'>{</em>
+<a id='L211' name='L211'></a> 211         <em class='comment'>/* Usage message. */</em>
+<a id='L212' name='L212'></a> 212         <strong class='reserved'>char</strong> *usage = "Usage: help [-h] [--help] [&lt;command-name&gt;]\n";
+<a id='L213' name='L213'></a> 213 
+<a id='L214' name='L214'></a> 214         <em class='comment'>/* Handle CLI args. */</em>
+<a id='L215' name='L215'></a> 215         <strong class='reserved'>if</strong>(argc == 1) <em class='brace'>{</em>
+<a id='L216' name='L216'></a> 216                 fprintf(ostate-&gt;output, "Available commands:\n");
+<a id='L217' name='L217'></a> 217 
+<a id='L218' name='L218'></a> 218                 <em class='comment'>/* </em>
+<a id='L219' name='L219'></a> 219 <em class='comment'>                 * @TODO 10/07/17 Ben Culkin :PrintCommandState</em>
+<a id='L220' name='L220'></a> 220 <em class='comment'>                 *       printcommands needs to be rewritten to accept a</em>
+<a id='L221' name='L221'></a> 221 <em class='comment'>                 *       commandstate, so that it can handle things like command</em>
+<a id='L222' name='L222'></a> 222 <em class='comment'>                 *       categories and help-only commands/internal commands</em>
+<a id='L223' name='L223'></a> 223 <em class='comment'>                 *       that don't show up in the default help list.</em>
+<a id='L224' name='L224'></a> 224 <em class='comment'>                 */</em>
+<a id='L225' name='L225'></a> 225                 <a href='../S/9.html#L120' title='Defined at 120 in comlist.c.'>printcommands</a>(ostate-&gt;pComstate-&gt;plCommands, ostate-&gt;output);
+<a id='L226' name='L226'></a> 226         <em class='brace'>}</em> <strong class='reserved'>else</strong> <strong class='reserved'>if</strong>(argc == 2)<em class='brace'>{</em>
+<a id='L227' name='L227'></a> 227                 <em class='comment'>/* The path to the man page. */</em>
+<a id='L228' name='L228'></a> 228                 <strong class='reserved'>char</strong> *manpath;
+<a id='L229' name='L229'></a> 229 
+<a id='L230' name='L230'></a> 230                 <em class='comment'>/* The struct for checking if a file exists. */</em>
+<a id='L231' name='L231'></a> 231                 <strong class='reserved'>struct</strong> stat scratch;
+<a id='L232' name='L232'></a> 232 
+<a id='L233' name='L233'></a> 233                 <strong class='reserved'>int</strong> ret;
+<a id='L234' name='L234'></a> 234 
+<a id='L235' name='L235'></a> 235                 <em class='comment'>/* Handle CLI args. */</em>
+<a id='L236' name='L236'></a> 236                 <strong class='reserved'>if</strong>(argv[1][0] == '-') <em class='brace'>{</em>
+<a id='L237' name='L237'></a> 237                         <a href='../S/48.html#L10' title='Defined at 10 in command.c.'>checkhelpargs</a>(argc, argv, usage, ostate);
+<a id='L238' name='L238'></a> 238                         <strong class='reserved'>return</strong> 1;
+<a id='L239' name='L239'></a> 239                 <em class='brace'>}</em>
+<a id='L240' name='L240'></a> 240 
+<a id='L241' name='L241'></a> 241                 <em class='comment'>/* Get the path we want to use. */</em>
+<a id='L242' name='L242'></a> 242                 assert(asprintf(&amp;manpath, "help/%s.1", argv[1]) != -1);
+<a id='L243' name='L243'></a> 243 
+<a id='L244' name='L244'></a> 244                 <em class='comment'>/* Check if the file exists. */</em>
+<a id='L245' name='L245'></a> 245                 <strong class='reserved'>if</strong>(stat(manpath, &amp;scratch) == -1) <em class='brace'>{</em>
+<a id='L246' name='L246'></a> 246                         <em class='comment'>/* File wasn't found. */</em>
+<a id='L247' name='L247'></a> 247                         fprintf(ostate-&gt;output, "\tINTERNAL ERROR: Manpage for command '%s' ('%s') couldn't be found.\n", argv[1], manpath);
+<a id='L248' name='L248'></a> 248 
+<a id='L249' name='L249'></a> 249                         free(manpath);
+<a id='L250' name='L250'></a> 250                         <strong class='reserved'>return</strong> 1;
+<a id='L251' name='L251'></a> 251                 <em class='brace'>}</em>
+<a id='L252' name='L252'></a> 252                 <strong class='reserved'>if</strong>(S_ISREG(scratch.st_mode)) <em class='brace'>{</em>
+<a id='L253' name='L253'></a> 253                         <em class='comment'>/* Command to run. */</em>
+<a id='L254' name='L254'></a> 254                         <strong class='reserved'>char</strong> *compath;
+<a id='L255' name='L255'></a> 255 
+<a id='L256' name='L256'></a> 256                         <em class='comment'>/* Create our command, then run it. */</em>
+<a id='L257' name='L257'></a> 257                         assert(asprintf(&amp;compath, "man %s", manpath) != -1);
+<a id='L258' name='L258'></a> 258                         <strong class='reserved'>if</strong>(system(compath) != 0) <em class='brace'>{</em>
+<a id='L259' name='L259'></a> 259                                 fprintf(ostate-&gt;output, "\tINTERNAL ERROR: Could not display the manpage for '%s'\n", argv[1]);
+<a id='L260' name='L260'></a> 260                         <em class='brace'>}</em>
+<a id='L261' name='L261'></a> 261 
+<a id='L262' name='L262'></a> 262                         free(compath);  
+<a id='L263' name='L263'></a> 263                 <em class='brace'>}</em> <strong class='reserved'>else</strong> <em class='brace'>{</em>
+<a id='L264' name='L264'></a> 264                         fprintf(ostate-&gt;output, "\tINTERNAL ERROR: Manpage for command '%s' ('%s') is not valid.\n", argv[1], manpath);
+<a id='L265' name='L265'></a> 265 
+<a id='L266' name='L266'></a> 266                         free(manpath);
+<a id='L267' name='L267'></a> 267                         <strong class='reserved'>return</strong> 1;
+<a id='L268' name='L268'></a> 268                 <em class='brace'>}</em>
+<a id='L269' name='L269'></a> 269 
+<a id='L270' name='L270'></a> 270                 free(manpath);
+<a id='L271' name='L271'></a> 271         <em class='brace'>}</em> <strong class='reserved'>else</strong> <em class='brace'>{</em>
+<a id='L272' name='L272'></a> 272                 fprintf(ostate-&gt;output, "\tERROR: Invalid command-line arguments\n");
+<a id='L273' name='L273'></a> 273                 fprintf(ostate-&gt;output, "\t%s", usage);
+<a id='L274' name='L274'></a> 274         <em class='brace'>}</em>
+<a id='L275' name='L275'></a> 275 
+<a id='L276' name='L276'></a> 276         <strong class='reserved'>return</strong> 0;
+<a id='L277' name='L277'></a> 277 <em class='brace'>}</em>
+<a id='L278' name='L278'></a> 278 
+<a id='L279' name='L279'></a> 279 HANDLECOM(moo) <em class='brace'>{</em>
+<a id='L280' name='L280'></a> 280         fprintf(ostate-&gt;output, "        (__)\n");
+<a id='L281' name='L281'></a> 281         fprintf(ostate-&gt;output, "        (oo)\n");
+<a id='L282' name='L282'></a> 282         fprintf(ostate-&gt;output, "  /------\\/\n");
+<a id='L283' name='L283'></a> 283         fprintf(ostate-&gt;output, " / |    ||\n");
+<a id='L284' name='L284'></a> 284         fprintf(ostate-&gt;output, "*  /\\---/\\\n");
+<a id='L285' name='L285'></a> 285         fprintf(ostate-&gt;output, "   ~~   ~~\n");
+<a id='L286' name='L286'></a> 286         fprintf(ostate-&gt;output, "....\"Have you mooed today?\"...\n");
+<a id='L287' name='L287'></a> 287         <strong class='reserved'>return</strong> 0;
+<a id='L288' name='L288'></a> 288 <em class='brace'>}</em>
+</pre>
+<hr />
+<a id='BOTTOM' name='BOTTOM'></a>
+<em class='comment'>/* [&lt;][&gt;]<a href='#L30'>[^]</a><a href='#L279'>[v]</a><a href='#TOP'>[top]</a>[bottom]<a href='../mains.html'>[index]</a><a href='../help.html'>[help]</a> */</em>
+</body>
+</html>

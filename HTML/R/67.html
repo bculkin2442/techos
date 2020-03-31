@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<title>comlist</title>
+<meta name='robots' content='noindex,nofollow' />
+<meta name='generator' content='GLOBAL-6.3.1' />
+<meta http-equiv='Content-Style-Type' content='text/css' />
+<link rel='stylesheet' type='text/css' href='../style.css' />
+</head>
+<body>
+<pre>
+<span class='curline'><a href='../S/9.html#L23'>comlist</a>            23 comlist.c      struct comlist *makecomlist() {</span>
+<span class='curline'><a href='../S/9.html#L25'>comlist</a>            25 comlist.c      	struct comlist *ret = malloc(sizeof(struct comlist));</span>
+<span class='curline'><a href='../S/9.html#L45'>comlist</a>            45 comlist.c      void killcomlist(struct comlist *list) {</span>
+<span class='curline'><a href='../S/9.html#L72'>comlist</a>            72 comlist.c      void addcommand(struct comlist *plList, char *pszName, char *pszDesc, comfun_t pfHandler) {</span>
+<span class='curline'><a href='../S/9.html#L102'>comlist</a>           102 comlist.c      struct command *getcommand(struct comlist *list, char *name) {</span>
+<span class='curline'><a href='../S/9.html#L114'>comlist</a>           114 comlist.c      void foreachcommand(struct comlist *list, void (*comitr)(struct command *)) {</span>
+<span class='curline'><a href='../S/9.html#L120'>comlist</a>           120 comlist.c      void printcommands(struct comlist *list, FILE *fle) {</span>
+<span class='curline'><a href='../S/4.html#L9'>comlist</a>             9 comlist.h      struct comlist;</span>
+<span class='curline'><a href='../S/4.html#L12'>comlist</a>            12 comlist.h      struct comlist *makecomlist();</span>
+<span class='curline'><a href='../S/4.html#L14'>comlist</a>            14 comlist.h      void            killcomlist(struct comlist *);</span>
+<span class='curline'><a href='../S/4.html#L26'>comlist</a>            26 comlist.h      void addcommand(struct comlist *, char *, char *, comfun_t);</span>
+<span class='curline'><a href='../S/4.html#L33'>comlist</a>            33 comlist.h      struct command *getcommand(struct comlist *, char *);</span>
+<span class='curline'><a href='../S/4.html#L36'>comlist</a>            36 comlist.h      void foreachcommand(struct comlist *, void (*comitr)(struct command *));</span>
+<span class='curline'><a href='../S/4.html#L39'>comlist</a>            39 comlist.h      void printcommands(struct comlist *, FILE *);</span>
+<span class='curline'><a href='../S/93.html#L40'>comlist</a>            40 commands.c     void addcommands(struct comlist *list) {</span>
+<span class='curline'><a href='../S/106.html#L14'>comlist</a>            14 commands.h     void addcommands(struct comlist *);</span>
+<span class='curline'><a href='../S/89.html#L5'>comlist</a>             5 commandstate.h 	struct comlist *plCommands;</span>
+<span class='curline'><a href='../S/44.html#L14'>comlist</a>            14 techos.h       extern struct comlist *all_commands;</span>
+</pre>
+</body>
+</html>

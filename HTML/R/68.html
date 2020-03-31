@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<title>command</title>
+<meta name='robots' content='noindex,nofollow' />
+<meta name='generator' content='GLOBAL-6.3.1' />
+<meta http-equiv='Content-Style-Type' content='text/css' />
+<link rel='stylesheet' type='text/css' href='../style.css' />
+</head>
+<body>
+<pre>
+<span class='curline'><a href='../S/9.html#L13'>command</a>            13 comlist.c      	struct command **commands;</span>
+<span class='curline'><a href='../S/9.html#L30'>command</a>            30 comlist.c      	ret-&gt;commands = calloc(10, sizeof(struct command));</span>
+<span class='curline'><a href='../S/9.html#L81'>command</a>            81 comlist.c      		plList-&gt;commands = realloc(plList-&gt;commands, sizeof(struct command *) * plList-&gt;comspace);</span>
+<span class='curline'><a href='../S/9.html#L90'>command</a>            90 comlist.c      	struct command *pCommand = makecommand((char *)strdup(pszName), (char *)strdup(pszDesc), pfHandler);</span>
+<span class='curline'><a href='../S/9.html#L102'>command</a>           102 comlist.c      struct command *getcommand(struct comlist *list, char *name) {</span>
+<span class='curline'><a href='../S/9.html#L114'>command</a>           114 comlist.c      void foreachcommand(struct comlist *list, void (*comitr)(struct command *)) {</span>
+<span class='curline'><a href='../S/9.html#L123'>command</a>           123 comlist.c      		struct command *com = list-&gt;commands[i];</span>
+<span class='curline'><a href='../S/4.html#L33'>command</a>            33 comlist.h      struct command *getcommand(struct comlist *, char *);</span>
+<span class='curline'><a href='../S/4.html#L36'>command</a>            36 comlist.h      void foreachcommand(struct comlist *, void (*comitr)(struct command *));</span>
+<span class='curline'><a href='../S/48.html#L21'>command</a>            21 command.c      struct command *makecommand(char *pszName, char *pszBrief, comfun_t pfHandler) {</span>
+<span class='curline'><a href='../S/48.html#L23'>command</a>            23 command.c      	struct command *pCommand = malloc(sizeof(struct command));</span>
+<span class='curline'><a href='../S/48.html#L36'>command</a>            36 command.c      void killcommand(struct command *pCommand) {</span>
+<span class='curline'><a href='../S/6.html#L36'>command</a>            36 command.h      static struct command INVALID_COMMAND = {CT_NORMAL, "invalid", "", NULL};</span>
+<span class='curline'><a href='../S/6.html#L48'>command</a>            48 command.h      struct command *makecommand(char *, char *, comfun_t);</span>
+<span class='curline'><a href='../S/6.html#L50'>command</a>            50 command.h      void            killcommand(struct command *);</span>
+<span class='curline'><a href='../S/43.html#L108'>command</a>           108 techos.c       		struct command *com;</span>
+<span class='curline'><a href='../S/43.html#L156'>command</a>           156 techos.c       int execcom(struct command *com, struct cliargs args, char *argline, struct osstate *ostate) {</span>
+<span class='curline'><a href='../S/44.html#L41'>command</a>            41 techos.h       int execcom(struct command *, struct cliargs, char *, struct osstate *);</span>
+</pre>
+</body>
+</html>

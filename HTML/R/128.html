@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<title>osstate</title>
+<meta name='robots' content='noindex,nofollow' />
+<meta name='generator' content='GLOBAL-6.3.1' />
+<meta http-equiv='Content-Style-Type' content='text/css' />
+<link rel='stylesheet' type='text/css' href='../style.css' />
+</head>
+<body>
+<pre>
+<span class='curline'><a href='../S/48.html#L10'>osstate</a>            10 command.c      int checkhelpargs(int argc, char **argv, char *usage, struct osstate *ostate) {</span>
+<span class='curline'><a href='../S/6.html#L7'>osstate</a>             7 command.h      typedef int (*comfun_t)(int, char **, char *, struct osstate *);</span>
+<span class='curline'><a href='../S/6.html#L39'>osstate</a>            39 command.h      #define DECLCOM(name) int handle_##name(int, char **, char *, struct osstate *)</span>
+<span class='curline'><a href='../S/6.html#L42'>osstate</a>            42 command.h      #define HANDLECOM(nam) int handle_##nam(int argc, char **argv, char *argl, struct osstate *ostate)</span>
+<span class='curline'><a href='../S/6.html#L45'>osstate</a>            45 command.h      int checkhelpargs(int, char **, char *, struct osstate *);</span>
+<span class='curline'><a href='../S/49.html#L16'>osstate</a>            16 dispatchcmds.c static int dodispatch(struct osstate *ostate, int verbosity) {</span>
+<span class='curline'><a href='../S/105.html#L25'>osstate</a>            25 osstate.c      struct osstate *makeosstate() {</span>
+<span class='curline'><a href='../S/105.html#L27'>osstate</a>            27 osstate.c      	struct osstate *ostate;</span>
+<span class='curline'><a href='../S/105.html#L32'>osstate</a>            32 osstate.c      	ostate = malloc(sizeof(struct osstate));</span>
+<span class='curline'><a href='../S/105.html#L73'>osstate</a>            73 osstate.c      void killosstate(struct osstate *ostate) {</span>
+<span class='curline'><a href='../S/112.html#L81'>osstate</a>            81 osstate.h      struct osstate *makeosstate();</span>
+<span class='curline'><a href='../S/112.html#L82'>osstate</a>            82 osstate.h      void             killosstate(struct osstate *);</span>
+<span class='curline'><a href='../S/2.html#L379'>osstate</a>           379 pcb.c          	struct osstate *ostate;</span>
+<span class='curline'><a href='../S/2.html#L393'>osstate</a>           393 pcb.c          	ostate = (struct osstate *)(pvState);</span>
+<span class='curline'><a href='../S/43.html#L30'>osstate</a>            30 techos.c       	struct osstate *ostate;</span>
+<span class='curline'><a href='../S/43.html#L57'>osstate</a>            57 techos.c       void comhan(struct osstate *ostate) {</span>
+<span class='curline'><a href='../S/43.html#L88'>osstate</a>            88 techos.c       int handleline(struct osstate *ostate, char *line) {</span>
+<span class='curline'><a href='../S/43.html#L156'>osstate</a>           156 techos.c       int execcom(struct command *com, struct cliargs args, char *argline, struct osstate *ostate) {</span>
+<span class='curline'><a href='../S/43.html#L172'>osstate</a>           172 techos.c       void loginuser(struct osstate *ostate) {</span>
+<span class='curline'><a href='../S/44.html#L26'>osstate</a>            26 techos.h       void comhan(struct osstate *);</span>
+<span class='curline'><a href='../S/44.html#L34'>osstate</a>            34 techos.h       int handleline(struct osstate *, char *);</span>
+<span class='curline'><a href='../S/44.html#L41'>osstate</a>            41 techos.h       int execcom(struct command *, struct cliargs, char *, struct osstate *);</span>
+<span class='curline'><a href='../S/44.html#L44'>osstate</a>            44 techos.h       void loginuser(struct osstate *);</span>
+</pre>
+</body>
+</html>

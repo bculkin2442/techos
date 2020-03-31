@@ -470,9 +470,15 @@ struct listitrdata {
 };
 
 static void dointernlistitr(const char *pszName, internkey kKey, void *pvData) {
+	void *pvItem;
+
 	struct listitrdata *pData = (struct listitrdata *)pvData;
 
-	pData->pfFunc((char *)pszName, getinternlist(pData->plList, (char *)pszName), pData->pvData);
+	pvItem = getinternlist(pData->plList, (char *)pszName);
+
+	if(pvItem != NULL) {
+		pData->pfFunc((char *)pszName, pvItem, pData->pvData);
+	}
 }
 
 void foreachinternlist(struct internlist *plList, internlistitr pfFunc, void *pvData) {

@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<title>users.c</title>
+<meta name='robots' content='noindex,nofollow' />
+<meta name='generator' content='GLOBAL-6.3.1' />
+<meta http-equiv='Content-Style-Type' content='text/css' />
+<link rel='stylesheet' type='text/css' href='../style.css' />
+</head>
+<body>
+<a id='TOP' name='TOP'></a><h2 class='header'><a href='../mains.html'>root</a>/users.c</h2>
+<em class='comment'>/* [&lt;][&gt;]<a href='#L9'>[^]</a><a href='#L157'>[v]</a>[top]<a href='#BOTTOM'>[bottom]</a><a href='../mains.html'>[index]</a><a href='../help.html'>[help]</a> */</em>
+<hr />
+<h2 class='header'>DEFINITIONS</h2>
+This source file includes following definitions.
+<ol>
+<li><a href='#L9' title='Defined at 9.'>killuser</a></li>
+<li><a href='#L26' title='Defined at 26.'>makeudb</a></li>
+<li><a href='#L40' title='Defined at 40.'>killudb</a></li>
+<li><a href='#L48' title='Defined at 48.'>udblookup</a></li>
+<li><a href='#L52' title='Defined at 52.'>udbinsert</a></li>
+<li><a href='#L64' title='Defined at 64.'>udbremove</a></li>
+<li><a href='#L69' title='Defined at 69.'>ramfileintodb</a></li>
+<li><a href='#L124' title='Defined at 124.'>offloaduser</a></li>
+<li><a href='#L157' title='Defined at 157.'>ramdbintofile</a></li>
+</ol>
+<hr />
+<pre>
+<a id='L1' name='L1'></a>   1 <em class='sharp'>#include</em> &lt;assert.h&gt;
+<a id='L2' name='L2'></a>   2 <em class='sharp'>#include</em> &lt;stdlib.h&gt;
+<a id='L3' name='L3'></a>   3 <em class='sharp'>#include</em> &lt;stdio.h&gt;
+<a id='L4' name='L4'></a>   4 
+<a id='L5' name='L5'></a>   5 <em class='sharp'>#include</em> "<a href='98.html'>libs/intern.h</a>"
+<a id='L6' name='L6'></a>   6 
+<a id='L7' name='L7'></a>   7 <em class='sharp'>#include</em> "<a href='3.html'>users.h</a>"
+<a id='L8' name='L8'></a>   8 
+<a id='L9' name='L9'></a>   9 <strong class='reserved'>static</strong> <strong class='reserved'>void</strong> <a href='../S/10.html#L33' title='Referred from 33 in users.c.'>killuser</a>(<strong class='reserved'>void</strong> *pvUser) <em class='brace'>{</em>
+<a id='L10' name='L10'></a>  10         <strong class='reserved'>struct</strong> <a href='../S/3.html#L28' title='Defined at 28 in users.h.'>user</a> *puUser = (<strong class='reserved'>struct</strong> <a href='../S/3.html#L28' title='Defined at 28 in users.h.'>user</a> *)pvUser;
+<a id='L11' name='L11'></a>  11 
+<a id='L12' name='L12'></a>  12         <strong class='reserved'>if</strong>(pvUser == NULL) <em class='brace'>{</em>
+<a id='L13' name='L13'></a>  13                 <strong class='reserved'>return</strong>;
+<a id='L14' name='L14'></a>  14         <em class='brace'>}</em>
+<a id='L15' name='L15'></a>  15 
+<a id='L16' name='L16'></a>  16         free(puUser-&gt;pszName);
+<a id='L17' name='L17'></a>  17         free(puUser-&gt;pszPass);
+<a id='L18' name='L18'></a>  18 
+<a id='L19' name='L19'></a>  19         free(puUser);
+<a id='L20' name='L20'></a>  20 <em class='brace'>}</em>
+<a id='L21' name='L21'></a>  21 
+<a id='L22' name='L22'></a>  22 <strong class='reserved'>struct</strong> <a href='../R/158.html' title='Multiple referred from 17 places.'>userdb</a> <em class='brace'>{</em>
+<a id='L23' name='L23'></a>  23         <strong class='reserved'>struct</strong> <a href='../S/101.html#L339' title='Defined at 339 in libs/intern.c.'>internlist</a> *plUsers;
+<a id='L24' name='L24'></a>  24 <em class='brace'>}</em>;
+<a id='L25' name='L25'></a>  25 
+<a id='L26' name='L26'></a>  26 <strong class='reserved'>struct</strong> <a href='../S/10.html#L22' title='Defined at 22 in users.c.'>userdb</a> *<a href='../R/126.html' title='Multiple referred from 2 places.'>makeudb</a>() <em class='brace'>{</em>
+<a id='L27' name='L27'></a>  27         <em class='comment'>/* Allocate memory for the DB. */</em>
+<a id='L28' name='L28'></a>  28         <strong class='reserved'>struct</strong> <a href='../S/10.html#L22' title='Defined at 22 in users.c.'>userdb</a>  *pdDB = malloc(<strong class='reserved'>sizeof</strong>(<strong class='reserved'>struct</strong> <a href='../S/10.html#L22' title='Defined at 22 in users.c.'>userdb</a>));
+<a id='L29' name='L29'></a>  29         <em class='comment'>/* Fail if allocation did. */</em>
+<a id='L30' name='L30'></a>  30         assert(pdDB != NULL);
+<a id='L31' name='L31'></a>  31 
+<a id='L32' name='L32'></a>  32         <em class='comment'>/* Allocate memory for the user list. */</em>
+<a id='L33' name='L33'></a>  33         pdDB-&gt;plUsers = <a href='../S/101.html#L360' title='Defined at 360 in libs/intern.c.'>makeinternlist</a>(5, &amp;<a href='../S/10.html#L9' title='Defined at 9 in users.c.'>killuser</a>);
+<a id='L34' name='L34'></a>  34         <em class='comment'>/* Fail if allocation did. */</em>
+<a id='L35' name='L35'></a>  35         assert(pdDB-&gt;plUsers != NULL);
+<a id='L36' name='L36'></a>  36 
+<a id='L37' name='L37'></a>  37         <strong class='reserved'>return</strong> pdDB;
+<a id='L38' name='L38'></a>  38 <em class='brace'>}</em>
+<a id='L39' name='L39'></a>  39 
+<a id='L40' name='L40'></a>  40 <strong class='reserved'>void</strong> <a href='../R/110.html' title='Multiple referred from 2 places.'>killudb</a>(<strong class='reserved'>struct</strong> <a href='../S/10.html#L22' title='Defined at 22 in users.c.'>userdb</a> *pdDB) <em class='brace'>{</em>
+<a id='L41' name='L41'></a>  41         <strong class='reserved'>int</strong> i;
+<a id='L42' name='L42'></a>  42 
+<a id='L43' name='L43'></a>  43         <a href='../S/101.html#L381' title='Defined at 381 in libs/intern.c.'>killinternlist</a>(pdDB-&gt;plUsers);
+<a id='L44' name='L44'></a>  44 
+<a id='L45' name='L45'></a>  45         free(pdDB);
+<a id='L46' name='L46'></a>  46 <em class='brace'>}</em>
+<a id='L47' name='L47'></a>  47 
+<a id='L48' name='L48'></a>  48 <strong class='reserved'>struct</strong> <a href='../S/3.html#L28' title='Defined at 28 in users.h.'>user</a> *<a href='../R/155.html' title='Multiple referred from 6 places.'>udblookup</a>(<strong class='reserved'>struct</strong> <a href='../S/10.html#L22' title='Defined at 22 in users.c.'>userdb</a> *pdDB, <strong class='reserved'>char</strong> *pszUsername) <em class='brace'>{</em>
+<a id='L49' name='L49'></a>  49         <strong class='reserved'>return</strong> (<strong class='reserved'>struct</strong> <a href='../S/3.html#L28' title='Defined at 28 in users.h.'>user</a> *)<a href='../S/101.html#L425' title='Defined at 425 in libs/intern.c.'>getinternlist</a>(pdDB-&gt;plUsers, pszUsername);
+<a id='L50' name='L50'></a>  50 <em class='brace'>}</em>
+<a id='L51' name='L51'></a>  51 
+<a id='L52' name='L52'></a>  52 <strong class='reserved'>void</strong> <a href='../R/154.html' title='Multiple referred from 3 places.'>udbinsert</a>(<strong class='reserved'>struct</strong> <a href='../S/10.html#L22' title='Defined at 22 in users.c.'>userdb</a> *pdDB, <strong class='reserved'>enum</strong> <a href='../S/3.html#L5' title='Defined at 5 in users.h.'>utype</a> type, <strong class='reserved'>char</strong> *pszUsername, <strong class='reserved'>char</strong> *pszPassword) <em class='brace'>{</em>
+<a id='L53' name='L53'></a>  53         <strong class='reserved'>struct</strong> <a href='../S/3.html#L28' title='Defined at 28 in users.h.'>user</a> *puUser = malloc(<strong class='reserved'>sizeof</strong>(<strong class='reserved'>struct</strong> <a href='../S/3.html#L28' title='Defined at 28 in users.h.'>user</a>));
+<a id='L54' name='L54'></a>  54         assert(puUser != NULL);
+<a id='L55' name='L55'></a>  55 
+<a id='L56' name='L56'></a>  56         puUser-&gt;type = type;
+<a id='L57' name='L57'></a>  57 
+<a id='L58' name='L58'></a>  58         puUser-&gt;pszName = (<strong class='reserved'>char</strong> *)strdup(pszUsername);
+<a id='L59' name='L59'></a>  59         puUser-&gt;pszPass = (<strong class='reserved'>char</strong> *)strdup(pszPassword);
+<a id='L60' name='L60'></a>  60 
+<a id='L61' name='L61'></a>  61         <a href='../S/101.html#L396' title='Defined at 396 in libs/intern.c.'>putinternlist</a>(pdDB-&gt;plUsers, pszUsername, puUser);
+<a id='L62' name='L62'></a>  62 <em class='brace'>}</em>
+<a id='L63' name='L63'></a>  63 
+<a id='L64' name='L64'></a>  64 <strong class='reserved'>void</strong> <a href='../R/156.html' title='Multiple referred from 3 places.'>udbremove</a>(<strong class='reserved'>struct</strong> <a href='../S/10.html#L22' title='Defined at 22 in users.c.'>userdb</a> *pdDB, <strong class='reserved'>char</strong> *pszUsername) <em class='brace'>{</em>
+<a id='L65' name='L65'></a>  65         <a href='../S/101.html#L436' title='Defined at 436 in libs/intern.c.'>deleteinternlist</a>(pdDB-&gt;plUsers, pszUsername);
+<a id='L66' name='L66'></a>  66 <em class='brace'>}</em>
+<a id='L67' name='L67'></a>  67 
+<a id='L68' name='L68'></a>  68 <em class='comment'>/* Load user database from a file. */</em>
+<a id='L69' name='L69'></a>  69 <strong class='reserved'>void</strong> <a href='../R/150.html' title='Multiple referred from 2 places.'>ramfileintodb</a>(<strong class='reserved'>struct</strong> <a href='../S/10.html#L22' title='Defined at 22 in users.c.'>userdb</a> *pdDB, <strong class='reserved'>char</strong> *pszFilename) <em class='brace'>{</em>
+<a id='L70' name='L70'></a>  70         FILE *pfFile;
+<a id='L71' name='L71'></a>  71 
+<a id='L72' name='L72'></a>  72         <strong class='reserved'>char</strong> *pszLine;
+<a id='L73' name='L73'></a>  73         size_t  llen;
+<a id='L74' name='L74'></a>  74         size_t lread;
+<a id='L75' name='L75'></a>  75 
+<a id='L76' name='L76'></a>  76         llen = 0;
+<a id='L77' name='L77'></a>  77 
+<a id='L78' name='L78'></a>  78         pfFile = fopen(pszFilename, "r");
+<a id='L79' name='L79'></a>  79         <strong class='reserved'>if</strong>(pfFile == NULL) <em class='brace'>{</em>
+<a id='L80' name='L80'></a>  80                 <strong class='reserved'>return</strong>;
+<a id='L81' name='L81'></a>  81         <em class='brace'>}</em>
+<a id='L82' name='L82'></a>  82 
+<a id='L83' name='L83'></a>  83         <strong class='reserved'>while</strong>((lread = getline(&amp;pszLine, &amp;llen, pfFile)) != -1) <em class='brace'>{</em>
+<a id='L84' name='L84'></a>  84                 <strong class='reserved'>if</strong>(feof(pfFile)) <strong class='reserved'>break</strong>;
+<a id='L85' name='L85'></a>  85                 
+<a id='L86' name='L86'></a>  86                 <strong class='reserved'>char</strong> *pszName, *pszPass, *pszType, *pSave;
+<a id='L87' name='L87'></a>  87                 <strong class='reserved'>enum</strong> <a href='../S/3.html#L5' title='Defined at 5 in users.h.'>utype</a> type;
+<a id='L88' name='L88'></a>  88 
+<a id='L89' name='L89'></a>  89                 pSave = NULL;
+<a id='L90' name='L90'></a>  90 
+<a id='L91' name='L91'></a>  91                 <em class='comment'>/* Read username. */</em>
+<a id='L92' name='L92'></a>  92                 pszName = (<strong class='reserved'>char</strong> *)strtok_r(pszLine, ":", &amp;pSave);
+<a id='L93' name='L93'></a>  93                 <em class='comment'>/* Skip improperly formatted records. */</em>
+<a id='L94' name='L94'></a>  94                 <strong class='reserved'>if</strong>(pszName == NULL) <strong class='reserved'>continue</strong>;
+<a id='L95' name='L95'></a>  95 
+<a id='L96' name='L96'></a>  96                 <em class='comment'>/* Read password. */</em>
+<a id='L97' name='L97'></a>  97                 pszPass = (<strong class='reserved'>char</strong> *)strtok_r(NULL, ":", &amp;pSave);
+<a id='L98' name='L98'></a>  98                 <em class='comment'>/* Skip improperly formatted records. */</em>
+<a id='L99' name='L99'></a>  99                 <strong class='reserved'>if</strong>(pszPass == NULL) <strong class='reserved'>continue</strong>;
+<a id='L100' name='L100'></a> 100 
+<a id='L101' name='L101'></a> 101                 <em class='comment'>/* Read user type. */</em>
+<a id='L102' name='L102'></a> 102                 pszType = (<strong class='reserved'>char</strong> *)strtok_r(NULL, ":", &amp;pSave);
+<a id='L103' name='L103'></a> 103                 <em class='comment'>/* Skip improperly formatted records. */</em>
+<a id='L104' name='L104'></a> 104                 <strong class='reserved'>if</strong>(pszType == NULL) <strong class='reserved'>continue</strong>;
+<a id='L105' name='L105'></a> 105 
+<a id='L106' name='L106'></a> 106                 <em class='comment'>/* Parse user type. */</em>
+<a id='L107' name='L107'></a> 107                 <strong class='reserved'>if</strong>(strncmp("rim", pszType, 3) == 0) <em class='brace'>{</em>
+<a id='L108' name='L108'></a> 108                         type = <a href='../S/3.html#L10' title='Defined at 10 in users.h.'>UTY_BASIC</a>;
+<a id='L109' name='L109'></a> 109                 <em class='brace'>}</em> <strong class='reserved'>else</strong> <strong class='reserved'>if</strong>(strncmp("spoke", pszType, 5) == 0) <em class='brace'>{</em>
+<a id='L110' name='L110'></a> 110                         type = <a href='../S/3.html#L17' title='Defined at 17 in users.h.'>UTY_ADMIN</a>;
+<a id='L111' name='L111'></a> 111                 <em class='brace'>}</em> <strong class='reserved'>else</strong> <strong class='reserved'>if</strong>(strncmp("hub", pszType, 3) == 0) <em class='brace'>{</em>
+<a id='L112' name='L112'></a> 112                         type = <a href='../S/3.html#L24' title='Defined at 24 in users.h.'>UTY_ROOT</a>;
+<a id='L113' name='L113'></a> 113                 <em class='brace'>}</em> <strong class='reserved'>else</strong> <em class='brace'>{</em>
+<a id='L114' name='L114'></a> 114                         <em class='comment'>/* Invalid user type. */</em>
+<a id='L115' name='L115'></a> 115                         <strong class='reserved'>continue</strong>;
+<a id='L116' name='L116'></a> 116                 <em class='brace'>}</em>
+<a id='L117' name='L117'></a> 117 
+<a id='L118' name='L118'></a> 118                 <a href='../S/10.html#L52' title='Defined at 52 in users.c.'>udbinsert</a>(pdDB, type, pszName, pszPass);
+<a id='L119' name='L119'></a> 119         <em class='brace'>}</em>
+<a id='L120' name='L120'></a> 120 
+<a id='L121' name='L121'></a> 121         fclose(pfFile);
+<a id='L122' name='L122'></a> 122 <em class='brace'>}</em>
+<a id='L123' name='L123'></a> 123 
+<a id='L124' name='L124'></a> 124 <strong class='reserved'>void</strong> <a href='../S/10.html#L161' title='Referred from 161 in users.c.'>offloaduser</a>(<strong class='reserved'>char</strong> *pszUsername, <strong class='reserved'>void</strong> *pvUser, <strong class='reserved'>void</strong> *pvData) <em class='brace'>{</em>
+<a id='L125' name='L125'></a> 125         <strong class='reserved'>struct</strong> <a href='../S/3.html#L28' title='Defined at 28 in users.h.'>user</a> *puUser;
+<a id='L126' name='L126'></a> 126 
+<a id='L127' name='L127'></a> 127         FILE *pfOutput;
+<a id='L128' name='L128'></a> 128 
+<a id='L129' name='L129'></a> 129         <strong class='reserved'>char</strong> *pszKind;
+<a id='L130' name='L130'></a> 130 
+<a id='L131' name='L131'></a> 131         puUser   = (<strong class='reserved'>struct</strong> <a href='../S/3.html#L28' title='Defined at 28 in users.h.'>user</a> *)pvUser;
+<a id='L132' name='L132'></a> 132         pfOutput = (FILE *)pvData;
+<a id='L133' name='L133'></a> 133 
+<a id='L134' name='L134'></a> 134         <strong class='reserved'>if</strong>(puUser == NULL) <em class='brace'>{</em>
+<a id='L135' name='L135'></a> 135                 <strong class='reserved'>return</strong>;
+<a id='L136' name='L136'></a> 136         <em class='brace'>}</em>
+<a id='L137' name='L137'></a> 137 
+<a id='L138' name='L138'></a> 138         <strong class='reserved'>switch</strong>(puUser-&gt;type) <em class='brace'>{</em>
+<a id='L139' name='L139'></a> 139         <strong class='reserved'>case</strong> <a href='../S/3.html#L10' title='Defined at 10 in users.h.'>UTY_BASIC</a>:
+<a id='L140' name='L140'></a> 140                 pszKind = "rim";
+<a id='L141' name='L141'></a> 141                 <strong class='reserved'>break</strong>;
+<a id='L142' name='L142'></a> 142         <strong class='reserved'>case</strong> <a href='../S/3.html#L17' title='Defined at 17 in users.h.'>UTY_ADMIN</a>:
+<a id='L143' name='L143'></a> 143                 pszKind = "spoke";
+<a id='L144' name='L144'></a> 144                 <strong class='reserved'>break</strong>;
+<a id='L145' name='L145'></a> 145         <strong class='reserved'>case</strong> <a href='../S/3.html#L24' title='Defined at 24 in users.h.'>UTY_ROOT</a>:
+<a id='L146' name='L146'></a> 146                 pszKind = "hub";
+<a id='L147' name='L147'></a> 147                 <strong class='reserved'>break</strong>;
+<a id='L148' name='L148'></a> 148         <strong class='reserved'>default</strong>:
+<a id='L149' name='L149'></a> 149                 <em class='comment'>/* Shouldn't happen. */</em>
+<a id='L150' name='L150'></a> 150                 assert(0);
+<a id='L151' name='L151'></a> 151         <em class='brace'>}</em>
+<a id='L152' name='L152'></a> 152 
+<a id='L153' name='L153'></a> 153         fprintf(pfOutput, "%s:%s:%s\n", puUser-&gt;pszName, puUser-&gt;pszPass, pszKind);
+<a id='L154' name='L154'></a> 154 <em class='brace'>}</em>
+<a id='L155' name='L155'></a> 155 
+<a id='L156' name='L156'></a> 156 <em class='comment'>/* Save user database to a file. */</em>
+<a id='L157' name='L157'></a> 157 <strong class='reserved'>void</strong> <a href='../R/149.html' title='Multiple referred from 2 places.'>ramdbintofile</a>(<strong class='reserved'>struct</strong> <a href='../S/10.html#L22' title='Defined at 22 in users.c.'>userdb</a> *pdDB, <strong class='reserved'>char</strong> *pszFilename) <em class='brace'>{</em>
+<a id='L158' name='L158'></a> 158         FILE *pfFile = fopen(pszFilename, "w");
+<a id='L159' name='L159'></a> 159         <strong class='reserved'>if</strong>(pfFile == NULL) <strong class='reserved'>return</strong>;
+<a id='L160' name='L160'></a> 160 
+<a id='L161' name='L161'></a> 161         <a href='../S/101.html#L484' title='Defined at 484 in libs/intern.c.'>foreachinternlist</a>(pdDB-&gt;plUsers, &amp;<a href='../S/10.html#L124' title='Defined at 124 in users.c.'>offloaduser</a>, pfFile);
+<a id='L162' name='L162'></a> 162 
+<a id='L163' name='L163'></a> 163         fclose(pfFile);
+<a id='L164' name='L164'></a> 164 <em class='brace'>}</em>
+</pre>
+<hr />
+<a id='BOTTOM' name='BOTTOM'></a>
+<em class='comment'>/* [&lt;][&gt;]<a href='#L9'>[^]</a><a href='#L157'>[v]</a><a href='#TOP'>[top]</a>[bottom]<a href='../mains.html'>[index]</a><a href='../help.html'>[help]</a> */</em>
+</body>
+</html>

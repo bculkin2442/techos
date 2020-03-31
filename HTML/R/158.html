@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<title>userdb</title>
+<meta name='robots' content='noindex,nofollow' />
+<meta name='generator' content='GLOBAL-6.3.1' />
+<meta http-equiv='Content-Style-Type' content='text/css' />
+<link rel='stylesheet' type='text/css' href='../style.css' />
+</head>
+<body>
+<pre>
+<span class='curline'><a href='../S/112.html#L77'>userdb</a>             77 osstate.h      	struct userdb *pdUsers;</span>
+<span class='curline'><a href='../S/10.html#L26'>userdb</a>             26 users.c        struct userdb *makeudb() {</span>
+<span class='curline'><a href='../S/10.html#L28'>userdb</a>             28 users.c        	struct userdb  *pdDB = malloc(sizeof(struct userdb));</span>
+<span class='curline'><a href='../S/10.html#L40'>userdb</a>             40 users.c        void killudb(struct userdb *pdDB) {</span>
+<span class='curline'><a href='../S/10.html#L48'>userdb</a>             48 users.c        struct user *udblookup(struct userdb *pdDB, char *pszUsername) {</span>
+<span class='curline'><a href='../S/10.html#L52'>userdb</a>             52 users.c        void udbinsert(struct userdb *pdDB, enum utype type, char *pszUsername, char *pszPassword) {</span>
+<span class='curline'><a href='../S/10.html#L64'>userdb</a>             64 users.c        void udbremove(struct userdb *pdDB, char *pszUsername) {</span>
+<span class='curline'><a href='../S/10.html#L69'>userdb</a>             69 users.c        void ramfileintodb(struct userdb *pdDB, char *pszFilename) {</span>
+<span class='curline'><a href='../S/10.html#L157'>userdb</a>            157 users.c        void ramdbintofile(struct userdb *pdDB, char *pszFilename) {</span>
+<span class='curline'><a href='../S/3.html#L39'>userdb</a>             39 users.h        struct userdb;</span>
+<span class='curline'><a href='../S/3.html#L42'>userdb</a>             42 users.h        struct userdb *makeudb();</span>
+<span class='curline'><a href='../S/3.html#L44'>userdb</a>             44 users.h        void           killudb(struct userdb *);</span>
+<span class='curline'><a href='../S/3.html#L46'>userdb</a>             46 users.h        void          udbinsert(struct userdb *, enum utype, char *, char *);</span>
+<span class='curline'><a href='../S/3.html#L52'>userdb</a>             52 users.h        struct user *udblookup(struct userdb *, char *);</span>
+<span class='curline'><a href='../S/3.html#L54'>userdb</a>             54 users.h        void         udbremove(struct userdb *, char *);</span>
+<span class='curline'><a href='../S/3.html#L57'>userdb</a>             57 users.h        void ramfileintodb(struct userdb *, char *);</span>
+<span class='curline'><a href='../S/3.html#L59'>userdb</a>             59 users.h        void ramdbintofile(struct userdb *, char *);</span>
+</pre>
+</body>
+</html>

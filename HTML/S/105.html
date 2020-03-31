@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<title>osstate.c</title>
+<meta name='robots' content='noindex,nofollow' />
+<meta name='generator' content='GLOBAL-6.3.1' />
+<meta http-equiv='Content-Style-Type' content='text/css' />
+<link rel='stylesheet' type='text/css' href='../style.css' />
+</head>
+<body>
+<a id='TOP' name='TOP'></a><h2 class='header'><a href='../mains.html'>root</a>/osstate.c</h2>
+<em class='comment'>/* [&lt;][&gt;]<a href='#L25'>[^]</a><a href='#L73'>[v]</a>[top]<a href='#BOTTOM'>[bottom]</a><a href='../mains.html'>[index]</a><a href='../help.html'>[help]</a> */</em>
+<hr />
+<h2 class='header'>DEFINITIONS</h2>
+This source file includes following definitions.
+<ol>
+<li><a href='#L25' title='Defined at 25.'>makeosstate</a></li>
+<li><a href='#L73' title='Defined at 73.'>killosstate</a></li>
+</ol>
+<hr />
+<pre>
+<a id='L1' name='L1'></a>   1 <em class='sharp'>#define</em> _POSIX_C_SOURCE 200810
+<a id='L2' name='L2'></a>   2 
+<a id='L3' name='L3'></a>   3 <em class='sharp'>#include</em> &lt;assert.h&gt;
+<a id='L4' name='L4'></a>   4 <em class='sharp'>#include</em> &lt;fcntl.h&gt;
+<a id='L5' name='L5'></a>   5 <em class='sharp'>#include</em> &lt;stdio.h&gt;
+<a id='L6' name='L6'></a>   6 <em class='sharp'>#include</em> &lt;stdlib.h&gt;
+<a id='L7' name='L7'></a>   7 <em class='sharp'>#include</em> &lt;time.h&gt;
+<a id='L8' name='L8'></a>   8 
+<a id='L9' name='L9'></a>   9 <em class='sharp'>#include</em> &lt;sys/types.h&gt;
+<a id='L10' name='L10'></a>  10 <em class='sharp'>#include</em> &lt;sys/stat.h&gt;
+<a id='L11' name='L11'></a>  11 
+<a id='L12' name='L12'></a>  12 <em class='sharp'>#include</em> "<a href='112.html'>osstate.h</a>"
+<a id='L13' name='L13'></a>  13 
+<a id='L14' name='L14'></a>  14 <em class='sharp'>#include</em> "<a href='104.html'>pcb.h</a>"
+<a id='L15' name='L15'></a>  15 <em class='sharp'>#include</em> "<a href='46.html'>pcbinternals.h</a>"
+<a id='L16' name='L16'></a>  16 
+<a id='L17' name='L17'></a>  17 <em class='sharp'>#include</em> "<a href='89.html'>commandstate.h</a>"
+<a id='L18' name='L18'></a>  18 
+<a id='L19' name='L19'></a>  19 <em class='comment'>/* Set default date formats */</em>
+<a id='L20' name='L20'></a>  20 <strong class='reserved'>char</strong> *defin_datefmt   = "%Y-%m-%d";
+<a id='L21' name='L21'></a>  21 <strong class='reserved'>char</strong> *deftime_datefmt = "%r (%Z)";
+<a id='L22' name='L22'></a>  22 <strong class='reserved'>char</strong> *defout_datefmt  = "%A, %d, %B, %Y";
+<a id='L23' name='L23'></a>  23 
+<a id='L24' name='L24'></a>  24 <em class='comment'>/* Allocate/initialize OS state. */</em>
+<a id='L25' name='L25'></a>  25 <strong class='reserved'>struct</strong> <a href='../S/112.html#L27' title='Defined at 27 in osstate.h.'>osstate</a> *<a href='../R/121.html' title='Multiple referred from 2 places.'>makeosstate</a>() <em class='brace'>{</em>
+<a id='L26' name='L26'></a>  26         <em class='comment'>/* State to return. */</em>
+<a id='L27' name='L27'></a>  27         <strong class='reserved'>struct</strong> <a href='../S/112.html#L27' title='Defined at 27 in osstate.h.'>osstate</a> *ostate;
+<a id='L28' name='L28'></a>  28 
+<a id='L29' name='L29'></a>  29         <em class='comment'>/* Current time. */</em>
+<a id='L30' name='L30'></a>  30         clock_t clocktime;
+<a id='L31' name='L31'></a>  31 
+<a id='L32' name='L32'></a>  32         ostate = malloc(<strong class='reserved'>sizeof</strong>(<strong class='reserved'>struct</strong> <a href='../S/112.html#L27' title='Defined at 27 in osstate.h.'>osstate</a>));
+<a id='L33' name='L33'></a>  33         assert(ostate != NULL);
+<a id='L34' name='L34'></a>  34 
+<a id='L35' name='L35'></a>  35         <em class='comment'>/* Set up default formats for date I/O. */</em>
+<a id='L36' name='L36'></a>  36         ostate-&gt;in_datefmt   = malloc(<a href='../S/112.html#L10' title='Defined at 10 in osstate.h.'>MAX_FMT_SIZE</a>);
+<a id='L37' name='L37'></a>  37         ostate-&gt;out_datefmt  = malloc(<a href='../S/112.html#L10' title='Defined at 10 in osstate.h.'>MAX_FMT_SIZE</a>);
+<a id='L38' name='L38'></a>  38         ostate-&gt;time_datefmt = malloc(<a href='../S/112.html#L10' title='Defined at 10 in osstate.h.'>MAX_FMT_SIZE</a>);
+<a id='L39' name='L39'></a>  39         <em class='comment'>/* Fail if a memory allocation failed. */</em>
+<a id='L40' name='L40'></a>  40         assert(ostate-&gt;in_datefmt != NULL);
+<a id='L41' name='L41'></a>  41         assert(ostate-&gt;out_datefmt != NULL);
+<a id='L42' name='L42'></a>  42         assert(ostate-&gt;time_datefmt != NULL);
+<a id='L43' name='L43'></a>  43 
+<a id='L44' name='L44'></a>  44         <em class='comment'>/* Set them to their default values. */</em>
+<a id='L45' name='L45'></a>  45         sprintf(ostate-&gt;in_datefmt,   "%.256s", defin_datefmt);
+<a id='L46' name='L46'></a>  46         sprintf(ostate-&gt;time_datefmt, "%.256s", deftime_datefmt);
+<a id='L47' name='L47'></a>  47         sprintf(ostate-&gt;out_datefmt,  "%.256s", defout_datefmt);
+<a id='L48' name='L48'></a>  48 
+<a id='L49' name='L49'></a>  49         <em class='comment'>/* Get current date/time. */</em>
+<a id='L50' name='L50'></a>  50         clocktime = time(NULL);
+<a id='L51' name='L51'></a>  51         ostate-&gt;datetime = localtime(&amp;clocktime);
+<a id='L52' name='L52'></a>  52 
+<a id='L53' name='L53'></a>  53         <em class='comment'>/* Setup PCB state. */</em>
+<a id='L54' name='L54'></a>  54         ostate-&gt;pPCBstat = <a href='../S/7.html#L205' title='Defined at 205 in pcbinternals.c.'>makepcbstate</a>();
+<a id='L55' name='L55'></a>  55 
+<a id='L56' name='L56'></a>  56         <em class='comment'>/* Setup command state. */</em>
+<a id='L57' name='L57'></a>  57         ostate-&gt;pComstate = <a href='../S/92.html#L7' title='Defined at 7 in commandstate.c.'>makecommandstate</a>();
+<a id='L58' name='L58'></a>  58 
+<a id='L59' name='L59'></a>  59         <em class='comment'>/* Setup working directory. */</em>
+<a id='L60' name='L60'></a>  60         ostate-&gt;fWorkingDir = open("tree", O_RDONLY);
+<a id='L61' name='L61'></a>  61         <strong class='reserved'>if</strong>(ostate-&gt;fWorkingDir == -1) <em class='brace'>{</em>
+<a id='L62' name='L62'></a>  62                 assert(0);
+<a id='L63' name='L63'></a>  63         <em class='brace'>}</em>
+<a id='L64' name='L64'></a>  64 
+<a id='L65' name='L65'></a>  65         <em class='comment'>/* Load user database. */</em>
+<a id='L66' name='L66'></a>  66         ostate-&gt;pdUsers = <a href='../S/10.html#L26' title='Defined at 26 in users.c.'>makeudb</a>();
+<a id='L67' name='L67'></a>  67         <a href='../S/10.html#L69' title='Defined at 69 in users.c.'>ramfileintodb</a>(ostate-&gt;pdUsers, "users.txt");
+<a id='L68' name='L68'></a>  68 
+<a id='L69' name='L69'></a>  69         <strong class='reserved'>return</strong> ostate;
+<a id='L70' name='L70'></a>  70 <em class='brace'>}</em>
+<a id='L71' name='L71'></a>  71 
+<a id='L72' name='L72'></a>  72 <em class='comment'>/* Free/destroy OS state. */</em>
+<a id='L73' name='L73'></a>  73 <strong class='reserved'>void</strong> <a href='../R/106.html' title='Multiple referred from 2 places.'>killosstate</a>(<strong class='reserved'>struct</strong> <a href='../S/112.html#L27' title='Defined at 27 in osstate.h.'>osstate</a> *ostate) <em class='brace'>{</em>
+<a id='L74' name='L74'></a>  74         <em class='comment'>/* Save user changes and free DB. */</em>
+<a id='L75' name='L75'></a>  75         <a href='../S/10.html#L157' title='Defined at 157 in users.c.'>ramdbintofile</a>(ostate-&gt;pdUsers, "users.txt");
+<a id='L76' name='L76'></a>  76         <a href='../S/10.html#L40' title='Defined at 40 in users.c.'>killudb</a>(ostate-&gt;pdUsers);
+<a id='L77' name='L77'></a>  77 
+<a id='L78' name='L78'></a>  78         <em class='comment'>/* Close working directory. */</em>
+<a id='L79' name='L79'></a>  79         close(ostate-&gt;fWorkingDir);
+<a id='L80' name='L80'></a>  80 
+<a id='L81' name='L81'></a>  81         <em class='comment'>/* Free command state. */</em>
+<a id='L82' name='L82'></a>  82         <a href='../S/92.html#L16' title='Defined at 16 in commandstate.c.'>killcommandstate</a>(ostate-&gt;pComstate);
+<a id='L83' name='L83'></a>  83 
+<a id='L84' name='L84'></a>  84         <em class='comment'>/* Free PCB state. */</em>
+<a id='L85' name='L85'></a>  85         <a href='../S/7.html#L227' title='Defined at 227 in pcbinternals.c.'>killpcbstate</a>(ostate-&gt;pPCBstat);
+<a id='L86' name='L86'></a>  86 
+<a id='L87' name='L87'></a>  87         <em class='comment'>/* Free date/time vars. */</em>
+<a id='L88' name='L88'></a>  88         free(ostate-&gt;in_datefmt);
+<a id='L89' name='L89'></a>  89         free(ostate-&gt;time_datefmt);
+<a id='L90' name='L90'></a>  90         free(ostate-&gt;out_datefmt);
+<a id='L91' name='L91'></a>  91 
+<a id='L92' name='L92'></a>  92         <em class='comment'>/* Free state. */</em>
+<a id='L93' name='L93'></a>  93         free(ostate);
+<a id='L94' name='L94'></a>  94 <em class='brace'>}</em>
+</pre>
+<hr />
+<a id='BOTTOM' name='BOTTOM'></a>
+<em class='comment'>/* [&lt;][&gt;]<a href='#L25'>[^]</a><a href='#L73'>[v]</a><a href='#TOP'>[top]</a>[bottom]<a href='../mains.html'>[index]</a><a href='../help.html'>[help]</a> */</em>
+</body>
+</html>

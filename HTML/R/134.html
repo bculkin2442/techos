@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<title>pcbqueue</title>
+<meta name='robots' content='noindex,nofollow' />
+<meta name='generator' content='GLOBAL-6.3.1' />
+<meta http-equiv='Content-Style-Type' content='text/css' />
+<link rel='stylesheet' type='text/css' href='../style.css' />
+</head>
+<body>
+<pre>
+<span class='curline'><a href='../S/2.html#L54'>pcbqueue</a>           54 pcb.c          static struct pcb *queuefindpcbnum(struct pcbqueue *pqQueue, int pcbnum) {</span>
+<span class='curline'><a href='../S/2.html#L103'>pcbqueue</a>          103 pcb.c          static struct pcb *queuefindpcbname(struct pcbqueue *pqQueue, int kPCBName) {</span>
+<span class='curline'><a href='../S/2.html#L198'>pcbqueue</a>          198 pcb.c          static int fillqueue(struct pcbqueue *pqQueue, struct pcb *pPCB) {</span>
+<span class='curline'><a href='../S/2.html#L211'>pcbqueue</a>          211 pcb.c          static void fifoinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {</span>
+<span class='curline'><a href='../S/2.html#L236'>pcbqueue</a>          236 pcb.c          static void filoinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {</span>
+<span class='curline'><a href='../S/2.html#L251'>pcbqueue</a>          251 pcb.c          static void priorinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {</span>
+<span class='curline'><a href='../S/2.html#L265'>pcbqueue</a>          265 pcb.c          void doinsertpcb(struct pcbqueue *pqQueue, struct pcb *pPCB) {</span>
+<span class='curline'><a href='../S/2.html#L281'>pcbqueue</a>          281 pcb.c          	struct pcbqueue *pqReady;</span>
+<span class='curline'><a href='../S/2.html#L282'>pcbqueue</a>          282 pcb.c          	struct pcbqueue *pqBlocked;</span>
+<span class='curline'><a href='../S/2.html#L323'>pcbqueue</a>          323 pcb.c          	struct pcbqueue *pqQueue;</span>
+<span class='curline'><a href='../S/104.html#L74'>pcbqueue</a>           74 pcb.h          struct pcbqueue;</span>
+<span class='curline'><a href='../S/7.html#L8'>pcbqueue</a>            8 pcbinternals.c struct pcbqueue *makepcbqueue() {</span>
+<span class='curline'><a href='../S/7.html#L13'>pcbqueue</a>           13 pcbinternals.c struct pcbqueue *maketypedpcbqueue(enum queuetype type) {</span>
+<span class='curline'><a href='../S/7.html#L18'>pcbqueue</a>           18 pcbinternals.c 			struct pcbqueue *pqQueue = malloc(sizeof(struct pcbqueue));</span>
+<span class='curline'><a href='../S/7.html#L42'>pcbqueue</a>           42 pcbinternals.c 			pqrQueue-&gt;apqQueues = calloc(PCB_MAXPRIOR + 1, sizeof(struct pcbqueue));</span>
+<span class='curline'><a href='../S/7.html#L49'>pcbqueue</a>           49 pcbinternals.c 			return (struct pcbqueue *)pqrQueue;</span>
+<span class='curline'><a href='../S/7.html#L58'>pcbqueue</a>           58 pcbinternals.c void killpcbqueue(struct pcbqueue *pqQueue) {</span>
+<span class='curline'><a href='../S/7.html#L109'>pcbqueue</a>          109 pcbinternals.c void foreachpcb(struct pcbqueue *pqQueue, void(*pcbitr)(struct pcb *, void *), void *arg) {</span>
+<span class='curline'><a href='../S/7.html#L153'>pcbqueue</a>          153 pcbinternals.c struct pcb *poppcb(struct pcbstate *pState, struct pcbqueue *pqQueue) {</span>
+<span class='curline'><a href='../S/46.html#L53'>pcbqueue</a>           53 pcbinternals.h 	struct pcbqueue **apqQueues; 	</span>
+<span class='curline'><a href='../S/46.html#L67'>pcbqueue</a>           67 pcbinternals.h 	struct pcbqueue *pqReady;</span>
+<span class='curline'><a href='../S/46.html#L69'>pcbqueue</a>           69 pcbinternals.h 	struct pcbqueue *pqBlocked;</span>
+<span class='curline'><a href='../S/46.html#L72'>pcbqueue</a>           72 pcbinternals.h 	struct pcbqueue *pqsReady;</span>
+<span class='curline'><a href='../S/46.html#L74'>pcbqueue</a>           74 pcbinternals.h 	struct pcbqueue *pqsBlocked;</span>
+<span class='curline'><a href='../S/46.html#L78'>pcbqueue</a>           78 pcbinternals.h void foreachpcb(struct pcbqueue *, void (*pcbitr)(struct pcb *, void *), void *);</span>
+<span class='curline'><a href='../S/46.html#L81'>pcbqueue</a>           81 pcbinternals.h struct pcbqueue *makepcbqueue();</span>
+<span class='curline'><a href='../S/46.html#L83'>pcbqueue</a>           83 pcbinternals.h struct pcbqueue *maketypedpcbqueue(enum queuetype);</span>
+<span class='curline'><a href='../S/46.html#L90'>pcbqueue</a>           90 pcbinternals.h void killpcbqueue(struct pcbqueue *);</span>
+<span class='curline'><a href='../S/46.html#L97'>pcbqueue</a>           97 pcbinternals.h struct pcb *poppcb(struct pcbstate *, struct pcbqueue *);</span>
+</pre>
+</body>
+</html>
